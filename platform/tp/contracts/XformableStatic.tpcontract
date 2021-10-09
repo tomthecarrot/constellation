@@ -1,0 +1,20 @@
+apiVersion: 0
+type: Contract
+namespace: Teleportal.Foundation
+name: XformableStatic
+version: 0
+inherit: [
+  <Teleportal.Foundation.ObjectBase 0>
+]
+
+properties:
+  xform:
+    parent: state ObjectHandle = none | ca super
+    x: state (linear) float = 0.0 | readwrite super
+    y: state (linear) float = 0.0 | readwrite super
+    z: state (linear) float = 0.0 | readwrite super
+    rotation: state (linear) TPQuat = <0.0 0.0 0.0 1.0> | readwrite super
+    uniscale: state (linear) float = 1.0 | readwrite super
+
+compiled:
+  FollowParent:

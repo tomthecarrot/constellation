@@ -1,0 +1,47 @@
+apiVersion: 0 
+type: Contract
+namespace: Teleportal.Foundation
+name: ObjectBase
+version: 0
+
+properties:
+  self:
+    name: state TPString = "ObjectBase" | readwrite override
+  time:
+    parent: state ObjectHandle = none | ca super
+    offset:
+      local: state int32 = 0 | ca super
+      parent: state int32 = 0 | ca super
+      scalar: state float = 1.0 | ca super
+  view:
+    type: state uint8 = 0 | ca
+
+compiled:
+  LockObject:
+    lock: bool
+  LockState:
+    property_state_list: TPList<StateHandle>
+  LockChannel:
+    property_channel_list: TPList<ChannelHandle>
+  LockQueue:
+    property_queue_list: TPList<QueueHandle>
+  WriteState:
+    address_handle: StateHandle
+    value: DATATYPES_VALID_STATE
+  WriteChannel:
+    address_handle: ChannelHandle
+    value: DATATYPES_VALID_CHANNEL
+  WriteQueue:
+    address_handle: QueueHandle
+    Value: DATATYPES_VALID_QUEUE
+  ArmChannel:
+    address_handle: ChannelHandle
+    arm: bool
+  RTPreviewEnable:
+    address_handle: ChannelHandle
+    RTPreviewEnable: bool
+  ChangeTime:
+    parent_offset: uint32
+    local_offset: uint32
+    scalar: int32
+    loop: uint32

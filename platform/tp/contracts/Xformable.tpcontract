@@ -1,0 +1,20 @@
+apiVersion: 0
+type: Contract
+namespace: Teleportal.Foundation
+name: Xformable
+version: 0
+inherit: [
+  <Teleportal.Foundation.ObjectBase 0>
+]
+
+properties:
+  xform:
+    parent: state ObjectHandle = none | ca super
+    x: channel (linear) float = 0.0 | readwrite super
+    y: channel (linear) float = 0.0 | readwrite super
+    z: channel (linear) float = 0.0 | readwrite super
+    rotation: channel (linear) TPQuat = <0.0 0.0 0.0 1.0> | readwrite super
+    uniscale: channel (linear) float = 1.0 | readwrite super
+
+compiled:
+  FollowParent:
