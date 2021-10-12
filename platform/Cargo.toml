@@ -13,3 +13,4 @@ crate-type = ["cdylib"]
 [dependencies]
 timer = "0.2.0"
 chrono = "0.4.19"
+lazy_mut = "0.1.0"
