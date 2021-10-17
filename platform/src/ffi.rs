@@ -22,27 +22,28 @@ pub extern "C" fn tp_init() -> TPResultCode {
 }
 
 #[no_mangle]
-pub extern "C" fn tp_property_get_ptr(object_handle: ObjectHandle, property_handle: StateHandle, data_type: DataType, result_ptr: *mut u8) -> TPResultCode {
+pub extern "C" fn tp_property_get_ptr(object_handle: ObjectHandle, property_handle: StateHandle, data_type: DataType, data_addr: *mut usize) -> TPResultCode {
     let mut result_code: TPResultCode = TPResultCode::FailUnknown;
 
     unsafe {
-        let data_value: i8 = TEST_SET.int8; // TEMP
-        let data_ptr = &data_value as *const i8; // TEMP
-        let generic_ptr = data_ptr as *const u8; // TEMP
+        let data_value_ref = &TEST_SET.int8;
+        let data_ptr_raw = data_value_ref as *const i8;
+        *data_addr = data_ptr_raw as usize;
 
-        *result_ptr = *generic_ptr; // MARK[UNSAFE_NEEDED]
-        result_code = TPResultCode::Ok; // MARK[UNSAFE_NEEDED]
+        result_code = TPResultCode::Ok;
     }
     
     result_code
 }
 
 #[no_mangle]
-pub extern "C" fn tp_property_flag() {
-    todo!()
+pub extern "C" fn tp_property_flag() -> TPResultCode {
+    // TODO
+    TPResultCode::NotImplemented
 }
 
 #[no_mangle]
 pub extern "C" fn tp_property_arm(object_handle: ObjectHandle, property_handle: StateHandle, armed: bool) -> TPResultCode {
-    todo!()
+    // TODO
+    TPResultCode::NotImplemented
 }

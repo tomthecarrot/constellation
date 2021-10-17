@@ -5,4 +5,5 @@ pub enum TPResultCode
     FailUnknown,
     DataTypeMismatch,
     InvalidPointer,
+    NotImplemented,
 }
