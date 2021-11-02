@@ -1,15 +1,18 @@
+mod contract;
 mod link;
+mod object;
+mod properties;
 mod realm;
 
 use eyre::{eyre, Result, WrapErr};
-use link::{Link, Session};
-use realm::{Realm, RealmHandle};
+use link::{Link, RealmServerHandle, Session};
+use realm::{Realm, RealmID};
 
 // TODO: Make this an actual channel or something
 
 #[non_exhaustive]
 pub enum Endpoint {
-    Local(RealmHandle),
+    Local(RealmServerHandle),
     Wss(String, u16),
     Tcp(String, u16),
 }
@@ -38,7 +41,7 @@ pub struct RealmClient {
 }
 impl RealmClient {
     fn new(builder: RealmClientBuilder) -> Result<Self> {
-        let local_realm = Realm::new(builder.realm_id);
+        let local_realm = Realm::new(RealmID::new(builder.realm_id));
         let result = match builder.endpoint {
             Endpoint::Local(handle) => {
                 let link = Link::new(handle);
