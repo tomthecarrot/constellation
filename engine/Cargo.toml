@@ -1,5 +1,5 @@
 [package]
-name = "tp_platform"
+name = "tp_engine"
 version = "3.0.0"
 edition = "2021"
 rust-version = "1.56"  # Rust 2021
