@@ -1,15 +1,13 @@
 //! TODO!: This module just has `Link` only use rchannels. We need it to work
 //! across multiple backends instead.
 
-use crate::realm::RealmHandle;
-
 /// Handles communication over the network/process/channel. Multiple
 /// `RealmClient`s can be multiplexed over the `Link`.
 pub struct Link {
-    handle: RealmHandle,
+    handle: RealmServerHandle,
 }
 impl Link {
-    pub fn new(handle: RealmHandle) -> Self {
+    pub fn new(handle: RealmServerHandle) -> Self {
         Link { handle }
     }
 
@@ -26,3 +24,6 @@ impl Link {
 pub struct Session {
     secret: u64, //TODO: Make this use OAuth2 or something
 }
+
+/// The "pipe" over which a `Link` can communicate with a Realm Server
+pub struct RealmServerHandle {}
