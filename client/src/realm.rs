@@ -1,7 +1,6 @@
 use crate::contract::{Contract, ContractID};
+use crate::datastructures::Arena;
 use crate::object::{Object, ObjectID};
-
-use std::collections::{HashMap, HashSet};
 
 pub struct RealmID(String);
 impl RealmID {
@@ -10,17 +9,20 @@ impl RealmID {
     }
 }
 
+/// A Realm holds all the data necessary to describe the state of a particular
+/// virtual space. This includes but is not limited to contracts, objects, and
+/// additional data global to that virtual space.
 pub struct Realm {
     realm_id: RealmID,
-    objects: HashMap<ObjectID, Object>,
-    contracts: HashMap<ContractID, Contract>,
+    objects: Arena<Object>,
+    contracts: Arena<Contract>,
     time: std::time::Duration,
 }
 impl Realm {
     pub fn new(realm_id: RealmID) -> Self {
-        let objects = HashMap::default();
+        let objects = Arena::new();
         let time = std::time::Duration::ZERO;
-        let contracts = HashMap::default();
+        let contracts = Arena::new();
         Self {
             realm_id,
             objects,
@@ -37,11 +39,23 @@ impl Realm {
         self.time
     }
 
-    pub fn iter_objects(&self) -> impl Iterator<Item = &ObjectID> {
-        self.objects.keys()
+    pub fn iter_objects(&self) -> impl Iterator<Item = (ObjectID, &Object)> {
+        self.objects.iter()
     }
 
-    pub fn iter_contracts(&self) -> impl Iterator<Item = &ContractID> {
-        self.contracts.keys()
+    pub fn iter_contracts(&self) -> impl Iterator<Item = (ContractID, &Contract)> {
+        self.contracts.iter()
+    }
+}
+impl core::ops::Index<ObjectID> for Realm {
+    type Output = Object;
+
+    fn index(&self, index: ObjectID) -> &Self::Output {
+        &self.objects[index]
+    }
+}
+impl core::ops::IndexMut<ObjectID> for Realm {
+    fn index_mut(&mut self, index: ObjectID) -> &mut Self::Output {
+        todo!()
     }
 }

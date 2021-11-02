@@ -1,3 +1,5 @@
+use crate::datastructures::arena;
+
 pub struct Contract {}
 
-pub struct ContractID {}
+pub type ContractID = arena::Index<Contract>;

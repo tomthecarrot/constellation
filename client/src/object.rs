@@ -1,4 +1,5 @@
+use crate::datastructures::arena;
+
 pub struct Object {}
 
-#[derive(Clone, Copy, Debug, Hash)]
-pub struct ObjectID {}
+pub type ObjectID = arena::Index<Object>;

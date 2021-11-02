@@ -9,3 +9,4 @@ rust-version = "1.56"  # Rust 2021
 [dependencies]
 rand = "0.8"
 eyre = "0.6"
+generational-arena = "0.2"
