@@ -43,6 +43,22 @@ impl<T> Arena<T> {
     pub fn iter_mut(&mut self) -> IterMut<'_, T> {
         IterMut(self.0.iter_mut())
     }
+
+    pub fn len(&self) -> usize {
+        self.0.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.0.is_empty()
+    }
+
+    pub fn capacity(&self) -> usize {
+        self.0.capacity()
+    }
+
+    pub fn reserve(&mut self, additional_capacity: usize) {
+        self.0.reserve(additional_capacity)
+    }
 }
 impl<T> Default for Arena<T> {
     fn default() -> Self {
@@ -102,6 +118,8 @@ impl<T> From<Index<T>> for generational_arena::Index {
     }
 }
 
+// ---- Iterator implementations ----
+
 #[derive(Clone, Debug)]
 pub struct Iter<'a, T: 'a>(ga::Iter<'a, T>);
 impl<'a, T> Iterator for Iter<'a, T> {
@@ -141,7 +159,7 @@ impl<'a, T> Iterator for IterMut<'a, T> {
     type Item = (Index<T>, &'a mut T);
 
     fn next(&mut self) -> Option<Self::Item> {
-        todo!()
+        self.0.next().map(|(idx, it)| (Index::new(idx), it))
     }
 
     fn size_hint(&self) -> (usize, Option<usize>) {
@@ -159,3 +177,66 @@ impl<'a, T> ExactSizeIterator for IterMut<'a, T> {
     }
 }
 impl<'a, T> FusedIterator for IterMut<'a, T> {}
+
+#[cfg(test)]
+mod test {
+    use super::{ga, Arena, Index};
+
+    #[test]
+    fn test_insert_delete() {
+        let mut arena = Arena::new();
+        assert_eq!(arena.len(), 0);
+        assert!(arena.is_empty());
+        assert!(arena
+            .get(Index::new(ga::Index::from_raw_parts(0, 0)))
+            .is_none());
+        assert_eq!(arena.iter().count(), 0);
+        assert_eq!(arena.iter_mut().count(), 0);
+
+        let a_string = String::from("a");
+        let a = arena.insert(a_string.as_str());
+        let b = arena.insert("b");
+        let c = arena.insert("c");
+
+        assert!(arena.contains(a));
+        assert!(arena.contains(b));
+        assert!(arena.contains(c));
+        assert_eq!(arena[a], "a");
+        assert_eq!(arena[b], "b");
+        assert_eq!(arena[c], "c");
+        assert_eq!(arena.len(), 3);
+        assert!(arena.capacity() >= arena.len());
+        assert_eq!(arena.iter().count(), 3);
+        assert_eq!(arena.iter_mut().count(), 3);
+
+        let b1 = b;
+
+        let removed = arena.remove(b1);
+        assert_eq!(removed, Some("b"));
+        assert!(arena.contains(a));
+        assert!(!arena.contains(b1));
+        assert!(arena.contains(c));
+        assert_eq!(arena[a], "a");
+        assert_eq!(arena.get(b), None);
+        assert_eq!(arena.get(c), Some(&"c"));
+        assert_eq!(arena.len(), 2);
+        assert!(arena.capacity() >= arena.len());
+        assert_eq!(arena.iter().count(), 2);
+        assert_eq!(arena.iter_mut().count(), 2);
+
+        let b2 = arena.insert("b");
+
+        assert!(arena.contains(a));
+        assert!(!arena.contains(b1));
+        assert!(arena.contains(b2));
+        assert!(arena.contains(c));
+        assert_eq!(arena[a], "a");
+        assert_eq!(arena.get(b1), None);
+        assert_eq!(arena[b2], "b");
+        assert_eq!(arena[c], "c");
+        assert_eq!(arena.len(), 3);
+        assert!(arena.capacity() >= arena.len());
+        assert_eq!(arena.iter().count(), 3);
+        assert_eq!(arena.iter_mut().count(), 3);
+    }
+}
