@@ -1,7 +1,8 @@
 use crate::contract::{Contract, ContractID};
-use crate::datastructures::Arena;
 use crate::object::{Object, ObjectID};
 use crate::properties::{Channel, State};
+
+use arena::Arena;
 
 pub struct RealmID(String);
 impl RealmID {
