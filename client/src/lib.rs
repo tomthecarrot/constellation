@@ -1,5 +1,4 @@
 mod contract;
-mod datastructures;
 mod flatb;
 mod link;
 mod object;
