@@ -1,5 +1,3 @@
-use crate::datastructures::arena;
-
 pub struct Object {
     //states: HashMap<String, StateID>,
 }

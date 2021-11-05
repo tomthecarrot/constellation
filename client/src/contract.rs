@@ -1,7 +1,8 @@
-use crate::datastructures::arena;
+use std::collections::HashMap;
 
 pub struct Contract {
-    //states: HashMap<String, StateID>,
+    //state_properties: HashMap<String, StateProperty>,
+//channel_properties: HashMap<String, ChannelProperty>,
 }
 
 pub type ContractID = arena::Index<Contract>;

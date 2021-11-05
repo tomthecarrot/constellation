@@ -1,12 +1,9 @@
 [package]
-name = "tp_client"
-version = "3.0.0"
+name = "arena"
+version = "0.1.0"
 edition = "2021"
-rust-version = "1.56"  # Rust 2021
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-rand = "0.8"
-eyre = "0.6"
-arena = {path = "../datastructures/arena"}
+generational-arena = "0.2"
