@@ -1,8 +1,9 @@
 use crate::contract::{Contract, ContractID};
 use crate::object::{Object, ObjectID};
-use crate::properties::{Channel, State};
-
+use crate::properties::{Channel, ChannelArenaMap, State, StateArenaMap};
 use arena::Arena;
+
+use typemap::TypeMap;
 
 pub struct RealmID(String);
 impl RealmID {
@@ -18,8 +19,8 @@ pub struct Realm {
     realm_id: RealmID,
     objects: Arena<Object>,
     contracts: Arena<Contract>,
-    states: Arena<State>,
-    channels: Arena<Channel>,
+    states: StateArenaMap,     // maps from T to Arena<State<T>>
+    channels: ChannelArenaMap, // maps from T to Arena<Channel<T>>
     time: std::time::Duration,
 }
 impl Realm {
@@ -27,8 +28,8 @@ impl Realm {
         let objects = Arena::new();
         let time = std::time::Duration::ZERO;
         let contracts = Arena::new();
-        let states = Arena::new();
-        let channels = Arena::new();
+        let states = TypeMap::new();
+        let channels = TypeMap::new();
         Self {
             realm_id,
             objects,

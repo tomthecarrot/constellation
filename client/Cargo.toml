@@ -10,3 +10,4 @@ rust-version = "1.56"  # Rust 2021
 rand = "0.8"
 eyre = "0.6"
 arena = {path = "../datastructures/arena"}
+typemap = "0.3"

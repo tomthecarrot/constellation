@@ -1,8 +1,9 @@
 mod channel;
+mod data;
 mod state;
 
-pub use channel::{Channel, ChannelID};
-pub use state::{State, StateID};
+pub use channel::{Channel, ChannelArenaMap, ChannelID};
+pub use state::{State, StateArenaMap, StateID};
 
 /*
 
