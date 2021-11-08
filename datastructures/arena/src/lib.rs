@@ -99,7 +99,7 @@ impl<T> FromIterator<T> for Arena<T> {
 }
 
 /// A type-safe index for [`Arena`]
-#[derive(Clone, Copy, Debug, Eq, PartialEq, PartialOrd, Ord, Hash)]
+#[derive(PartialEq, PartialOrd, Eq, Ord)]
 pub struct Index<T> {
     inner: ga::Index,
     _phantom: PhantomData<T>,
@@ -115,6 +115,29 @@ impl<T> Index<T> {
 impl<T> From<Index<T>> for generational_arena::Index {
     fn from(idx: Index<T>) -> Self {
         idx.inner
+    }
+}
+
+impl<T> Clone for Index<T> {
+    fn clone(&self) -> Self {
+        Self {
+            inner: self.inner.clone(),
+            _phantom: Default::default(),
+        }
+    }
+}
+
+impl<T> Copy for Index<T> {}
+
+impl<T> std::fmt::Debug for Index<T> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_tuple("Index").field(&self.inner).finish()
+    }
+}
+
+impl<T> std::hash::Hash for Index<T> {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.inner.hash(state);
     }
 }
 
