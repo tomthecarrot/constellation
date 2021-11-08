@@ -1,10 +1,12 @@
-use crate::properties::{ChannelName, StateName};
+pub mod properties;
+
+use crate::contract::properties::{ChannelID, StateID};
 
 use std::collections::HashMap;
 
 pub struct Contract {
-    state_names: HashMap<String, StateName>,
-    channel_names: HashMap<String, ChannelName>,
+    state_names: HashMap<String, StateID>,
+    channel_names: HashMap<String, ChannelID>,
 }
 
 impl Contract {
@@ -20,10 +22,10 @@ impl Contract {
     /// let s1 = c.state("path/to/state1").unwrap();
     /// // use s1 on objects
     /// ```
-    pub fn state(&self, name: &str) -> Option<StateName> {
+    pub fn state(&self, name: &str) -> Option<StateID> {
         let n = self.state_names.get(name);
         n.copied()
     }
 }
 
-pub type ContractID = arena::Index<Contract>;
+pub type ContractHandle = arena::Index<Contract>;
