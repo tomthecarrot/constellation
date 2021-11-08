@@ -2,7 +2,6 @@ pub mod contract;
 mod flatb;
 mod link;
 mod object;
-mod properties;
 mod realm;
 
 use eyre::{eyre, Result, WrapErr};
