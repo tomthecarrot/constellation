@@ -1,6 +1,6 @@
-use crate::contract::{Contract, ContractID};
-use crate::object::{Object, ObjectID};
-use crate::properties::{Channel, ChannelArenaMap, State, StateArenaMap};
+use crate::contract::properties::{Channel, ChannelArenaMap, State, StateArenaMap};
+use crate::contract::{Contract, ContractHandle};
+use crate::object::{Object, ObjectHandle};
 use arena::Arena;
 
 use typemap::TypeMap;
@@ -48,23 +48,23 @@ impl Realm {
         self.time
     }
 
-    pub fn iter_objects(&self) -> impl Iterator<Item = (ObjectID, &Object)> {
+    pub fn iter_objects(&self) -> impl Iterator<Item = (ObjectHandle, &Object)> {
         self.objects.iter()
     }
 
-    pub fn iter_contracts(&self) -> impl Iterator<Item = (ContractID, &Contract)> {
+    pub fn iter_contracts(&self) -> impl Iterator<Item = (ContractHandle, &Contract)> {
         self.contracts.iter()
     }
 }
-impl core::ops::Index<ObjectID> for Realm {
+impl core::ops::Index<ObjectHandle> for Realm {
     type Output = Object;
 
-    fn index(&self, index: ObjectID) -> &Self::Output {
+    fn index(&self, index: ObjectHandle) -> &Self::Output {
         &self.objects[index]
     }
 }
-impl core::ops::IndexMut<ObjectID> for Realm {
-    fn index_mut(&mut self, index: ObjectID) -> &mut Self::Output {
+impl core::ops::IndexMut<ObjectHandle> for Realm {
+    fn index_mut(&mut self, index: ObjectHandle) -> &mut Self::Output {
         todo!()
     }
 }
