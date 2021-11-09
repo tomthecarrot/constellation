@@ -9,8 +9,8 @@ pub type StateHandle<T> = arena::Index<State<T>>;
 pub struct State<T: TPData>(T);
 
 /// A `TypeMap` key to access the arena containing `State<T>`s.
-pub struct StateArenaID<T>(PhantomData<T>);
-impl<T: 'static + TPData> typemap::Key for StateArenaID<T> {
+pub struct StateArenaHandle<T>(PhantomData<T>);
+impl<T: 'static + TPData> typemap::Key for StateArenaHandle<T> {
     type Value = arena::Arena<State<T>>;
 }
 
