@@ -1,8 +1,12 @@
-use crate::contract::properties::{Channel, ChannelArenaMap, State, StateArenaMap};
+use crate::contract::properties::{
+    Channel, ChannelArenaHandle, ChannelArenaMap, ChannelHandle, State, StateArenaHandle,
+    StateArenaMap, StateHandle, TPData,
+};
 use crate::contract::{Contract, ContractHandle};
 use crate::object::{Object, ObjectHandle};
 use arena::Arena;
 
+use eyre::{eyre, Result, WrapErr};
 use typemap::TypeMap;
 
 pub struct RealmID(String);
@@ -48,12 +52,50 @@ impl Realm {
         self.time
     }
 
+    // ---- Object and Contract Acessors ----
+
     pub fn iter_objects(&self) -> impl Iterator<Item = (ObjectHandle, &Object)> {
         self.objects.iter()
     }
 
     pub fn iter_contracts(&self) -> impl Iterator<Item = (ContractHandle, &Contract)> {
         self.contracts.iter()
+    }
+
+    pub fn object(&self, obj: ObjectHandle) -> eyre::Result<&Object> {
+        self.objects
+            .get(obj)
+            .ok_or_else(|| eyre!("The given handle doesn't exist in the Arena"))
+    }
+
+    pub fn contract(&self, contract: ContractHandle) -> eyre::Result<&Contract> {
+        self.contracts
+            .get(contract)
+            .ok_or_else(|| eyre!("The given handle doesn't exist in the Arena"))
+    }
+
+    // ---- Property accessors ----
+
+    pub fn state<T: TPData>(&self, state: StateHandle<T>) -> Result<&State<T>> {
+        let arena = self
+            .states
+            .get::<StateArenaHandle<T>>()
+            .ok_or_else(|| eyre!("The given handle doesn't have an associated Arena"))?;
+
+        arena
+            .get(state)
+            .ok_or_else(|| eyre!("The given handle doesn't exist in the Arena"))
+    }
+
+    pub fn channel<T: TPData>(&self, chan: ChannelHandle<T>) -> Result<&Channel<T>> {
+        let arena = self
+            .states
+            .get::<ChannelArenaHandle<T>>()
+            .ok_or_else(|| eyre!("The given handle doesn't have an associated Arena"))?;
+
+        arena
+            .get(chan)
+            .ok_or_else(|| eyre!("The given handle doesn't exist in the Arena"))
     }
 }
 impl core::ops::Index<ObjectHandle> for Realm {
