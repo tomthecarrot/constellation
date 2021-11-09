@@ -20,6 +20,11 @@ pub type StateArenaMap = TypeMap;
 /// a specific object, see [`StateHandle`].
 #[derive(Copy, Clone, Hash, Debug)]
 pub struct StateID {
-    idx: usize, // idx into an object's state properties
+    pub(crate) idx: usize, // idx into an object's state properties
     contract: ContractHandle,
+}
+impl StateID {
+    pub fn contract(&self) -> ContractHandle {
+        self.contract
+    }
 }
