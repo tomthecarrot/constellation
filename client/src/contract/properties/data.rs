@@ -1,5 +1,5 @@
 /// Any data that can be stored in a property implements `TPData`.
-pub trait TPData: private::Sealed {}
+pub trait TPData: Sized + private::Sealed {}
 
 impl TPData for u8 {}
 

@@ -1,6 +1,7 @@
 use core::marker::PhantomData;
 use std::iter::FusedIterator;
 
+pub use generational_arena;
 use generational_arena as ga;
 
 /// A generational arena allocator. Built as a wrapper around
@@ -99,13 +100,13 @@ impl<T> FromIterator<T> for Arena<T> {
 }
 
 /// A type-safe index for [`Arena`]
-#[derive(PartialEq, PartialOrd, Eq, Ord)]
+#[derive(PartialOrd, Ord)]
 pub struct Index<T> {
     inner: ga::Index,
     _phantom: PhantomData<T>,
 }
 impl<T> Index<T> {
-    fn new(idx: ga::Index) -> Self {
+    pub fn new(idx: ga::Index) -> Self {
         Self {
             inner: idx,
             _phantom: PhantomData,
@@ -140,6 +141,14 @@ impl<T> std::hash::Hash for Index<T> {
         self.inner.hash(state);
     }
 }
+
+impl<T> std::cmp::PartialEq for Index<T> {
+    fn eq(&self, other: &Self) -> bool {
+        self.inner == other.inner
+    }
+}
+
+impl<T> std::cmp::Eq for Index<T> {}
 
 // ---- Iterator implementations ----
 
