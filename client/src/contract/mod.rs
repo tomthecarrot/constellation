@@ -11,7 +11,7 @@ pub struct Contract {
 
 impl Contract {
     pub fn new() -> Self {
-        todo!()
+        todo!("Parse from a file")
     }
 
     /// # Examples
@@ -24,6 +24,11 @@ impl Contract {
     /// ```
     pub fn state(&self, name: &str) -> Option<StateID> {
         let n = self.state_names.get(name);
+        n.copied()
+    }
+
+    pub fn channel(&self, name: &str) -> Option<ChannelID> {
+        let n = self.channel_names.get(name);
         n.copied()
     }
 }

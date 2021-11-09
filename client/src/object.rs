@@ -1,4 +1,4 @@
-use crate::contract::properties::{StateHandle, StateID, TPData};
+use crate::contract::properties::{ChannelHandle, ChannelID, StateHandle, StateID, TPData};
 use crate::contract::ContractHandle;
 
 use arena::generational_arena as ga;
@@ -18,7 +18,7 @@ impl Object {
             self.contract,
             "`id` was for a different contract!"
         );
-        let idx = self.states.get(id.idx);
+        let idx = self.states.get(id.idx());
         let idx = if let Some(idx) = idx {
             *idx
         } else {
@@ -29,6 +29,25 @@ impl Object {
             )
         };
         StateHandle::new(idx)
+    }
+
+    pub fn channel<T: TPData>(&self, id: ChannelID) -> ChannelHandle<T> {
+        assert_eq!(
+            id.contract(),
+            self.contract,
+            "`id` was for a different contract!"
+        );
+        let idx = self.channels.get(id.idx());
+        let idx = if let Some(idx) = idx {
+            *idx
+        } else {
+            unreachable!(
+                "Because the `ChannelID` comes from the contract, and we have already
+                verified that the contract matches, it should not be possible for
+                the index to not be valid"
+            )
+        };
+        ChannelHandle::new(idx)
     }
 
     pub fn contract(&self) -> ContractHandle {
