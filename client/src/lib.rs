@@ -1,9 +1,10 @@
+mod action;
 pub mod contract;
+mod engine;
 mod flatb;
 mod link;
 mod object;
 mod realm;
-mod engine;
 
 use eyre::{eyre, Result, WrapErr};
 use link::{Link, RealmServerHandle, Session};
