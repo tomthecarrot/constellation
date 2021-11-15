@@ -1,7 +1,6 @@
 mod action;
 pub mod contract;
 mod engine;
-mod flatb;
 mod link;
 mod object;
 mod realm;
