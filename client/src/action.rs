@@ -22,6 +22,7 @@ pub trait Action {
     fn into_bytes(self) -> Box<[u8]>;
     //fn write_into(&self, buf: &mut impl Write) -> Result<(), std::io::Error>;
 }
+
 pub struct Collaction {
     actions: Vec<Box<dyn Action>>,
 }
@@ -29,4 +30,24 @@ pub struct Collaction {
 pub struct CollactionResult {
     collaction: Collaction,
     was_accepted: bool,
+}
+
+// ---- Action trait impls ----
+
+impl<T: TPData> Action for StateAction<T> {
+    fn into_bytes(self) -> Box<[u8]> {
+        todo!()
+    }
+}
+
+impl<T: TPData> Action for ChannelAction<T> {
+    fn into_bytes(self) -> Box<[u8]> {
+        todo!()
+    }
+}
+
+impl<T: TPData> Action for PropertyAction<T> {
+    fn into_bytes(self) -> Box<[u8]> {
+        todo!()
+    }
 }
