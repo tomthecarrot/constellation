@@ -132,6 +132,9 @@ impl Realm {
             .ok_or_else(|| eyre!("The given handle doesn't exist in the Arena"))
     }
 }
+
+// ---- Index traits ----
+
 impl core::ops::Index<ObjectHandle> for Realm {
     type Output = Object;
 
@@ -141,6 +144,45 @@ impl core::ops::Index<ObjectHandle> for Realm {
 }
 impl core::ops::IndexMut<ObjectHandle> for Realm {
     fn index_mut(&mut self, index: ObjectHandle) -> &mut Self::Output {
-        todo!()
+        &mut self.objects[index]
+    }
+}
+
+impl core::ops::Index<ContractHandle> for Realm {
+    type Output = Contract;
+
+    fn index(&self, index: ContractHandle) -> &Self::Output {
+        &self.contracts[index]
+    }
+}
+impl core::ops::IndexMut<ContractHandle> for Realm {
+    fn index_mut(&mut self, index: ContractHandle) -> &mut Self::Output {
+        &mut self.contracts[index]
+    }
+}
+
+impl<T: TPData> core::ops::Index<StateHandle<T>> for Realm {
+    type Output = State<T>;
+
+    fn index(&self, index: StateHandle<T>) -> &Self::Output {
+        self.state(index).expect("Invalid handle")
+    }
+}
+impl<T: TPData> core::ops::IndexMut<StateHandle<T>> for Realm {
+    fn index_mut(&mut self, index: StateHandle<T>) -> &mut Self::Output {
+        self.state_mut(index).expect("Invalid handle")
+    }
+}
+
+impl<T: TPData> core::ops::Index<ChannelHandle<T>> for Realm {
+    type Output = Channel<T>;
+
+    fn index(&self, index: ChannelHandle<T>) -> &Self::Output {
+        self.channel(index).expect("Invalid handle")
+    }
+}
+impl<T: TPData> core::ops::IndexMut<ChannelHandle<T>> for Realm {
+    fn index_mut(&mut self, index: ChannelHandle<T>) -> &mut Self::Output {
+        self.channel_mut(index).expect("Invalid handle")
     }
 }
