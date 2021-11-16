@@ -68,9 +68,21 @@ impl Realm {
             .ok_or_else(|| eyre!("The given handle doesn't exist in the Arena"))
     }
 
+    pub fn object_mut(&mut self, obj: ObjectHandle) -> eyre::Result<&mut Object> {
+        self.objects
+            .get_mut(obj)
+            .ok_or_else(|| eyre!("The given handle doesn't exist in the Arena"))
+    }
+
     pub fn contract(&self, contract: ContractHandle) -> eyre::Result<&Contract> {
         self.contracts
             .get(contract)
+            .ok_or_else(|| eyre!("The given handle doesn't exist in the Arena"))
+    }
+
+    pub fn contract_mut(&mut self, contract: ContractHandle) -> eyre::Result<&mut Contract> {
+        self.contracts
+            .get_mut(contract)
             .ok_or_else(|| eyre!("The given handle doesn't exist in the Arena"))
     }
 
@@ -87,6 +99,17 @@ impl Realm {
             .ok_or_else(|| eyre!("The given handle doesn't exist in the Arena"))
     }
 
+    pub fn state_mut<T: TPData>(&mut self, state: StateHandle<T>) -> Result<&mut State<T>> {
+        let arena = self
+            .states
+            .get_mut::<StateArenaHandle<T>>()
+            .ok_or_else(|| eyre!("The given handle doesn't have an associated Arena"))?;
+
+        arena
+            .get_mut(state)
+            .ok_or_else(|| eyre!("The given handle doesn't exist in the Arena"))
+    }
+
     pub fn channel<T: TPData>(&self, chan: ChannelHandle<T>) -> Result<&Channel<T>> {
         let arena = self
             .states
@@ -95,6 +118,17 @@ impl Realm {
 
         arena
             .get(chan)
+            .ok_or_else(|| eyre!("The given handle doesn't exist in the Arena"))
+    }
+
+    pub fn channel_mut<T: TPData>(&mut self, chan: ChannelHandle<T>) -> Result<&mut Channel<T>> {
+        let arena = self
+            .states
+            .get_mut::<ChannelArenaHandle<T>>()
+            .ok_or_else(|| eyre!("The given handle doesn't have an associated Arena"))?;
+
+        arena
+            .get_mut(chan)
             .ok_or_else(|| eyre!("The given handle doesn't exist in the Arena"))
     }
 }
