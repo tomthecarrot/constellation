@@ -1,4 +1,5 @@
 mod action;
+mod baseline;
 pub mod contract;
 mod engine;
 mod link;
@@ -22,23 +23,23 @@ pub struct RealmClientBuilder {
     endpoint: Endpoint,
     realm_id: String,
 }
-impl RealmClientBuilder {
+impl<'a> RealmClientBuilder {
     pub fn create(endpoint: Endpoint, realm_id: String) -> Self {
         Self { endpoint, realm_id }
     }
 
-    pub fn build(self) -> Result<RealmClient> {
+    pub fn build(self) -> Result<RealmClient<'a>> {
         RealmClient::new(self)
     }
 }
 
 /// Represents an API client for the realm.
-pub struct RealmClient {
+pub struct RealmClient<'a> {
     session: Session,
     link: Link,
-    local_realm: Realm,
+    local_realm: Realm<'a>,
 }
-impl RealmClient {
+impl<'a> RealmClient<'a> {
     fn new(builder: RealmClientBuilder) -> Result<Self> {
         let local_realm = Realm::new(RealmID::new(builder.realm_id));
         let result = match builder.endpoint {

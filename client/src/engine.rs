@@ -20,12 +20,12 @@ type ApplyResult = Result<CollactionResult, RecvTimeoutError>;
 
 /// The writeable state of the engine. In this state, the realm's data can be
 /// mutated by a single thread.
-pub struct WriteableEngine {
-    realm: Realm,
+pub struct WriteableEngine<'a> {
+    realm: Realm<'a>,
     receiver: Receiver<Collaction>,
 }
-impl WriteableEngine {
-    pub fn new(realm: Realm, queue_capacity: Option<usize>) -> (Self, Sender<Collaction>) {
+impl<'a> WriteableEngine<'a> {
+    pub fn new(realm: Realm<'a>, queue_capacity: Option<usize>) -> (Self, Sender<Collaction>) {
         let (sender, receiver) = if let Some(cap) = queue_capacity {
             crossbeam_channel::bounded(cap)
         } else {
@@ -35,7 +35,7 @@ impl WriteableEngine {
         let this = Self { realm, receiver };
         (this, sender)
     }
-    pub fn into_readable(self) -> ReadableEngine {
+    pub fn into_readable(self) -> ReadableEngine<'a> {
         ReadableEngine {
             realm: self.realm,
             receiver: self.receiver,
@@ -46,7 +46,7 @@ impl WriteableEngine {
         &self.realm
     }
 
-    pub fn realm_mut(&mut self) -> &mut Realm {
+    pub fn realm_mut(&mut self) -> &mut Realm<'a> {
         &mut self.realm
     }
 
@@ -68,16 +68,16 @@ impl WriteableEngine {
 
 /// The readable state of the engine. In this state, the realm's data can be
 /// concurrently read by multiple threads, but will not be mutated.
-pub struct ReadableEngine {
-    realm: Realm,
+pub struct ReadableEngine<'a> {
+    realm: Realm<'a>,
     receiver: Receiver<Collaction>,
 }
-impl ReadableEngine {
+impl<'a> ReadableEngine<'a> {
     pub fn realm(&self) -> &Realm {
         &self.realm
     }
 
-    pub fn into_writeable(self) -> WriteableEngine {
+    pub fn into_writeable(self) -> WriteableEngine<'a> {
         WriteableEngine {
             realm: self.realm,
             receiver: self.receiver,
