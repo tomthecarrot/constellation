@@ -10,6 +10,7 @@ use crate::object::{Object, ObjectHandle};
 use crate::baseline::BaselineGeneric;
 
 use std::time::Duration;
+use std::collections::HashMap;
 
 pub struct RealmID(String);
 impl RealmID {
@@ -26,18 +27,22 @@ pub struct Realm<'a> {
     time: Duration,
     baseline: BaselineGeneric<'a>,
     baseline_fork: BaselineGeneric<'a>,
+    snapshots: HashMap<Duration, BaselineGeneric<'a>>
 }
 impl<'a> Realm<'a> {
     pub fn new(realm_id: RealmID) -> Self {
         let time = &Duration::ZERO;
         let baseline = BaselineGeneric::new(&time);
         let baseline_fork = BaselineGeneric::new(&time);
+        baseline_fork.follow(&baseline);
+        let snapshots = HashMap::new();
 
         Self {
             realm_id,
             time: *time,
             baseline,
-            baseline_fork
+            baseline_fork,
+            snapshots
         }
     }
 
@@ -57,5 +62,13 @@ impl<'a> Realm<'a> {
 
     pub fn baseline_fork(&self) -> &BaselineGeneric {
         &self.baseline_fork
+    }
+
+    // ---- BaselineFork / Snapshot ----
+
+    pub fn take_snapshot(&'a mut self) {
+        let snapshot = BaselineGeneric::new(&self.time);
+        snapshot.follow(&self.baseline_fork);
+        self.snapshots.insert(self.time, snapshot);
     }
 }
