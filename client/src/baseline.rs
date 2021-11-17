@@ -12,9 +12,14 @@ use arena::Arena;
 use typemap::TypeMap;
 use eyre::{eyre, Result, WrapErr};
 
+use std::hash::{Hash, Hasher};
+use std::collections::HashSet;
 use std::time::Duration;
+use rand::Rng;
 
 pub struct BaselineGeneric<'a> {
+    following: Option<&'a BaselineGeneric<'a>>,
+    followers: HashSet<&'a BaselineGeneric<'a>>,
     time: &'a Duration,
     objects: Arena<Object>,
     contracts: Arena<Contract>,
@@ -22,20 +27,68 @@ pub struct BaselineGeneric<'a> {
     channels: ChannelArenaMap, // maps from T to Arena<Channel<T>>
 }
 
+impl<'a> PartialEq for BaselineGeneric<'a> {
+    fn eq(&self, other: &BaselineGeneric) -> bool {
+        return false;
+    }
+}
+impl<'a> Eq for BaselineGeneric<'a> {
+
+}
+impl<'a> Hash for BaselineGeneric<'a> {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        let num: u64 = rand::thread_rng().next_u64();
+        state.write_u64(num);
+    }
+}
+
 impl<'a> BaselineGeneric<'a> {
     pub fn new(time: &'a Duration) -> Self {
+        let following = None;
+        let followers = HashSet::new();
         let objects = Arena::new();
         let contracts = Arena::new();
         let states = TypeMap::new();
         let channels = TypeMap::new();
 
         Self {
+            following,
+            followers,
             time,
             objects,
             contracts,
             states,
             channels
         }
+    }
+
+    pub fn follow(&self, baseline: &BaselineGeneric<'a>) {
+        self.following = Some(baseline);
+        baseline.register_follower(&self);
+    }
+
+    pub fn unfollow(&self) {
+        match self.following {
+            Some(following) => {
+                following.unregister_follower(&self);
+            }
+        }
+    }
+
+    pub fn register_follower(&self, follower: &'a BaselineGeneric<'a>) {
+        self.followers.insert(follower);
+    }
+
+    pub fn unregister_follower(&self, follower: &'a BaselineGeneric<'a>) {
+        self.followers.push(follower);
+    }
+
+    pub fn notify_dirty_state<T: TPData>(&self, state: StateHandle<T>) {
+
+    }
+
+    pub fn notify_dirty_channel<T: TPData>(&self, state: StateHandle<T>) {
+
     }
 
     // ---- Object and Contract Acessors ----
