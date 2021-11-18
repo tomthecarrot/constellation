@@ -1,15 +1,17 @@
 // Teleportal Platform v3
 // Copyright 2021 WiTag Inc. dba Teleportal
 
-use crate::baseline::BaselineGeneric;
+use crate::baseline::{BaselineGeneric, BaselineGenericHandle};
 use crate::contract::properties::{
     Channel, ChannelArenaHandle, ChannelArenaMap, ChannelHandle, State, StateArenaHandle,
     StateArenaMap, StateHandle, TPData,
 };
 use crate::contract::{Contract, ContractHandle};
 use crate::object::{Object, ObjectHandle};
+use crate::snapshot::{Snapshot, SnapshotHandle};
 
-use std::collections::HashMap;
+use arena::Arena;
+
 use std::time::Duration;
 
 pub struct RealmID(String);
@@ -25,24 +27,34 @@ impl RealmID {
 pub struct Realm {
     realm_id: RealmID,
     time: Duration,
-    baseline: BaselineGeneric,
-    baseline_fork: BaselineGeneric,
-    snapshots: HashMap<Duration, BaselineGeneric>,
+    snapshots: Arena<Snapshot>,
+    baselines_generic: Arena<BaselineGeneric>,
+    baseline: BaselineGenericHandle,
+    baseline_fork: BaselineGenericHandle,
 }
 impl Realm {
     pub fn new(realm_id: RealmID) -> Self {
-        let time = &Duration::ZERO;
+        let time = Duration::ZERO;
+        let snapshots = Arena::new();
+        let baselines_generic = Arena::new();
+
         let baseline = BaselineGeneric::new(&time);
         let baseline_fork = BaselineGeneric::new(&time);
-        baseline_fork.follow(&baseline);
-        let snapshots = HashMap::new();
+
+        let baseline_handle = baselines_generic.insert(baseline);
+        let baseline_fork_handle = baselines_generic.insert(baseline_fork);
+        baseline.set_handle(baseline_handle);
+        baseline_fork.set_handle(baseline_fork_handle);
+
+        baseline_fork.follow(baseline_handle);
 
         Self {
-            realm_id,
-            time: *time,
-            baseline,
-            baseline_fork,
-            snapshots,
+            realm_id: realm_id,
+            time: time,
+            snapshots: snapshots,
+            baselines_generic: baselines_generic,
+            baseline: baseline_handle,
+            baseline_fork: baseline_fork_handle,
         }
     }
 
@@ -56,19 +68,30 @@ impl Realm {
 
     // ---- Baseline Accessors ----
 
-    pub fn baseline(&self) -> &BaselineGeneric {
-        &self.baseline
+    pub fn baseline(&self) -> BaselineGenericHandle {
+        self.baseline
     }
 
-    pub fn baseline_fork(&self) -> &BaselineGeneric {
-        &self.baseline_fork
+    pub fn baseline_fork(&self) -> BaselineGenericHandle {
+        self.baseline_fork
     }
 
     // ---- BaselineFork / Snapshot ----
 
-    pub fn take_snapshot(&mut self) {
-        let snapshot = BaselineGeneric::new(&self.time);
-        snapshot.follow(&self.baseline_fork);
-        self.snapshots.insert(self.time, snapshot);
+    pub fn take_snapshot(&self) -> SnapshotHandle {
+        let snapshot_baseline = BaselineGeneric::new(&self.time);
+        snapshot_baseline.follow(self.baseline_fork);
+
+        let snapshot_baseline_handle = self.baselines_generic.insert(snapshot_baseline);
+        snapshot_baseline.set_handle(snapshot_baseline_handle);
+
+        let snapshot = Snapshot::new(self.time, snapshot_baseline_handle);
+        let snapshot_handle = self.snapshots.insert(snapshot);
+
+        snapshot_handle
+    }
+
+    pub fn get_snapshot(&self, handle: SnapshotHandle) -> Option<&Snapshot> {
+        self.snapshots.get(handle)
     }
 }
