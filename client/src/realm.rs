@@ -1,16 +1,16 @@
 // Teleportal Platform v3
 // Copyright 2021 WiTag Inc. dba Teleportal
 
+use crate::baseline::BaselineGeneric;
 use crate::contract::properties::{
     Channel, ChannelArenaHandle, ChannelArenaMap, ChannelHandle, State, StateArenaHandle,
     StateArenaMap, StateHandle, TPData,
 };
 use crate::contract::{Contract, ContractHandle};
 use crate::object::{Object, ObjectHandle};
-use crate::baseline::BaselineGeneric;
 
-use std::time::Duration;
 use std::collections::HashMap;
+use std::time::Duration;
 
 pub struct RealmID(String);
 impl RealmID {
@@ -22,14 +22,14 @@ impl RealmID {
 /// A Realm holds all the data necessary to describe the state of a particular
 /// virtual space. This includes but is not limited to contracts, objects, and
 /// additional data global to that virtual space.
-pub struct Realm<'a> {
+pub struct Realm {
     realm_id: RealmID,
     time: Duration,
-    baseline: BaselineGeneric<'a>,
-    baseline_fork: BaselineGeneric<'a>,
-    snapshots: HashMap<Duration, BaselineGeneric<'a>>
+    baseline: BaselineGeneric,
+    baseline_fork: BaselineGeneric,
+    snapshots: HashMap<Duration, BaselineGeneric>,
 }
-impl<'a> Realm<'a> {
+impl Realm {
     pub fn new(realm_id: RealmID) -> Self {
         let time = &Duration::ZERO;
         let baseline = BaselineGeneric::new(&time);
@@ -42,7 +42,7 @@ impl<'a> Realm<'a> {
             time: *time,
             baseline,
             baseline_fork,
-            snapshots
+            snapshots,
         }
     }
 
@@ -66,7 +66,7 @@ impl<'a> Realm<'a> {
 
     // ---- BaselineFork / Snapshot ----
 
-    pub fn take_snapshot(&'a mut self) {
+    pub fn take_snapshot(&mut self) {
         let snapshot = BaselineGeneric::new(&self.time);
         snapshot.follow(&self.baseline_fork);
         self.snapshots.insert(self.time, snapshot);

@@ -9,41 +9,39 @@ use crate::contract::{Contract, ContractHandle};
 use crate::object::{Object, ObjectHandle};
 
 use arena::Arena;
-use typemap::TypeMap;
 use eyre::{eyre, Result, WrapErr};
+use typemap::TypeMap;
 
-use std::hash::{Hash, Hasher};
-use std::collections::HashSet;
-use std::time::Duration;
 use rand::Rng;
+use std::collections::HashSet;
+use std::hash::{Hash, Hasher};
+use std::time::Duration;
 
-pub struct BaselineGeneric<'a> {
-    following: Option<&'a BaselineGeneric<'a>>,
-    followers: HashSet<&'a BaselineGeneric<'a>>,
-    time: &'a Duration,
+pub struct BaselineGeneric {
+    following: Option<&BaselineGeneric>,
+    followers: HashSet<&BaselineGeneric>,
+    time: &Duration,
     objects: Arena<Object>,
     contracts: Arena<Contract>,
     states: StateArenaMap,     // maps from T to Arena<State<T>>
     channels: ChannelArenaMap, // maps from T to Arena<Channel<T>>
 }
 
-impl<'a> PartialEq for BaselineGeneric<'a> {
+impl PartialEq for BaselineGeneric {
     fn eq(&self, other: &BaselineGeneric) -> bool {
         return false;
     }
 }
-impl<'a> Eq for BaselineGeneric<'a> {
-
-}
-impl<'a> Hash for BaselineGeneric<'a> {
+impl Eq for BaselineGeneric {}
+impl Hash for BaselineGeneric {
     fn hash<H: Hasher>(&self, state: &mut H) {
         let num: u64 = rand::thread_rng().next_u64();
         state.write_u64(num);
     }
 }
 
-impl<'a> BaselineGeneric<'a> {
-    pub fn new(time: &'a Duration) -> Self {
+impl BaselineGeneric {
+    pub fn new(time: &Duration) -> Self {
         let following = None;
         let followers = HashSet::new();
         let objects = Arena::new();
@@ -58,11 +56,11 @@ impl<'a> BaselineGeneric<'a> {
             objects,
             contracts,
             states,
-            channels
+            channels,
         }
     }
 
-    pub fn follow(&self, baseline: &BaselineGeneric<'a>) {
+    pub fn follow(&self, baseline: &BaselineGeneric) {
         self.following = Some(baseline);
         baseline.register_follower(&self);
     }
@@ -75,21 +73,17 @@ impl<'a> BaselineGeneric<'a> {
         }
     }
 
-    pub fn register_follower(&self, follower: &'a BaselineGeneric<'a>) {
+    pub fn register_follower(&self, follower: &BaselineGeneric) {
         self.followers.insert(follower);
     }
 
-    pub fn unregister_follower(&self, follower: &'a BaselineGeneric<'a>) {
+    pub fn unregister_follower(&self, follower: &BaselineGeneric) {
         self.followers.push(follower);
     }
 
-    pub fn notify_dirty_state<T: TPData>(&self, state: StateHandle<T>) {
+    pub fn notify_dirty_state<T: TPData>(&self, state: StateHandle<T>) {}
 
-    }
-
-    pub fn notify_dirty_channel<T: TPData>(&self, state: StateHandle<T>) {
-
-    }
+    pub fn notify_dirty_channel<T: TPData>(&self, state: StateHandle<T>) {}
 
     // ---- Object and Contract Acessors ----
 
@@ -174,53 +168,53 @@ impl<'a> BaselineGeneric<'a> {
 
 // ---- Index traits ----
 
-impl<'a> core::ops::Index<ObjectHandle> for BaselineGeneric<'a> {
+impl core::ops::Index<ObjectHandle> for BaselineGeneric {
     type Output = Object;
 
     fn index(&self, index: ObjectHandle) -> &Self::Output {
         &self.objects[index]
     }
 }
-impl<'a> core::ops::IndexMut<ObjectHandle> for BaselineGeneric<'a> {
+impl core::ops::IndexMut<ObjectHandle> for BaselineGeneric {
     fn index_mut(&mut self, index: ObjectHandle) -> &mut Self::Output {
         &mut self.objects[index]
     }
 }
 
-impl<'a> core::ops::Index<ContractHandle> for BaselineGeneric<'a> {
+impl core::ops::Index<ContractHandle> for BaselineGeneric {
     type Output = Contract;
 
     fn index(&self, index: ContractHandle) -> &Self::Output {
         &self.contracts[index]
     }
 }
-impl<'a> core::ops::IndexMut<ContractHandle> for BaselineGeneric<'a> {
+impl core::ops::IndexMut<ContractHandle> for BaselineGeneric {
     fn index_mut(&mut self, index: ContractHandle) -> &mut Self::Output {
         &mut self.contracts[index]
     }
 }
 
-impl<'a, T: TPData> core::ops::Index<StateHandle<T>> for BaselineGeneric<'a> {
+impl<'a, T: TPData> core::ops::Index<StateHandle<T>> for BaselineGeneric {
     type Output = State<T>;
 
     fn index(&self, index: StateHandle<T>) -> &Self::Output {
         self.state(index).expect("Invalid handle")
     }
 }
-impl<'a, T: TPData> core::ops::IndexMut<StateHandle<T>> for BaselineGeneric<'a> {
+impl<'a, T: TPData> core::ops::IndexMut<StateHandle<T>> for BaselineGeneric {
     fn index_mut(&mut self, index: StateHandle<T>) -> &mut Self::Output {
         self.state_mut(index).expect("Invalid handle")
     }
 }
 
-impl<'a, T: TPData> core::ops::Index<ChannelHandle<T>> for BaselineGeneric<'a> {
+impl<'a, T: TPData> core::ops::Index<ChannelHandle<T>> for BaselineGeneric {
     type Output = Channel<T>;
 
     fn index(&self, index: ChannelHandle<T>) -> &Self::Output {
         self.channel(index).expect("Invalid handle")
     }
 }
-impl<'a, T: TPData> core::ops::IndexMut<ChannelHandle<T>> for BaselineGeneric<'a> {
+impl<'a, T: TPData> core::ops::IndexMut<ChannelHandle<T>> for BaselineGeneric {
     fn index_mut(&mut self, index: ChannelHandle<T>) -> &mut Self::Output {
         self.channel_mut(index).expect("Invalid handle")
     }

@@ -23,23 +23,23 @@ pub struct RealmClientBuilder {
     endpoint: Endpoint,
     realm_id: String,
 }
-impl<'a> RealmClientBuilder {
+impl RealmClientBuilder {
     pub fn create(endpoint: Endpoint, realm_id: String) -> Self {
         Self { endpoint, realm_id }
     }
 
-    pub fn build(self) -> Result<RealmClient<'a>> {
+    pub fn build(self) -> Result<RealmClient> {
         RealmClient::new(self)
     }
 }
 
 /// Represents an API client for the realm.
-pub struct RealmClient<'a> {
+pub struct RealmClient {
     session: Session,
     link: Link,
-    local_realm: Realm<'a>,
+    local_realm: Realm,
 }
-impl<'a> RealmClient<'a> {
+impl RealmClient {
     fn new(builder: RealmClientBuilder) -> Result<Self> {
         let local_realm = Realm::new(RealmID::new(builder.realm_id));
         let result = match builder.endpoint {
