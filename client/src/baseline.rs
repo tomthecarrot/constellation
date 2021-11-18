@@ -7,7 +7,6 @@ use crate::contract::properties::{
 };
 use crate::contract::{Contract, ContractHandle};
 use crate::object::{Object, ObjectHandle};
-use crate::realm::Realm;
 
 use arena::Arena;
 use eyre::{eyre, Result, WrapErr};
@@ -20,7 +19,8 @@ pub struct BaselineGeneric {
     handle: Option<BaselineGenericHandle>,
     following: Option<BaselineGenericHandle>,
     followers: HashSet<BaselineGenericHandle>,
-    realm: &Realm,
+    time: &Duration,
+    baselines: &Arena<BaselineGeneric>
     objects: Arena<Object>,
     contracts: Arena<Contract>,
     states: StateArenaMap,     // maps from T to Arena<State<T>>
@@ -28,7 +28,7 @@ pub struct BaselineGeneric {
 }
 
 impl BaselineGeneric {
-    pub fn new(realm: &Duration) -> Self {
+    pub fn new(time: &Duration, baselines: &Arena<BaselineGeneric>) -> Self {
         let handle = None;
         let following = None;
         let followers = HashSet::new();
@@ -41,7 +41,8 @@ impl BaselineGeneric {
             handle,
             following,
             followers,
-            realm,
+            time,
+            baselines,
             objects,
             contracts,
             states,
@@ -53,7 +54,7 @@ impl BaselineGeneric {
         self.handle = Some(handle);
     }
 
-    // ---- Follow registration, called by Baseline owner ----
+    // ---- Follow registration, called by owner of this baseline ----
 
     pub fn follow(&self, baseline: BaselineGenericHandle) {
         self.following = Some(baseline);
@@ -84,6 +85,8 @@ impl BaselineGeneric {
                 )
             }
         }
+
+        self.following = None;
     }
 
     // ---- Follow registration, called by new followers ----
