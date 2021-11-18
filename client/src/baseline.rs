@@ -7,41 +7,29 @@ use crate::contract::properties::{
 };
 use crate::contract::{Contract, ContractHandle};
 use crate::object::{Object, ObjectHandle};
+use crate::realm::Realm;
 
 use arena::Arena;
 use eyre::{eyre, Result, WrapErr};
+use std::collections::HashSet;
 use typemap::TypeMap;
 
-use rand::Rng;
-use std::collections::HashSet;
-use std::hash::{Hash, Hasher};
 use std::time::Duration;
 
 pub struct BaselineGeneric {
-    following: Option<&BaselineGeneric>,
-    followers: HashSet<&BaselineGeneric>,
-    time: &Duration,
+    handle: Option<BaselineGenericHandle>,
+    following: Option<BaselineGenericHandle>,
+    followers: HashSet<BaselineGenericHandle>,
+    realm: &Realm,
     objects: Arena<Object>,
     contracts: Arena<Contract>,
     states: StateArenaMap,     // maps from T to Arena<State<T>>
     channels: ChannelArenaMap, // maps from T to Arena<Channel<T>>
 }
 
-impl PartialEq for BaselineGeneric {
-    fn eq(&self, other: &BaselineGeneric) -> bool {
-        return false;
-    }
-}
-impl Eq for BaselineGeneric {}
-impl Hash for BaselineGeneric {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        let num: u64 = rand::thread_rng().next_u64();
-        state.write_u64(num);
-    }
-}
-
 impl BaselineGeneric {
-    pub fn new(time: &Duration) -> Self {
+    pub fn new(realm: &Duration) -> Self {
+        let handle = None;
         let following = None;
         let followers = HashSet::new();
         let objects = Arena::new();
@@ -50,9 +38,10 @@ impl BaselineGeneric {
         let channels = TypeMap::new();
 
         Self {
+            handle,
             following,
             followers,
-            time,
+            realm,
             objects,
             contracts,
             states,
@@ -60,32 +49,60 @@ impl BaselineGeneric {
         }
     }
 
-    pub fn follow(&self, baseline: &BaselineGeneric) {
-        self.following = Some(baseline);
-        baseline.register_follower(&self);
+    pub fn set_handle(&self, handle: BaselineGenericHandle) {
+        self.handle = Some(handle);
     }
 
-    pub fn unfollow(&self) {
-        match self.following {
-            Some(following) => {
-                following.unregister_follower(&self);
+    // ---- Follow registration, called by Baseline owner ----
+
+    pub fn follow(&self, baseline: BaselineGenericHandle) {
+        self.following = Some(baseline);
+
+        match self.handle {
+            Some(handle) => {
+                baseline.register_follower(handle);
+            }
+            None => {
+                eprintln!("[Baseline] Cannot follow since `self.handle` is None.");
             }
         }
     }
 
-    pub fn register_follower(&self, follower: &BaselineGeneric) {
+    pub fn unfollow(&self) {
+        match self.following {
+            Some(following) => match self.handle {
+                Some(handle) => {
+                    following.unregister_follower(handle);
+                }
+                None => {
+                    eprintln!("[Baseline] Cannot unfollow since `self.handle` is None.");
+                }
+            },
+            None => {
+                eprintln!(
+                    "[Baseline] Cannot unfollow since Baseline is not already following anything."
+                )
+            }
+        }
+    }
+
+    // ---- Follow registration, called by new followers ----
+
+    pub fn register_follower(&self, follower: BaselineGenericHandle) {
         self.followers.insert(follower);
     }
 
-    pub fn unregister_follower(&self, follower: &BaselineGeneric) {
-        self.followers.push(follower);
+    pub fn unregister_follower(&self, follower: BaselineGenericHandle) {
+        self.followers.remove(&follower);
     }
+
+    // ---- Notifications from a parent BaselineGeneric to its followers ----
 
     pub fn notify_dirty_state<T: TPData>(&self, state: StateHandle<T>) {}
 
     pub fn notify_dirty_channel<T: TPData>(&self, state: StateHandle<T>) {}
 
-    // ---- Object and Contract Acessors ----
+    // ---- Object anStateHandled Contract Acessors ----
 
     pub fn iter_objects(&self) -> impl Iterator<Item = (ObjectHandle, &Object)> {
         self.objects.iter()
@@ -219,3 +236,5 @@ impl<'a, T: TPData> core::ops::IndexMut<ChannelHandle<T>> for BaselineGeneric {
         self.channel_mut(index).expect("Invalid handle")
     }
 }
+
+pub type BaselineGenericHandle = arena::Index<BaselineGeneric>;
