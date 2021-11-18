@@ -9,8 +9,6 @@ use eyre::{eyre, Result, WrapErr};
 use link::{Link, RealmServerHandle, Session};
 use realm::{Realm, RealmID};
 
-// TODO: Make this an actual channel or something
-
 #[non_exhaustive]
 pub enum Endpoint {
     Local(RealmServerHandle),
