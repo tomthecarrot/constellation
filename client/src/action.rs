@@ -20,7 +20,7 @@ pub enum PropertyAction<T: TPData> {
 
 pub trait Action {
     fn into_bytes(self) -> Box<[u8]>;
-    //fn write_into(&self, buf: &mut impl Write) -> Result<(), std::io::Error>;
+    // TODO[SER-257]: fn write_into(&self, buf: &mut impl Write) -> Result<(), std::io::Error>;
 }
 
 pub struct Collaction {
