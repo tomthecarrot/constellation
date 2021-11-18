@@ -26,4 +26,5 @@ pub struct Session {
 }
 
 /// The "pipe" over which a `Link` can communicate with a Realm Server
+// TODO: Make this an actual rchannel or something
 pub struct RealmServerHandle {}
