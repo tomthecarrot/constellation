@@ -2,12 +2,6 @@
 // Copyright 2021 WiTag Inc. dba Teleportal
 
 use crate::baseline::{BaselineGeneric, BaselineGenericHandle};
-use crate::contract::properties::{
-    Channel, ChannelArenaHandle, ChannelArenaMap, ChannelHandle, State, StateArenaHandle,
-    StateArenaMap, StateHandle, TPData,
-};
-use crate::contract::{Contract, ContractHandle};
-use crate::object::{Object, ObjectHandle};
 use crate::snapshot::{Snapshot, SnapshotHandle};
 
 use arena::Arena;
@@ -38,8 +32,8 @@ impl Realm {
         let snapshots = Arena::new();
         let baselines_generic = Arena::new();
 
-        let baseline = BaselineGeneric::new(&time);
-        let baseline_fork = BaselineGeneric::new(&time);
+        let baseline = BaselineGeneric::new(&time, &baselines_generic);
+        let baseline_fork = BaselineGeneric::new(&time, &baselines_generic);
 
         let baseline_handle = baselines_generic.insert(baseline);
         let baseline_fork_handle = baselines_generic.insert(baseline_fork);
@@ -79,7 +73,7 @@ impl Realm {
     // ---- BaselineFork / Snapshot ----
 
     pub fn take_snapshot(&self) -> SnapshotHandle {
-        let snapshot_baseline = BaselineGeneric::new(&self.time);
+        let snapshot_baseline = BaselineGeneric::new(&self.time, &self.baselines_generic);
         snapshot_baseline.follow(self.baseline_fork);
 
         let snapshot_baseline_handle = self.baselines_generic.insert(snapshot_baseline);
