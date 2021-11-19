@@ -1,2 +1,2 @@
 [workspace]
-members = ["client", "datastructures/arena"]
+members = ["client", "datastructures/arena", "circle_game"]
