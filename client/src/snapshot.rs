@@ -1,17 +1,17 @@
 // Teleportal Platform v3
 // Copyright 2021 WiTag Inc. dba Teleportal
 
-use crate::baseline::BaselineGenericHandle;
+use crate::baseline::BaselineHandle;
 
 use std::time::Duration;
 
 pub struct Snapshot {
     time: Duration,
-    baseline: BaselineGenericHandle,
+    baseline: BaselineHandle,
 }
 
 impl Snapshot {
-    pub fn new(time: Duration, baseline: BaselineGenericHandle) -> Self {
+    pub fn new(time: Duration, baseline: BaselineHandle) -> Self {
         Self { time, baseline }
     }
 }
