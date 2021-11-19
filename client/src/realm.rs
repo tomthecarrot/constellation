@@ -2,7 +2,6 @@
 // Copyright 2021 WiTag Inc. dba Teleportal
 
 use crate::baseline::{Baseline, BaselineHandle};
-use crate::snapshot::{Snapshot, SnapshotHandle};
 
 use arena::Arena;
 
@@ -21,7 +20,6 @@ impl RealmID {
 pub struct Realm {
     realm_id: RealmID,
     time: Duration,
-    snapshots: Arena<Snapshot>,
     baselines: Arena<Baseline>,
     baseline_main: BaselineHandle,
     baseline_fork: BaselineHandle,
@@ -30,7 +28,6 @@ impl Realm {
     pub fn new(realm_id: RealmID) -> Self {
         // Initialize time and arena allocators.
         let time = Duration::ZERO;
-        let snapshots = Arena::new();
         let mut baselines = Arena::new();
 
         // Create the BaselineMain and BaselineFork.
@@ -42,7 +39,6 @@ impl Realm {
         Self {
             realm_id: realm_id,
             time: time,
-            snapshots: snapshots,
             baselines: baselines,
             baseline_main: baseline_main_handle,
             baseline_fork: baseline_fork_handle,
@@ -97,33 +93,12 @@ impl Realm {
                 if enabled {
                     target.register_follower(follower_handle);
                 } else {
-                    target.unregister_follower(follower_handle);
+                    target.unregister_follower();
                 }
             }
             None => {
                 eprintln!("[Realm] Cannot follow/unfollow: `target` does not exist in baselines.");
             }
         }
-    }
-
-    // ---- BaselineFork / Snapshot ----
-
-    pub fn take_snapshot(&mut self) -> SnapshotHandle {
-        // Create a baseline for this snapshot. Store it in baselines.
-        let snapshot_baseline = Baseline::new();
-        let snapshot_baseline_handle: BaselineHandle = self.baselines.insert(snapshot_baseline);
-
-        // Create a snapshot containing the baseline handle.
-        let snapshot = Snapshot::new(self.time, snapshot_baseline_handle);
-        let snapshot_handle: SnapshotHandle = self.snapshots.insert(snapshot);
-
-        // Connect this snapshot to the current baseline fork.
-        self.baseline_follow(true, snapshot_baseline_handle, self.baseline_fork);
-
-        snapshot_handle
-    }
-
-    pub fn get_snapshot(&self, handle: SnapshotHandle) -> Option<&Snapshot> {
-        self.snapshots.get(handle)
     }
 }

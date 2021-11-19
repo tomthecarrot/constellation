@@ -5,7 +5,6 @@ mod engine;
 mod link;
 mod object;
 mod realm;
-mod snapshot;
 
 use eyre::{eyre, Result, WrapErr};
 use link::{Link, RealmServerHandle, Session};
