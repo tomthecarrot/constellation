@@ -13,7 +13,7 @@
                     "build",
                     "--bin=platform",
                     "--package=platform",
-                    "--manifest-path=Cargo.toml"
+                    "--manifest-path=platform/Cargo.toml"
                 ],
                 "filter": {
                     "name": "platform",
@@ -21,7 +21,7 @@
                 }
             },
             "args": [],
-            "cwd": "${workspaceFolder}"
+            "cwd": "${workspaceFolder}/platform"
         },
         {
             "type": "lldb",
@@ -33,7 +33,7 @@
                     "--no-run",
                     "--bin=platform",
                     "--package=platform",
-                    "--manifest-path=Cargo.toml"
+                    "--manifest-path=platform/Cargo.toml"
                 ],
                 "filter": {
                     "name": "platform",
@@ -41,7 +41,7 @@
                 }
             },
             "args": [],
-            "cwd": "${workspaceFolder}"
+            "cwd": "${workspaceFolder}/platform"
         }
     ]
 }
