@@ -21,8 +21,7 @@ pub struct Baseline {
 }
 
 impl Baseline {
-    pub fn new() -> Self {
-        let fork = None;
+    pub fn new(fork: Option<BaselineHandle>) -> Self {
         let objects = Arena::new();
         let contracts = Arena::new();
         let states = TypeMap::new();
@@ -37,17 +36,7 @@ impl Baseline {
         }
     }
 
-    // ---- Target-side registration ----
-
-    pub fn register_fork(&mut self, fork: BaselineHandle) {
-        self.fork = Some(fork);
-    }
-
-    pub fn unregister_fork(&mut self) {
-        self.fork = None;
-    }
-
-    // ---- Called by a Baseline on its fork ----
+    // ---- Called by the Baseline on its fork ----
 
     // TODO[SER-259]: determine method for notifying Baseline fork.
 
@@ -59,7 +48,7 @@ impl Baseline {
         todo!("Notify fork");
     }
 
-    // ---- Object anStateHandled Contract Acessors ----
+    // ---- Object and Contract Acessors ----
 
     pub fn iter_objects(&self) -> impl Iterator<Item = (ObjectHandle, &Object)> {
         self.objects.iter()
