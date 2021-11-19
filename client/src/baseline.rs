@@ -69,9 +69,13 @@ impl BaselineGeneric {
 
     // ---- Notifications from a parent BaselineGeneric to its followers ----
 
-    pub fn notify_dirty_state<T: TPData>(&self, state: StateHandle<T>) {}
+    fn notify_dirty_state<T: TPData>(&self, state: StateHandle<T>) {
+        todo!("Notify followers");
+    }
 
-    pub fn notify_dirty_channel<T: TPData>(&self, state: StateHandle<T>) {}
+    fn notify_dirty_channel<T: TPData>(&self, state: StateHandle<T>) {
+        todo!("Notify followers");
+    }
 
     // ---- Object anStateHandled Contract Acessors ----
 
