@@ -43,7 +43,6 @@ pub struct RealmClient {
 impl RealmClient {
     fn new(builder: RealmClientBuilder) -> Result<Self> {
         let local_realm = Realm::new(RealmID::new(builder.realm_id));
-
         let result = match builder.endpoint {
             Endpoint::Local(handle) => {
                 let link = Link::new(handle);

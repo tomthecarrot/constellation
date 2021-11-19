@@ -15,16 +15,16 @@ use typemap::TypeMap;
 
 use std::time::Duration;
 
-pub struct BaselineGeneric {
-    target: Option<BaselineGenericHandle>,
-    followers: HashSet<BaselineGenericHandle>,
+pub struct Baseline {
+    target: Option<BaselineHandle>,
+    followers: HashSet<BaselineHandle>,
     objects: Arena<Object>,
     contracts: Arena<Contract>,
     states: StateArenaMap,     // maps from T to Arena<State<T>>
     channels: ChannelArenaMap, // maps from T to Arena<Channel<T>>
 }
 
-impl BaselineGeneric {
+impl Baseline {
     pub fn new() -> Self {
         let target = None;
         let followers = HashSet::new();
@@ -45,7 +45,7 @@ impl BaselineGeneric {
 
     // ---- Follower-side registration ----
 
-    pub fn start_following(&mut self, baseline: BaselineGenericHandle) {
+    pub fn start_following(&mut self, baseline: BaselineHandle) {
         self.target = Some(baseline);
     }
 
@@ -53,21 +53,21 @@ impl BaselineGeneric {
         self.target = None;
     }
 
-    pub fn get_target(&self) -> Option<BaselineGenericHandle> {
+    pub fn get_target(&self) -> Option<BaselineHandle> {
         self.target
     }
 
     // ---- Target-side registration ----
 
-    pub fn register_follower(&mut self, follower: BaselineGenericHandle) {
+    pub fn register_follower(&mut self, follower: BaselineHandle) {
         self.followers.insert(follower);
     }
 
-    pub fn unregister_follower(&mut self, follower: BaselineGenericHandle) {
+    pub fn unregister_follower(&mut self, follower: BaselineHandle) {
         self.followers.remove(&follower);
     }
 
-    // ---- Notifications from a parent BaselineGeneric to its followers ----
+    // ---- Notifications from a parent Baseline to its followers ----
 
     fn notify_dirty_state<T: TPData>(&self, state: StateHandle<T>) {
         todo!("Notify followers");
@@ -160,56 +160,56 @@ impl BaselineGeneric {
 
 // ---- Index traits ----
 
-impl core::ops::Index<ObjectHandle> for BaselineGeneric {
+impl core::ops::Index<ObjectHandle> for Baseline {
     type Output = Object;
 
     fn index(&self, index: ObjectHandle) -> &Self::Output {
         &self.objects[index]
     }
 }
-impl core::ops::IndexMut<ObjectHandle> for BaselineGeneric {
+impl core::ops::IndexMut<ObjectHandle> for Baseline {
     fn index_mut(&mut self, index: ObjectHandle) -> &mut Self::Output {
         &mut self.objects[index]
     }
 }
 
-impl core::ops::Index<ContractHandle> for BaselineGeneric {
+impl core::ops::Index<ContractHandle> for Baseline {
     type Output = Contract;
 
     fn index(&self, index: ContractHandle) -> &Self::Output {
         &self.contracts[index]
     }
 }
-impl core::ops::IndexMut<ContractHandle> for BaselineGeneric {
+impl core::ops::IndexMut<ContractHandle> for Baseline {
     fn index_mut(&mut self, index: ContractHandle) -> &mut Self::Output {
         &mut self.contracts[index]
     }
 }
 
-impl<'a, T: TPData> core::ops::Index<StateHandle<T>> for BaselineGeneric {
+impl<'a, T: TPData> core::ops::Index<StateHandle<T>> for Baseline {
     type Output = State<T>;
 
     fn index(&self, index: StateHandle<T>) -> &Self::Output {
         self.state(index).expect("Invalid handle")
     }
 }
-impl<'a, T: TPData> core::ops::IndexMut<StateHandle<T>> for BaselineGeneric {
+impl<'a, T: TPData> core::ops::IndexMut<StateHandle<T>> for Baseline {
     fn index_mut(&mut self, index: StateHandle<T>) -> &mut Self::Output {
         self.state_mut(index).expect("Invalid handle")
     }
 }
 
-impl<'a, T: TPData> core::ops::Index<ChannelHandle<T>> for BaselineGeneric {
+impl<'a, T: TPData> core::ops::Index<ChannelHandle<T>> for Baseline {
     type Output = Channel<T>;
 
     fn index(&self, index: ChannelHandle<T>) -> &Self::Output {
         self.channel(index).expect("Invalid handle")
     }
 }
-impl<'a, T: TPData> core::ops::IndexMut<ChannelHandle<T>> for BaselineGeneric {
+impl<'a, T: TPData> core::ops::IndexMut<ChannelHandle<T>> for Baseline {
     fn index_mut(&mut self, index: ChannelHandle<T>) -> &mut Self::Output {
         self.channel_mut(index).expect("Invalid handle")
     }
 }
 
-pub type BaselineGenericHandle = arena::Index<BaselineGeneric>;
+pub type BaselineHandle = arena::Index<Baseline>;
