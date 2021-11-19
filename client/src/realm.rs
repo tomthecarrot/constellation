@@ -30,11 +30,13 @@ impl Realm {
         let time = Duration::ZERO;
         let mut baselines = Arena::new();
 
-        // Create the BaselineMain and BaselineFork.
-        let baseline_main = Baseline::new();
-        let baseline_fork = Baseline::new();
-        let baseline_main_handle: BaselineHandle = baselines.insert(baseline_main);
+        // Create the BaselineFork.
+        let baseline_fork = Baseline::new(None);
         let baseline_fork_handle: BaselineHandle = baselines.insert(baseline_fork);
+
+        // Create the BaselineMain, registering the fork.
+        let baseline_main = Baseline::new(Some(baseline_fork_handle));
+        let baseline_main_handle: BaselineHandle = baselines.insert(baseline_main);
 
         Self {
             realm_id: realm_id,
@@ -61,27 +63,5 @@ impl Realm {
 
     pub fn baseline_fork(&self) -> BaselineHandle {
         self.baseline_fork
-    }
-
-    pub fn register_baseline_fork(
-        &mut self,
-        enabled: bool,
-        fork_handle: BaselineHandle,
-        target_handle: BaselineHandle,
-    ) {
-        // Register/unregister this fork with the target baseline.
-        let target_option = self.baselines.get_mut(target_handle);
-        match target_option {
-            Some(target) => {
-                if enabled {
-                    target.register_fork(fork_handle);
-                } else {
-                    target.unregister_fork();
-                }
-            }
-            None => {
-                eprintln!("[Realm] Cannot register/unregister fork: `target` does not exist in baselines.");
-            }
-        }
     }
 }
