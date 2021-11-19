@@ -69,6 +69,8 @@ impl Baseline {
 
     // ---- Called by a Baseline on its follower ----
 
+    // TODO[SER-259]: determine method for notifying Baseline follower.
+
     fn on_dirty_state<T: TPData>(&self, state: StateHandle<T>) {
         todo!("Notify follower");
     }
