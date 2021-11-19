@@ -17,10 +17,8 @@ use std::time::Duration;
 
 pub struct BaselineGeneric {
     handle: Option<BaselineGenericHandle>,
-    following: Option<BaselineGenericHandle>,
+    target: Option<BaselineGenericHandle>,
     followers: HashSet<BaselineGenericHandle>,
-    time: &Duration,
-    baselines: &Arena<BaselineGeneric>
     objects: Arena<Object>,
     contracts: Arena<Contract>,
     states: StateArenaMap,     // maps from T to Arena<State<T>>
@@ -28,9 +26,9 @@ pub struct BaselineGeneric {
 }
 
 impl BaselineGeneric {
-    pub fn new(time: &Duration, baselines: &Arena<BaselineGeneric>) -> Self {
+    pub fn new() -> Self {
         let handle = None;
-        let following = None;
+        let target = None;
         let followers = HashSet::new();
         let objects = Arena::new();
         let contracts = Arena::new();
@@ -39,10 +37,8 @@ impl BaselineGeneric {
 
         Self {
             handle,
-            following,
+            target,
             followers,
-            time,
-            baselines,
             objects,
             contracts,
             states,
@@ -50,52 +46,35 @@ impl BaselineGeneric {
         }
     }
 
-    pub fn set_handle(&self, handle: BaselineGenericHandle) {
+    pub fn get_handle(&self) -> Option<BaselineGenericHandle> {
+        self.handle
+    }
+
+    pub fn set_handle(&mut self, handle: BaselineGenericHandle) {
         self.handle = Some(handle);
     }
 
     // ---- Follow registration, called by owner of this baseline ----
 
-    pub fn follow(&self, baseline: BaselineGenericHandle) {
-        self.following = Some(baseline);
-
-        match self.handle {
-            Some(handle) => {
-                baseline.register_follower(handle);
-            }
-            None => {
-                eprintln!("[Baseline] Cannot follow since `self.handle` is None.");
-            }
-        }
+    pub fn start_following(&mut self, baseline: BaselineGenericHandle) {
+        self.target = Some(baseline);
     }
 
-    pub fn unfollow(&self) {
-        match self.following {
-            Some(following) => match self.handle {
-                Some(handle) => {
-                    following.unregister_follower(handle);
-                }
-                None => {
-                    eprintln!("[Baseline] Cannot unfollow since `self.handle` is None.");
-                }
-            },
-            None => {
-                eprintln!(
-                    "[Baseline] Cannot unfollow since Baseline is not already following anything."
-                )
-            }
-        }
-
-        self.following = None;
+    pub fn stop_following(&mut self) {
+        self.target = None;
     }
 
-    // ---- Follow registration, called by new followers ----
+    pub fn get_target(&self) -> Option<BaselineGenericHandle> {
+        self.target
+    }
 
-    pub fn register_follower(&self, follower: BaselineGenericHandle) {
+    // ---- Follower registration ----
+
+    pub fn register_follower(&mut self, follower: BaselineGenericHandle) {
         self.followers.insert(follower);
     }
 
-    pub fn unregister_follower(&self, follower: BaselineGenericHandle) {
+    pub fn unregister_follower(&mut self, follower: BaselineGenericHandle) {
         self.followers.remove(&follower);
     }
 
