@@ -16,7 +16,6 @@ use typemap::TypeMap;
 use std::time::Duration;
 
 pub struct BaselineGeneric {
-    handle: Option<BaselineGenericHandle>,
     target: Option<BaselineGenericHandle>,
     followers: HashSet<BaselineGenericHandle>,
     objects: Arena<Object>,
@@ -27,7 +26,6 @@ pub struct BaselineGeneric {
 
 impl BaselineGeneric {
     pub fn new() -> Self {
-        let handle = None;
         let target = None;
         let followers = HashSet::new();
         let objects = Arena::new();
@@ -36,7 +34,6 @@ impl BaselineGeneric {
         let channels = TypeMap::new();
 
         Self {
-            handle,
             target,
             followers,
             objects,
@@ -46,15 +43,7 @@ impl BaselineGeneric {
         }
     }
 
-    pub fn get_handle(&self) -> Option<BaselineGenericHandle> {
-        self.handle
-    }
-
-    pub fn set_handle(&mut self, handle: BaselineGenericHandle) {
-        self.handle = Some(handle);
-    }
-
-    // ---- Follow registration, called by owner of this baseline ----
+    // ---- Follower-side registration ----
 
     pub fn start_following(&mut self, baseline: BaselineGenericHandle) {
         self.target = Some(baseline);
@@ -68,7 +57,7 @@ impl BaselineGeneric {
         self.target
     }
 
-    // ---- Follower registration ----
+    // ---- Target-side registration ----
 
     pub fn register_follower(&mut self, follower: BaselineGenericHandle) {
         self.followers.insert(follower);
