@@ -63,41 +63,24 @@ impl Realm {
         self.baseline_fork
     }
 
-    pub fn baseline_follow(
+    pub fn register_baseline_fork(
         &mut self,
         enabled: bool,
-        follower_handle: BaselineHandle,
+        fork_handle: BaselineHandle,
         target_handle: BaselineHandle,
     ) {
-        // Tell the new follower that it is now following the target.
-        let follower_option = self.baselines.get_mut(follower_handle);
-        match follower_option {
-            Some(follower) => {
-                if enabled {
-                    follower.start_following(target_handle);
-                } else {
-                    follower.stop_following();
-                }
-            }
-            None => {
-                eprintln!(
-                    "[Realm] Cannot follow/unfollow: `follower` does not exist in baselines."
-                );
-            }
-        }
-
-        // Register/unregister the new follower with the target.
+        // Register/unregister this fork with the target baseline.
         let target_option = self.baselines.get_mut(target_handle);
         match target_option {
             Some(target) => {
                 if enabled {
-                    target.register_follower(follower_handle);
+                    target.register_fork(fork_handle);
                 } else {
-                    target.unregister_follower();
+                    target.unregister_fork();
                 }
             }
             None => {
-                eprintln!("[Realm] Cannot follow/unfollow: `target` does not exist in baselines.");
+                eprintln!("[Realm] Cannot register/unregister fork: `target` does not exist in baselines.");
             }
         }
     }

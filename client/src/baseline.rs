@@ -9,15 +9,11 @@ use crate::contract::{Contract, ContractHandle};
 use crate::object::{Object, ObjectHandle};
 
 use arena::Arena;
-use eyre::{eyre, Result, WrapErr};
-use std::collections::HashSet;
+use eyre::{eyre, Result};
 use typemap::TypeMap;
 
-use std::time::Duration;
-
 pub struct Baseline {
-    target: Option<BaselineHandle>,
-    follower: Option<BaselineHandle>,
+    fork: Option<BaselineHandle>,
     objects: Arena<Object>,
     contracts: Arena<Contract>,
     states: StateArenaMap,     // maps from T to Arena<State<T>>
@@ -26,16 +22,14 @@ pub struct Baseline {
 
 impl Baseline {
     pub fn new() -> Self {
-        let target = None;
-        let follower = None;
+        let fork = None;
         let objects = Arena::new();
         let contracts = Arena::new();
         let states = TypeMap::new();
         let channels = TypeMap::new();
 
         Self {
-            target,
-            follower,
+            fork,
             objects,
             contracts,
             states,
@@ -43,40 +37,26 @@ impl Baseline {
         }
     }
 
-    // ---- Follower-side registration ----
-
-    pub fn start_following(&mut self, baseline: BaselineHandle) {
-        self.target = Some(baseline);
-    }
-
-    pub fn stop_following(&mut self) {
-        self.target = None;
-    }
-
-    pub fn get_target(&self) -> Option<BaselineHandle> {
-        self.target
-    }
-
     // ---- Target-side registration ----
 
-    pub fn register_follower(&mut self, follower: BaselineHandle) {
-        self.follower = Some(follower);
+    pub fn register_fork(&mut self, fork: BaselineHandle) {
+        self.fork = Some(fork);
     }
 
-    pub fn unregister_follower(&mut self) {
-        self.follower = None;
+    pub fn unregister_fork(&mut self) {
+        self.fork = None;
     }
 
-    // ---- Called by a Baseline on its follower ----
+    // ---- Called by a Baseline on its fork ----
 
-    // TODO[SER-259]: determine method for notifying Baseline follower.
+    // TODO[SER-259]: determine method for notifying Baseline fork.
 
-    fn on_dirty_state<T: TPData>(&self, state: StateHandle<T>) {
-        todo!("Notify follower");
+    fn on_state_change<T: TPData>(&self, state: StateHandle<T>) {
+        todo!("Notify fork");
     }
 
-    fn on_dirty_channel<T: TPData>(&self, channel: ChannelHandle<T>) {
-        todo!("Notify follower");
+    fn on_channel_change<T: TPData>(&self, channel: ChannelHandle<T>) {
+        todo!("Notify fork");
     }
 
     // ---- Object anStateHandled Contract Acessors ----
