@@ -17,7 +17,7 @@ use std::time::Duration;
 
 pub struct Baseline {
     target: Option<BaselineHandle>,
-    followers: HashSet<BaselineHandle>,
+    follower: Option<BaselineHandle>,
     objects: Arena<Object>,
     contracts: Arena<Contract>,
     states: StateArenaMap,     // maps from T to Arena<State<T>>
@@ -27,7 +27,7 @@ pub struct Baseline {
 impl Baseline {
     pub fn new() -> Self {
         let target = None;
-        let followers = HashSet::new();
+        let follower = None;
         let objects = Arena::new();
         let contracts = Arena::new();
         let states = TypeMap::new();
@@ -35,7 +35,7 @@ impl Baseline {
 
         Self {
             target,
-            followers,
+            follower,
             objects,
             contracts,
             states,
@@ -60,21 +60,21 @@ impl Baseline {
     // ---- Target-side registration ----
 
     pub fn register_follower(&mut self, follower: BaselineHandle) {
-        self.followers.insert(follower);
+        self.follower = Some(follower);
     }
 
-    pub fn unregister_follower(&mut self, follower: BaselineHandle) {
-        self.followers.remove(&follower);
+    pub fn unregister_follower(&mut self) {
+        self.follower = None;
     }
 
-    // ---- Notifications from a parent Baseline to its followers ----
+    // ---- Called by a Baseline on its follower ----
 
-    fn notify_dirty_state<T: TPData>(&self, state: StateHandle<T>) {
-        todo!("Notify followers");
+    fn on_dirty_state<T: TPData>(&self, state: StateHandle<T>) {
+        todo!("Notify follower");
     }
 
-    fn notify_dirty_channel<T: TPData>(&self, state: StateHandle<T>) {
-        todo!("Notify followers");
+    fn on_dirty_channel<T: TPData>(&self, channel: ChannelHandle<T>) {
+        todo!("Notify follower");
     }
 
     // ---- Object anStateHandled Contract Acessors ----
