@@ -1,3 +1,5 @@
+use bevy::prelude::*;
+
 #[wasm_bindgen]
 pub fn main() {
     let mut app = App::build();
