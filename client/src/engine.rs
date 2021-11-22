@@ -1,10 +1,15 @@
-use crate::action::{Collaction, CollactionResult};
+use crate::action::property::{PropertyAction, StateAction};
+use crate::action::{Action, ActionKind, ActionResult, Collaction, CollactionResult, IAction};
+use crate::baseline::BaselineKind;
+use crate::contract::properties::ITpProperty;
 use crate::Realm;
 
 use crossbeam_channel::{Receiver, RecvTimeoutError, Sender, TryRecvError};
+use eyre::{eyre, WrapErr};
+use std::any::{Any, TypeId};
+use std::mem;
 
 type TryApplyResult = Result<CollactionResult, TryRecvError>;
-
 type ApplyResult = Result<CollactionResult, RecvTimeoutError>;
 
 pub type ActionSender = Sender<Collaction>;
@@ -49,15 +54,116 @@ impl Engine {
     /// Same as `apply_timeout()`, but immediately returns if there are no
     /// collactions pending.
     pub fn try_apply(&mut self) -> TryApplyResult {
-        let c = self.receiver.try_recv()?;
-        todo!("apply collaction!")
+        let collaction = self.receiver.try_recv()?;
+        let result = self.apply_collaction(collaction);
+        Ok(result)
     }
 
     /// Blocks until a collaction is applied or rejected from the pending
     /// collactions, and returns the `CollactionResult`. If there are no
     /// collactions found by `timeout`, returns an error.
     pub fn apply_timeout(&mut self, timeout: std::time::Duration) -> ApplyResult {
-        let c = self.receiver.recv_timeout(timeout)?;
-        todo!("apply collaction!")
+        let collaction = self.receiver.recv_timeout(timeout)?;
+        let result = self.apply_collaction(collaction);
+        Ok(result)
+    }
+
+    fn apply_collaction(&mut self, mut collaction: Collaction) -> CollactionResult {
+        // Keep track of applied Actions
+        let mut applied_actions = Vec::new();
+
+        // Iterate through all Actions in this Collaction.
+        let actions = collaction.actions_mut();
+        for action in actions {
+            let action_result = self.apply_action(action);
+            match action_result {
+                Ok(()) => {
+                    // Keep track of previously-applied Actions.
+                    applied_actions.push(action);
+                }
+                Err(_) => {
+                    // Reverse previously-applied Actions within this Collaction.
+                    applied_actions.push(action);
+                    // Go in FIFO order
+                    self.reverse_actions(applied_actions.into_iter().rev());
+
+                    // Bail and reject this Collaction.
+                    return Err(collaction);
+                }
+            }
+        }
+
+        // If all Actions succeeded, approve the Collaction.
+        Ok(collaction)
+    }
+
+    fn apply_action<T: ITpProperty>(&mut self, action: &mut Action<T>) -> ActionResult {
+        match action {
+            Action::Property(PropertyAction::State(action)) => {
+                // Get data from the Action and compare it against the BaselineFork.
+
+                match action {
+                    StateAction::Assert { handle, data } => {
+                        let state = self
+                            .realm()
+                            .baseline(BaselineKind::Fork)
+                            .state(*handle)
+                            .wrap_err("Invalid Handle")?;
+
+                        if state.0 == *data {
+                            Ok(())
+                        } else {
+                            Err(eyre!("Assert failed!"))
+                        }
+                    }
+                    StateAction::Write { handle, data } => {
+                        // Get data from the Action and apply it to the BaselineFork.
+                        let state = self
+                            .realm_mut()
+                            .baseline_mut(BaselineKind::Fork)
+                            .state_mut(*handle)
+                            .wrap_err("Invalid Handle")?;
+
+                        // Sanity check that all types remain the same
+                        debug_assert!(state.0.type_id() == (*data).type_id());
+                        // TODO[SER-272]: handle DynTpProperty<DynTpData> and DynTpData in general
+
+                        // Swap the current value with the new data.
+                        // This optimizes applying the Action and allows
+                        // for its simple reversal if needed.
+                        mem::swap(&mut state.0, data);
+                        Ok(())
+                    }
+                }
+            }
+            _ => {
+                tracing::warn!("Action not yet implemented. Treating as no-op.",);
+                Ok(())
+            }
+        }
+    }
+
+    fn reverse_action(&mut self, action: &mut Action) {
+        // Reverse Action by applying the previous value to the BaselineFork,
+        // where applicable.
+        match action.kind() {
+            ActionKind::StateAssert => {} // no-op
+            ActionKind::StateWrite => {
+                // Reverse by re-applying the Action.
+                // This triggers a value swap.
+                self.apply_action(action);
+            }
+            _ => {
+                tracing::warn!(
+                    "Reversing action that has not yet been implemented. Treating as no-op."
+                );
+            }
+        }
+    }
+
+    fn reverse_actions<'a>(&'a mut self, actions: impl Iterator<Item = &'a mut Action>) {
+        for action in actions {
+            self.reverse_action(action);
+        }
     }
 }

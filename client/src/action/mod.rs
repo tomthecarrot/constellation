@@ -20,7 +20,7 @@ pub trait IAction {
     // TODO[SER-257]: fn write_into(&self, buf: &mut impl Write) -> Result<(), std::io::Error>;
 }
 
-pub type ActionResult = Result<(), ()>;
+pub type ActionResult = eyre::Result<()>;
 
 pub struct Collaction {
     actions: Vec<Action>,

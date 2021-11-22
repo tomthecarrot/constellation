@@ -7,11 +7,12 @@ rust-version = "1.56"  # Rust 2021
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-rand = "0.8"
-eyre = "0.6"
 arena = { path = "../datastructures/arena" }
-typemap = "0.3"
 crossbeam-channel = "0.5"
 derive_more = "0.99"
 enum_dispatch = "0.3"
+eyre = "0.6"
 paste = "1"
+rand = "0.8"
+tracing = "0.1"
+typemap = "0.3"
