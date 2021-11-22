@@ -5,7 +5,7 @@ use std::marker::PhantomData;
 use typemap::ShareMap;
 
 // TODO: figure out data in a channel
-pub struct Channel<T: ITpProperty>(T);
+pub struct Channel<T: ITpProperty>(pub T);
 
 pub type ChannelHandle<T> = arena::Index<Channel<T>>;
 
