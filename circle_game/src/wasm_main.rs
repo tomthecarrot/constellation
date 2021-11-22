@@ -1,16 +1,17 @@
+use wasm_bindgen::prelude::*;
+
 use bevy::prelude::*;
 
-#[wasm_bindgen]
-pub fn main() {
-    let mut app = App::build();
+#[wasm_bindgen(start)]
+pub fn wasm_main() -> Result<(), JsValue> {
+    // This provides better error messages in debug mode.
+    // It's disabled in release mode so it doesn't bloat up the file size.
+    #[cfg(debug_assertions)]
+    console_error_panic_hook::set_once();
 
-    app.add_plugins(DefaultPlugins);
-
-    // when building for Web, use WebGL2 rendering
-    #[cfg(target_arch = "wasm32")]
+    let mut app = crate::configure_app();
     app.add_plugin(bevy_webgl2::WebGL2Plugin);
-
-    // TODO: add all your other stuff to `app` as usual
-
     app.run();
+
+    Ok(())
 }
