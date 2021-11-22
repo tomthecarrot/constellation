@@ -1,4 +1,4 @@
-use crate::action::{Collaction, CollactionResult};
+use crate::action::{Action, ActionResult, ActionType, Collaction, CollactionResult};
 use crate::Realm;
 
 use crossbeam_channel::{Receiver, RecvTimeoutError, Sender, TryRecvError};
@@ -49,15 +49,52 @@ impl Engine {
     /// Same as `apply_timeout()`, but immediately returns if there are no
     /// collactions pending.
     pub fn try_apply(&mut self) -> TryApplyResult {
-        let c = self.receiver.try_recv()?;
-        todo!("apply collaction!")
+        let collaction = self.receiver.try_recv()?;
+        let result = self.apply_collaction(collaction);
+        Ok(result)
     }
 
     /// Blocks until a collaction is applied or rejected from the pending
     /// collactions, and returns the `CollactionResult`. If there are no
     /// collactions found by `timeout`, returns an error.
     pub fn apply_timeout(&mut self, timeout: std::time::Duration) -> ApplyResult {
-        let c = self.receiver.recv_timeout(timeout)?;
-        todo!("apply collaction!")
+        let collaction = self.receiver.recv_timeout(timeout)?;
+        let result = self.apply_collaction(collaction);
+        Ok(result)
+    }
+
+    fn apply_collaction(&mut self, collaction: Collaction) -> CollactionResult {
+        // Start with approval.
+        let mut is_approved = true;
+
+        // Iterate through all Actions in this Collaction.
+        for action in collaction.get_actions() {
+            let action_result = self.apply_action(action.as_ref());
+
+            // If Action failed, bail and reject the whole Collaction.
+            if !action_result {
+                is_approved = false;
+                break;
+            }
+        }
+
+        let result = CollactionResult::new(collaction, is_approved);
+        result
+    }
+
+    fn apply_action(&mut self, action: &dyn Action) -> ActionResult {
+        // Every Action is approved in this single-Guest version of the Platform.
+        let is_approved = true;
+
+        match action.get_type() {
+            ActionType::StateWrite => {
+                todo!("Get data from Action and apply it to the Baseline.");
+            } // TODO[SER-260]: handle StateAssert and ChannelWrite.
+            _ => {
+                eprintln!("[Engine] Cannot apply Action: type is not yet implemented.");
+            }
+        }
+
+        is_approved
     }
 }
