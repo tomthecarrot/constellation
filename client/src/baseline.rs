@@ -12,8 +12,14 @@ use arena::Arena;
 use eyre::{eyre, Result};
 use typemap::TypeMap;
 
+#[derive(Copy, Clone, PartialEq, Eq, Debug, Hash)]
+pub enum BaselineKind {
+    Main,
+    Fork,
+}
+
 pub struct Baseline {
-    fork: Option<BaselineHandle>,
+    kind: BaselineKind,
     objects: Arena<Object>,
     contracts: Arena<Contract>,
     states: StateArenaMap,     // maps from T to Arena<State<T>>
@@ -21,14 +27,14 @@ pub struct Baseline {
 }
 
 impl Baseline {
-    pub fn new(fork: Option<BaselineHandle>) -> Self {
+    pub fn new(kind: BaselineKind) -> Self {
         let objects = Arena::new();
         let contracts = Arena::new();
         let states = TypeMap::new();
         let channels = TypeMap::new();
 
         Self {
-            fork,
+            kind,
             objects,
             contracts,
             states,
@@ -182,5 +188,3 @@ impl<'a, T: TPData> core::ops::IndexMut<ChannelHandle<T>> for Baseline {
         self.channel_mut(index).expect("Invalid handle")
     }
 }
-
-pub type BaselineHandle = arena::Index<Baseline>;

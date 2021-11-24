@@ -1,10 +1,10 @@
-mod action;
-mod baseline;
+pub mod action;
+pub mod baseline;
 pub mod contract;
 pub mod engine;
-mod link;
+pub mod link;
 pub mod object;
-mod realm;
+pub mod realm;
 
 use eyre::{eyre, Result, WrapErr};
 use link::{Link, RealmServerHandle, Session};
