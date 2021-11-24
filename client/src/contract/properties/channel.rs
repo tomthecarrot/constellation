@@ -2,7 +2,7 @@ use crate::contract::properties::data::TPData;
 use crate::contract::ContractHandle;
 
 use std::marker::PhantomData;
-use typemap::TypeMap;
+use typemap::ShareMap;
 
 // TODO: figure out data in a channel
 pub struct Channel<T: TPData>(T);
@@ -15,7 +15,7 @@ impl<T: 'static + TPData> typemap::Key for ChannelArenaHandle<T> {
     type Value = arena::Arena<Channel<T>>;
 }
 
-pub type ChannelArenaMap = TypeMap;
+pub type ChannelArenaMap = ShareMap;
 
 /// Represents a particular channel field of a contract. For actual channel data
 /// of a specific object, see [`ChannelHandle`].
