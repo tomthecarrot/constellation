@@ -64,22 +64,19 @@ impl Engine {
     }
 
     fn apply_collaction(&mut self, collaction: Collaction) -> CollactionResult {
-        // Start with approval.
-        let mut is_approved = true;
-
         // Iterate through all Actions in this Collaction.
         for action in collaction.actions() {
             let action_result = self.apply_action(action.as_ref());
 
-            // If Action failed, bail and reject the whole Collaction.
+            // If Action failed
             if !action_result {
-                is_approved = false;
-                break;
+                // Bail and reject the whole Collaction.
+                return Err(collaction);
             }
         }
 
-        let result = CollactionResult::new(collaction, is_approved);
-        result
+        // If all Actions succeeded, approve the Collaction.
+        Ok(collaction)
     }
 
     fn apply_action(&mut self, action: &dyn Action) -> ActionResult {

@@ -18,25 +18,13 @@ pub struct Collaction {
     actions: Vec<Box<dyn Action>>,
 }
 
-pub struct CollactionResult {
-    collaction: Collaction,
-    is_approved: bool,
-}
-
 impl Collaction {
     pub fn actions(&self) -> &Vec<Box<dyn Action>> {
         &self.actions
     }
 }
 
-impl CollactionResult {
-    pub fn new(collaction: Collaction, is_approved: bool) -> Self {
-        Self {
-            collaction,
-            is_approved,
-        }
-    }
-}
+pub type CollactionResult = Result<Collaction, Collaction>;
 
 // ---- Action trait impls ----
 
