@@ -1,3 +1,7 @@
+mod circle_bundle;
+
+use circle_bundle::{BaselineKind, CircleBundle};
+
 use bevy::prelude::*;
 use bevy_prototype_lyon::prelude::*;
 
@@ -23,20 +27,24 @@ pub fn configure_app() -> bevy::app::AppBuilder {
 }
 
 fn setup(mut commands: Commands) {
-    let shape = shapes::RegularPolygon {
-        sides: 6,
-        feature: shapes::RegularPolygonFeature::Radius(200.0),
-        ..shapes::RegularPolygon::default()
-    };
-
     commands.spawn_bundle(OrthographicCameraBundle::new_2d());
-    commands.spawn_bundle(GeometryBuilder::build_as(
-        &shape,
-        ShapeColors::outlined(Color::TEAL, Color::BLACK),
-        DrawMode::Outlined {
-            fill_options: FillOptions::default(),
-            outline_options: StrokeOptions::default().with_line_width(10.0),
-        },
-        Transform::default(),
-    ));
+
+    const SQUARE_SIZE: usize = 10;
+
+    for x in 0..SQUARE_SIZE {
+        for y in 0..SQUARE_SIZE {
+            fn offset_and_scale(val: usize) -> f32 {
+                (val as f32 - SQUARE_SIZE as f32 / 2.0) * 50.
+            }
+
+            commands.spawn_bundle(CircleBundle::new(
+                Transform::from_xyz(offset_and_scale(x), offset_and_scale(y), 1.),
+                BaselineKind::Baseline,
+            ));
+            commands.spawn_bundle(CircleBundle::new(
+                Transform::from_xyz(offset_and_scale(x), offset_and_scale(y), 0.),
+                BaselineKind::BaselineFork,
+            ));
+        }
+    }
 }
