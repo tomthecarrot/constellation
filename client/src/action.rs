@@ -18,7 +18,7 @@ pub enum PropertyAction<T: TPData> {
     Channel(ChannelAction<T>),
 }
 
-pub trait Action {
+pub trait Action: Send + Sync {
     fn into_bytes(self) -> Box<[u8]>;
     // TODO[SER-257]: fn write_into(&self, buf: &mut impl Write) -> Result<(), std::io::Error>;
 }

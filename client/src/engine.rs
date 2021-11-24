@@ -7,6 +7,8 @@ type TryApplyResult = Result<CollactionResult, TryRecvError>;
 
 type ApplyResult = Result<CollactionResult, RecvTimeoutError>;
 
+pub type ActionSender = Sender<Collaction>;
+
 /// Manages reading and writing to the `Realm`.
 ///
 /// # Threading architecture
@@ -25,7 +27,7 @@ pub struct Engine {
     receiver: Receiver<Collaction>,
 }
 impl Engine {
-    pub fn new(realm: Realm, queue_capacity: Option<usize>) -> (Self, Sender<Collaction>) {
+    pub fn new(realm: Realm, queue_capacity: Option<usize>) -> (Self, ActionSender) {
         let (sender, receiver) = if let Some(cap) = queue_capacity {
             crossbeam_channel::bounded(cap)
         } else {
