@@ -1,9 +1,9 @@
 mod action;
 mod baseline;
 pub mod contract;
-mod engine;
+pub mod engine;
 mod link;
-mod object;
+pub mod object;
 mod realm;
 
 use eyre::{eyre, Result, WrapErr};
