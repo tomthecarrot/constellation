@@ -1,4 +1,4 @@
-use crate::action::{Action, ActionResult, ActionType, Collaction, CollactionResult};
+use crate::action::{Action, ActionKind, ActionResult, Collaction, CollactionResult};
 use crate::Realm;
 
 use crossbeam_channel::{Receiver, RecvTimeoutError, Sender, TryRecvError};
@@ -68,7 +68,7 @@ impl Engine {
         let mut is_approved = true;
 
         // Iterate through all Actions in this Collaction.
-        for action in collaction.get_actions() {
+        for action in collaction.actions() {
             let action_result = self.apply_action(action.as_ref());
 
             // If Action failed, bail and reject the whole Collaction.
@@ -87,7 +87,7 @@ impl Engine {
         let is_approved = true;
 
         match action.get_type() {
-            ActionType::StateWrite => {
+            ActionKind::StateWrite => {
                 todo!("Get data from Action and apply it to the Baseline.");
             } // TODO[SER-260]: handle StateAssert and ChannelWrite.
             _ => {

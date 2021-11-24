@@ -7,7 +7,7 @@ pub enum PropertyAction<T: TPData> {
 }
 
 pub trait Action: Send + Sync {
-    fn get_type(&self) -> ActionType;
+    fn get_type(&self) -> ActionKind;
     fn into_bytes(self) -> Box<[u8]>;
     // TODO[SER-257]: fn write_into(&self, buf: &mut impl Write) -> Result<(), std::io::Error>;
 }
@@ -24,7 +24,7 @@ pub struct CollactionResult {
 }
 
 impl Collaction {
-    pub fn get_actions(&self) -> &Vec<Box<dyn Action>> {
+    pub fn actions(&self) -> &Vec<Box<dyn Action>> {
         &self.actions
     }
 }
@@ -41,11 +41,11 @@ impl CollactionResult {
 // ---- Action trait impls ----
 
 impl<T: TPData> Action for PropertyAction<T> {
-    fn get_type(&self) -> ActionType {
+    fn get_type(&self) -> ActionKind {
         match self {
-            PropertyAction::StateWrite(_, _) => ActionType::StateWrite,
-            PropertyAction::StateAssert(_, _) => ActionType::StateAssert,
-            PropertyAction::ChannelWrite(_, _) => ActionType::ChannelWrite,
+            PropertyAction::StateWrite(_, _) => ActionKind::StateWrite,
+            PropertyAction::StateAssert(_, _) => ActionKind::StateAssert,
+            PropertyAction::ChannelWrite(_, _) => ActionKind::ChannelWrite,
         }
     }
 
@@ -56,7 +56,7 @@ impl<T: TPData> Action for PropertyAction<T> {
 
 // ---- ObjectAction types ----
 
-pub enum ActionType {
+pub enum ActionKind {
     StateWrite,
     StateIncrement,
     QueueWrite,
