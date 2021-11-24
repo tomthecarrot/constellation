@@ -1,14 +1,3 @@
-//! Manages reading and writing to the `Realm`.
-//!
-//! # Threading architecture
-//! The Engine has a queue of pending collactions that indend to mutate the
-//! [`Realm`], as well as working copy of the `Realm` state. To avoid data races
-//! the `Realm` is never simultaneously readable and writable at the same time.
-//!
-//! The `Engine` operates in two steps: a writer phase where collactions are
-//! dequeued and applied as mutations on the `Realm` state, and a reader phase
-//! where all reads of the data take place, free of any mutation.
-
 use crate::action::{Collaction, CollactionResult};
 use crate::Realm;
 
@@ -18,13 +7,24 @@ type TryApplyResult = Result<CollactionResult, TryRecvError>;
 
 type ApplyResult = Result<CollactionResult, RecvTimeoutError>;
 
-/// The writeable state of the engine. In this state, the realm's data can be
-/// mutated by a single thread.
-pub struct WriteableEngine {
+/// Manages reading and writing to the `Realm`.
+///
+/// # Threading architecture
+/// The Engine has a queue of pending collactions that indend to mutate the
+/// [`Realm`], as well as working copy of the `Realm` state. To avoid data races
+/// the `Realm` is never simultaneously readable and writable at the same time.
+///
+/// The `Engine` cannot be simultaneously written and read from. For this
+/// reason, typically things are done in two steps: a writer phase where
+/// collactions are dequeued and applied as mutations on the `Realm` state, and
+/// a reader phase where all reads of the data take place, free of any mutation.
+/// Handling the transitions between these phases is the responsibility of the
+/// API Client(s).
+pub struct Engine {
     realm: Realm,
     receiver: Receiver<Collaction>,
 }
-impl WriteableEngine {
+impl Engine {
     pub fn new(realm: Realm, queue_capacity: Option<usize>) -> (Self, Sender<Collaction>) {
         let (sender, receiver) = if let Some(cap) = queue_capacity {
             crossbeam_channel::bounded(cap)
@@ -34,12 +34,6 @@ impl WriteableEngine {
 
         let this = Self { realm, receiver };
         (this, sender)
-    }
-    pub fn into_readable(self) -> ReadableEngine {
-        ReadableEngine {
-            realm: self.realm,
-            receiver: self.receiver,
-        }
     }
 
     pub fn realm(&self) -> &Realm {
@@ -63,24 +57,5 @@ impl WriteableEngine {
     pub fn apply_timeout(&mut self, timeout: std::time::Duration) -> ApplyResult {
         let c = self.receiver.recv_timeout(timeout)?;
         todo!("apply collaction!")
-    }
-}
-
-/// The readable state of the engine. In this state, the realm's data can be
-/// concurrently read by multiple threads, but will not be mutated.
-pub struct ReadableEngine {
-    realm: Realm,
-    receiver: Receiver<Collaction>,
-}
-impl ReadableEngine {
-    pub fn realm(&self) -> &Realm {
-        &self.realm
-    }
-
-    pub fn into_writeable(self) -> WriteableEngine {
-        WriteableEngine {
-            realm: self.realm,
-            receiver: self.receiver,
-        }
     }
 }
