@@ -1,6 +1,9 @@
 mod circle_bundle;
 
-use circle_bundle::{BaselineKind, CircleBundle};
+use circle_bundle::CircleBundle;
+use tp_client::engine::{ActionSender, Engine};
+use tp_client::realm::{Realm, RealmID};
+use tp_client::{baseline::BaselineKind, object::ObjectHandle};
 
 use bevy::prelude::*;
 use bevy_prototype_lyon::prelude::*;
@@ -17,8 +20,11 @@ static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 mod wasm_main;
 
 pub fn configure_app() -> bevy::app::AppBuilder {
+    let (engine, action_sender) = Engine::new(Realm::new(RealmID::new("tmp id".to_string())), None);
     let mut app = App::build();
     app.insert_resource(Msaa { samples: 8 })
+        .insert_resource(engine)
+        .insert_resource(action_sender)
         .add_plugins(DefaultPlugins)
         .add_plugin(ShapePlugin)
         .add_startup_system(setup.system());
@@ -26,7 +32,7 @@ pub fn configure_app() -> bevy::app::AppBuilder {
     app
 }
 
-fn setup(mut commands: Commands) {
+fn setup(engine: ResMut<Engine>, mut commands: Commands) {
     commands.spawn_bundle(OrthographicCameraBundle::new_2d());
 
     const SQUARE_SIZE: usize = 10;
@@ -37,14 +43,37 @@ fn setup(mut commands: Commands) {
                 (val as f32 - SQUARE_SIZE as f32 / 2.0) * 50.
             }
 
+            let x = offset_and_scale(x);
+            let y = offset_and_scale(y);
+
+            let obj_handle = todo!("Create a corresponding object in engine, and get handle");
+
             commands.spawn_bundle(CircleBundle::new(
-                Transform::from_xyz(offset_and_scale(x), offset_and_scale(y), 1.),
-                BaselineKind::Baseline,
+                Transform::from_xyz(x, y, 1.),
+                BaselineKind::Main,
+                obj_handle,
             ));
             commands.spawn_bundle(CircleBundle::new(
-                Transform::from_xyz(offset_and_scale(x), offset_and_scale(y), 0.),
-                BaselineKind::BaselineFork,
+                Transform::from_xyz(x, y, 0.),
+                BaselineKind::Fork,
+                obj_handle,
             ));
         }
+    }
+}
+
+fn update_position(
+    engine: Res<Engine>,
+    mut query: Query<(&BaselineKind, &ObjectHandle, &mut Transform)>,
+) {
+    for (kind, obj_handle, transform) in query.iter_mut() {
+        let base = match kind {
+            BaselineKind::Main => engine.realm().baseline(BaselineKind::Main),
+
+            BaselineKind::Fork => engine.realm().baseline(BaselineKind::Fork),
+        };
+        let obj = base.object(*obj_handle);
+        let t = todo!("Read position from obj");
+        *transform = t;
     }
 }
