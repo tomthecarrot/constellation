@@ -10,7 +10,7 @@ use crate::object::{Object, ObjectHandle};
 
 use arena::Arena;
 use eyre::{eyre, Result};
-use typemap::TypeMap;
+use typemap::{ShareMap, TypeMap};
 
 #[derive(Copy, Clone, PartialEq, Eq, Debug, Hash)]
 pub enum BaselineKind {
@@ -30,8 +30,8 @@ impl Baseline {
     pub fn new(kind: BaselineKind) -> Self {
         let objects = Arena::new();
         let contracts = Arena::new();
-        let states = TypeMap::new();
-        let channels = TypeMap::new();
+        let states = ShareMap::custom();
+        let channels = ShareMap::custom();
 
         Self {
             kind,

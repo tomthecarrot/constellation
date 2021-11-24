@@ -2,7 +2,7 @@ use crate::contract::properties::data::TPData;
 use crate::contract::ContractHandle;
 
 use std::marker::PhantomData;
-use typemap::TypeMap;
+use typemap::ShareMap;
 
 pub type StateHandle<T> = arena::Index<State<T>>;
 
@@ -14,7 +14,7 @@ impl<T: 'static + TPData> typemap::Key for StateArenaHandle<T> {
     type Value = arena::Arena<State<T>>;
 }
 
-pub type StateArenaMap = TypeMap;
+pub type StateArenaMap = ShareMap;
 
 /// Represents a particular state field of a contract. For actual state data of
 /// a specific object, see [`StateHandle`].
