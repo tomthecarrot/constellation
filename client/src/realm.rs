@@ -1,7 +1,7 @@
 // Teleportal Platform v3
 // Copyright 2021 WiTag Inc. dba Teleportal
 
-use crate::baseline::{Baseline, BaselineHandle};
+use crate::baseline::{Baseline, BaselineKind};
 
 use arena::Arena;
 
@@ -20,30 +20,25 @@ impl RealmID {
 pub struct Realm {
     realm_id: RealmID,
     time: Duration,
-    baselines: Arena<Baseline>,
-    baseline_main: BaselineHandle,
-    baseline_fork: BaselineHandle,
+    baseline_main: Baseline,
+    baseline_fork: Baseline,
 }
 impl Realm {
     pub fn new(realm_id: RealmID) -> Self {
         // Initialize time and arena allocators.
         let time = Duration::ZERO;
-        let mut baselines = Arena::new();
 
         // Create the BaselineFork.
-        let baseline_fork = Baseline::new(None);
-        let baseline_fork_handle: BaselineHandle = baselines.insert(baseline_fork);
+        let baseline_fork = Baseline::new(BaselineKind::Fork);
 
         // Create the BaselineMain, registering the fork.
-        let baseline_main = Baseline::new(Some(baseline_fork_handle));
-        let baseline_main_handle: BaselineHandle = baselines.insert(baseline_main);
+        let baseline_main = Baseline::new(BaselineKind::Main);
 
         Self {
             realm_id: realm_id,
             time: time,
-            baselines: baselines,
-            baseline_main: baseline_main_handle,
-            baseline_fork: baseline_fork_handle,
+            baseline_main,
+            baseline_fork,
         }
     }
 
@@ -57,11 +52,17 @@ impl Realm {
 
     // ---- Baseline Accessors ----
 
-    pub fn baseline_main(&self) -> BaselineHandle {
-        self.baseline_main
+    pub fn baseline(&self, kind: BaselineKind) -> &Baseline {
+        match kind {
+            BaselineKind::Main => &self.baseline_main,
+            BaselineKind::Fork => &self.baseline_fork,
+        }
     }
 
-    pub fn baseline_fork(&self) -> BaselineHandle {
-        self.baseline_fork
+    pub fn baseline_mut(&mut self, kind: BaselineKind) -> &mut Baseline {
+        match kind {
+            BaselineKind::Main => &mut self.baseline_main,
+            BaselineKind::Fork => &mut self.baseline_fork,
+        }
     }
 }
