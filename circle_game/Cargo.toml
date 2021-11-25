@@ -1,0 +1,84 @@
+# You must change these to your own details.
+[package]
+name = "circle_game"
+description = "My super awesome Rust, WebAssembly, and Webpack project!"
+version = "0.0.1"
+authors = ["Ryan Butler <ryan.butler@teleportal.app>"]
+categories = ["wasm"]
+readme = "README.md"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[profile.release]
+# This makes the compiled code faster and smaller, but it makes compiling slower,
+# so it's only enabled in release mode.
+lto = true
+
+[features]
+# If you uncomment this line, it will enable `wee_alloc`:
+#default = ["wee_alloc"]
+
+# Dependencies shared by both native and WASM
+[dependencies]
+# `wee_alloc` is a tiny allocator for wasm that is only ~1K in code size
+# compared to the default allocator's ~10K. However, it is slower than the default
+# allocator, so it's not enabled by default.
+wee_alloc = { version = "0.4.2", optional = true }
+
+tp_client = { path = "../client" }
+bevy_prototype_lyon = "0.3.1"
+
+
+
+# Dependencies for native only.
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+bevy = { version = "0.5", default-features = false, features = [
+    "bevy_gltf",
+    "bevy_winit",
+    "render",
+    "png",
+    "bevy_wgpu",
+] }
+[target.'cfg(target_os = "linux")'.dependencies]
+winit = { version = "0.24", features = ["x11"] }
+
+
+
+# Dependencies for WASM only.
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+bevy = { version = "0.5", default-features = false, features = [
+    "bevy_gltf",
+    "bevy_winit",
+    "render",
+    "png",
+] }
+bevy_webgl2 = "0.5"
+tracing-wasm = "=0.2.0" # Tracing-wasm broke semver, this locks to the working version
+
+# The `wasm-bindgen` crate provides the bare minimum functionality needed
+# to interact with JavaScript.
+wasm-bindgen = "0.2"
+
+# getrandom = { version = "0.2", features = ["wasm-bindgen"] }
+
+# The `web-sys` crate allows you to interact with the various browser APIs,
+# like the DOM.
+[target.'cfg(target_arch = "wasm32")'.dependencies.web-sys]
+version = "0.3.22"
+features = ["console"]
+
+# The `console_error_panic_hook` crate provides better debugging of panics by
+# logging them with `console.error`. This is great for development, but requires
+# all the `std::fmt` and `std::panicking` infrastructure, so it's only enabled
+# in debug mode.
+[target.'cfg(all(target_arch = "wasm32", debug_assertions))'.dependencies]
+console_error_panic_hook = "0.1.5"
+
+# These crates are used for running unit tests.
+[target.'cfg(target_arch = "wasm32")'.dev-dependencies]
+wasm-bindgen-test = "0.2.45"
+futures = "0.1.27"
+js-sys = "0.3.22"
+wasm-bindgen-futures = "0.3.22"
