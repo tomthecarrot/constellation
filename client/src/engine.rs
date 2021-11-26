@@ -64,12 +64,20 @@ impl Engine {
     }
 
     fn apply_collaction(&mut self, collaction: Collaction) -> CollactionResult {
+        // Keep track of applied Actions
+        let mut applied_actions: Vec<&dyn Action> = Vec::new();
+
         // Iterate through all Actions in this Collaction.
         for action in collaction.actions() {
-            let action_result = self.apply_action(action.as_ref());
+            let action_ref = action.as_ref();
+            let action_result = self.apply_action(action_ref);
+            applied_actions.push(action_ref);
 
             // If Action failed
             if !action_result {
+                // Reverse already applied Actions.
+                self.reverse_actions(applied_actions);
+
                 // Bail and reject the whole Collaction.
                 return Err(collaction);
             }
@@ -84,14 +92,28 @@ impl Engine {
         let is_approved = true;
 
         match action.get_type() {
+            ActionKind::StateAssert => {
+                todo!("Get data from Action and compare it with the BaselineFork.");
+            }
             ActionKind::StateWrite => {
-                todo!("Get data from Action and apply it to the Baseline.");
-            } // TODO[SER-260]: handle StateAssert and ChannelWrite.
+                todo!("Get data from Action and apply it to the BaselineFork.");
+            }
             _ => {
                 eprintln!("[Engine] Cannot apply Action: type is not yet implemented.");
             }
         }
 
         is_approved
+    }
+
+    // TODO[SER-260]: should these `reverse` methods have a return value?
+    fn reverse_action(&mut self, action: &dyn Action) {
+        todo!("Reverse Action by applying the previous value to the BaselineFork.");
+    }
+
+    fn reverse_actions(&mut self, actions: Vec<&dyn Action>) {
+        for action in actions {
+            self.reverse_action(action);
+        }
     }
 }
