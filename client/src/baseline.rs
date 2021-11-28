@@ -42,18 +42,6 @@ impl Baseline {
         }
     }
 
-    // ---- Called by the Baseline on its fork ----
-
-    // TODO[SER-259]: determine method for notifying Baseline fork.
-
-    fn on_state_change<T: TPData>(&self, state: StateHandle<T>) {
-        todo!("Notify fork");
-    }
-
-    fn on_channel_change<T: TPData>(&self, channel: ChannelHandle<T>) {
-        todo!("Notify fork");
-    }
-
     // ---- Object and Contract Acessors ----
 
     pub fn iter_objects(&self) -> impl Iterator<Item = (ObjectHandle, &Object)> {
