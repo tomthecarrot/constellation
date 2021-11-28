@@ -91,7 +91,7 @@ impl Engine {
         // Every Action is approved in this single-Guest version of the Platform.
         let is_approved = true;
 
-        match action.get_type() {
+        match action.kind() {
             ActionKind::StateAssert => {
                 todo!("Get data from Action and compare it with the BaselineFork.");
             }
