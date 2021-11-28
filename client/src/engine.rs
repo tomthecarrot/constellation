@@ -1,13 +1,15 @@
 use crate::action::{Action, ActionKind, ActionResult, Collaction, CollactionResult};
+use crate::baseline::BaselineKind;
+use crate::contract::properties::TPData;
 use crate::Realm;
 
 use crossbeam_channel::{Receiver, RecvTimeoutError, Sender, TryRecvError};
 
-type TryApplyResult = Result<CollactionResult, TryRecvError>;
+type TryApplyResult<T> = Result<CollactionResult<T>, TryRecvError>;
 
-type ApplyResult = Result<CollactionResult, RecvTimeoutError>;
+type ApplyResult<T> = Result<CollactionResult<T>, RecvTimeoutError>;
 
-pub type ActionSender = Sender<Collaction>;
+pub type ActionSender<T> = Sender<Collaction<T>>;
 
 /// Manages reading and writing to the `Realm`.
 ///
@@ -22,12 +24,12 @@ pub type ActionSender = Sender<Collaction>;
 /// a reader phase where all reads of the data take place, free of any mutation.
 /// Handling the transitions between these phases is the responsibility of the
 /// API Client(s).
-pub struct Engine {
+pub struct Engine<T: TPData> {
     realm: Realm,
-    receiver: Receiver<Collaction>,
+    receiver: Receiver<Collaction<T>>,
 }
-impl Engine {
-    pub fn new(realm: Realm, queue_capacity: Option<usize>) -> (Self, ActionSender) {
+impl<T: TPData + PartialEq + Clone> Engine<T> {
+    pub fn new(realm: Realm, queue_capacity: Option<usize>) -> (Self, ActionSender<T>) {
         let (sender, receiver) = if let Some(cap) = queue_capacity {
             crossbeam_channel::bounded(cap)
         } else {
@@ -48,7 +50,7 @@ impl Engine {
 
     /// Same as `apply_timeout()`, but immediately returns if there are no
     /// collactions pending.
-    pub fn try_apply(&mut self) -> TryApplyResult {
+    pub fn try_apply(&mut self) -> TryApplyResult<T> {
         let collaction = self.receiver.try_recv()?;
         let result = self.apply_collaction(collaction);
         Ok(result)
@@ -57,29 +59,31 @@ impl Engine {
     /// Blocks until a collaction is applied or rejected from the pending
     /// collactions, and returns the `CollactionResult`. If there are no
     /// collactions found by `timeout`, returns an error.
-    pub fn apply_timeout(&mut self, timeout: std::time::Duration) -> ApplyResult {
+    pub fn apply_timeout(&mut self, timeout: std::time::Duration) -> ApplyResult<T> {
         let collaction = self.receiver.recv_timeout(timeout)?;
         let result = self.apply_collaction(collaction);
         Ok(result)
     }
 
-    fn apply_collaction(&mut self, collaction: Collaction) -> CollactionResult {
+    fn apply_collaction(&mut self, collaction: Collaction<T>) -> CollactionResult<T> {
         // Keep track of applied Actions
-        let mut applied_actions: Vec<&dyn Action> = Vec::new();
+        let mut applied_actions: Vec<Box<dyn Action<T>>> = Vec::new();
 
         // Iterate through all Actions in this Collaction.
         for action in collaction.actions() {
-            let action_ref = action.as_ref();
-            let action_result = self.apply_action(action_ref);
-            applied_actions.push(action_ref);
+            let action_result = self.apply_action(action);
+            applied_actions.push(action);
 
             // If Action failed
-            if !action_result {
-                // Reverse already applied Actions.
-                self.reverse_actions(applied_actions);
+            match action_result {
+                Err(action) => {
+                    // Reverse already applied Actions.
+                    self.reverse_actions(applied_actions);
 
-                // Bail and reject the whole Collaction.
-                return Err(collaction);
+                    // Bail and reject the whole Collaction.
+                    return Err(collaction);
+                }
+                _ => {} // unused
             }
         }
 
@@ -87,31 +91,68 @@ impl Engine {
         Ok(collaction)
     }
 
-    fn apply_action(&mut self, action: &dyn Action) -> ActionResult {
-        // Every Action is approved in this single-Guest version of the Platform.
-        let is_approved = true;
+    fn apply_action(&mut self, action: Box<dyn Action<T>>) -> ActionResult<T> {
+        let mut is_approved = false;
 
         match action.kind() {
             ActionKind::StateAssert => {
-                todo!("Get data from Action and compare it with the BaselineFork.");
+                // Get data from the Action and compare it against the BaselineFork.
+                let state_handle = action.state_handle();
+                let data_new = action.raw_data();
+                let state_result = self
+                    .realm()
+                    .baseline(BaselineKind::Fork)
+                    .state(state_handle);
+
+                match state_result {
+                    Ok(state) => {
+                        if &state.0 == data_new {
+                            is_approved = true
+                        }
+                    }
+                    Err(e) => {
+                        panic!("[Engine] Could not apply StateAssert action: {}", e);
+                    }
+                }
             }
             ActionKind::StateWrite => {
-                todo!("Get data from Action and apply it to the BaselineFork.");
+                // Get data from the Action and apply it to the BaselineFork.
+                let state_handle = action.state_handle();
+                let data_new = action.raw_data();
+                let state_result = self
+                    .realm_mut()
+                    .baseline_mut(BaselineKind::Fork)
+                    .state_mut(state_handle);
+
+                match state_result {
+                    Ok(state) => {
+                        state.0 = data_new.clone(); // TODO[SER-260]: this deep copy seems inefficient.
+                    }
+                    Err(e) => {
+                        panic!("[Engine] Could not apply StateWrite action: {}", e);
+                    }
+                }
             }
             _ => {
-                eprintln!("[Engine] Cannot apply Action: type is not yet implemented.");
+                panic!(
+                    "[Engine] Cannot apply Action of specified ActionKind: not yet implemented."
+                );
             }
         }
 
-        is_approved
+        if is_approved {
+            Ok(action)
+        } else {
+            Err(action)
+        }
     }
 
     // TODO[SER-260]: should these `reverse` methods have a return value?
-    fn reverse_action(&mut self, action: &dyn Action) {
+    fn reverse_action(&mut self, action: Box<dyn Action<T>>) {
         todo!("Reverse Action by applying the previous value to the BaselineFork.");
     }
 
-    fn reverse_actions(&mut self, actions: Vec<&dyn Action>) {
+    fn reverse_actions(&mut self, actions: Vec<Box<dyn Action<T>>>) {
         for action in actions {
             self.reverse_action(action);
         }

@@ -6,7 +6,7 @@ use typemap::ShareMap;
 
 pub type StateHandle<T> = arena::Index<State<T>>;
 
-pub struct State<T: TPData>(T);
+pub struct State<T: TPData>(pub T);
 
 /// A `TypeMap` key to access the arena containing `State<T>`s.
 pub struct StateArenaHandle<T>(PhantomData<T>);
