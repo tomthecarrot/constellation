@@ -1,6 +1,4 @@
-use crate::action::{
-    Action, ActionKind, ActionResult, BoxedAction, BoxedActions, Collaction, CollactionResult,
-};
+use crate::action::{Action, ActionKind, ActionResult, BoxedAction, Collaction, CollactionResult};
 use crate::baseline::BaselineKind;
 use crate::contract::properties::TPData;
 use crate::Realm;
@@ -10,10 +8,10 @@ use tracing;
 
 use std::mem;
 
-type TryApplyResult<T> = Result<CollactionResult<T>, TryRecvError>;
-type ApplyResult<T> = Result<CollactionResult<T>, RecvTimeoutError>;
+type TryApplyResult = Result<CollactionResult, TryRecvError>;
+type ApplyResult = Result<CollactionResult, RecvTimeoutError>;
 
-pub type ActionSender<T> = Sender<Collaction<T>>;
+pub type ActionSender = Sender<Collaction>;
 
 /// Manages reading and writing to the `Realm`.
 ///
@@ -28,12 +26,12 @@ pub type ActionSender<T> = Sender<Collaction<T>>;
 /// a reader phase where all reads of the data take place, free of any mutation.
 /// Handling the transitions between these phases is the responsibility of the
 /// API Client(s).
-pub struct Engine<T: TPData> {
+pub struct Engine {
     realm: Realm,
-    receiver: Receiver<Collaction<T>>,
+    receiver: Receiver<Collaction>,
 }
-impl<T: TPData + PartialEq> Engine<T> {
-    pub fn new(realm: Realm, queue_capacity: Option<usize>) -> (Self, ActionSender<T>) {
+impl Engine {
+    pub fn new(realm: Realm, queue_capacity: Option<usize>) -> (Self, ActionSender) {
         let (sender, receiver) = if let Some(cap) = queue_capacity {
             crossbeam_channel::bounded(cap)
         } else {
@@ -54,7 +52,7 @@ impl<T: TPData + PartialEq> Engine<T> {
 
     /// Same as `apply_timeout()`, but immediately returns if there are no
     /// collactions pending.
-    pub fn try_apply(&mut self) -> TryApplyResult<T> {
+    pub fn try_apply(&mut self) -> TryApplyResult {
         let collaction = self.receiver.try_recv()?;
         let result = self.apply_collaction(collaction);
         Ok(result)
@@ -63,15 +61,15 @@ impl<T: TPData + PartialEq> Engine<T> {
     /// Blocks until a collaction is applied or rejected from the pending
     /// collactions, and returns the `CollactionResult`. If there are no
     /// collactions found by `timeout`, returns an error.
-    pub fn apply_timeout(&mut self, timeout: std::time::Duration) -> ApplyResult<T> {
+    pub fn apply_timeout(&mut self, timeout: std::time::Duration) -> ApplyResult {
         let collaction = self.receiver.recv_timeout(timeout)?;
         let result = self.apply_collaction(collaction);
         Ok(result)
     }
 
-    fn apply_collaction(&mut self, mut collaction: Collaction<T>) -> CollactionResult<T> {
+    fn apply_collaction(&mut self, mut collaction: Collaction) -> CollactionResult {
         // Keep track of applied Actions
-        let mut applied_actions: Vec<&mut BoxedAction<T>> = Vec::new();
+        let mut applied_actions = Vec::new();
 
         // Iterate through all Actions in this Collaction.
         let actions = collaction.actions();
@@ -97,7 +95,7 @@ impl<T: TPData + PartialEq> Engine<T> {
         Ok(collaction)
     }
 
-    fn apply_action(&mut self, action: &mut BoxedAction<T>) -> ActionResult {
+    fn apply_action(&mut self, action: &mut BoxedAction) -> ActionResult {
         let mut was_successful = false;
 
         match action.kind() {
@@ -160,7 +158,7 @@ impl<T: TPData + PartialEq> Engine<T> {
         }
     }
 
-    fn reverse_action(&mut self, action: &mut BoxedAction<T>) {
+    fn reverse_action(&mut self, action: &mut BoxedAction) {
         // Reverse Action by applying the previous value to the BaselineFork,
         // where applicable.
         match action.kind() {
@@ -178,7 +176,7 @@ impl<T: TPData + PartialEq> Engine<T> {
         }
     }
 
-    fn reverse_actions(&mut self, actions: &mut Vec<&mut BoxedAction<T>>) {
+    fn reverse_actions(&mut self, actions: &mut Vec<&mut BoxedAction>) {
         // Go in FIFO order
         for action in actions.into_iter().rev() {
             self.reverse_action(action);
