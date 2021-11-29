@@ -33,7 +33,7 @@ pub struct Engine<T: TPData> {
     realm: Realm,
     receiver: Receiver<Collaction<T>>,
 }
-impl<T: TPData + PartialEq + Clone> Engine<T> {
+impl<T: TPData + PartialEq> Engine<T> {
     pub fn new(realm: Realm, queue_capacity: Option<usize>) -> (Self, ActionSender<T>) {
         let (sender, receiver) = if let Some(cap) = queue_capacity {
             crossbeam_channel::bounded(cap)
