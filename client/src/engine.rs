@@ -1,7 +1,4 @@
-use crate::action::{
-    Action, ActionKind, ActionResult, BoxedActions, Collaction, CollactionResult,
-    CollactionReverseResult,
-};
+use crate::action::{Action, ActionKind, ActionResult, BoxedActions, Collaction, CollactionResult};
 use crate::baseline::BaselineKind;
 use crate::contract::properties::TPData;
 use crate::Realm;
@@ -183,17 +180,10 @@ impl<T: TPData + PartialEq> Engine<T> {
         }
     }
 
-    fn reverse_actions(&mut self, actions: BoxedActions<T>) -> CollactionReverseResult {
+    fn reverse_actions(&mut self, actions: BoxedActions<T>) {
         // Go in FIFO order
         for action in actions.into_iter().rev() {
-            match self.reverse_action(action) {
-                Ok(_) => {} // this action successfully reversed.
-                Err(_) => {
-                    return Err(false);
-                }
-            }
+            self.reverse_action(action);
         }
-
-        Ok(true)
     }
 }

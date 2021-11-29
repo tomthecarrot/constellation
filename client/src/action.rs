@@ -28,7 +28,6 @@ impl<T: TPData> Collaction<T> {
 }
 
 pub type CollactionResult = Result<bool, bool>;
-pub type CollactionReverseResult = Result<bool, bool>;
 
 // ---- Action trait impls ----
 
