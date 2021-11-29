@@ -15,18 +15,20 @@ pub trait Action<T: TPData>: Send + Sync {
 }
 
 pub type ActionResult<T> = Result<Box<dyn Action<T>>, Box<dyn Action<T>>>;
+pub type BoxedActions<T> = Vec<Box<dyn Action<T>>>;
 
 pub struct Collaction<T> {
-    actions: Vec<Box<dyn Action<T>>>,
+    actions: BoxedActions<T>,
 }
 
 impl<T: TPData> Collaction<T> {
-    pub fn actions(self) -> Vec<Box<dyn Action<T>>> {
+    pub fn actions(self) -> BoxedActions<T> {
         self.actions
     }
 }
 
 pub type CollactionResult = Result<bool, bool>;
+pub type CollactionReverseResult = Result<bool, bool>;
 
 // ---- Action trait impls ----
 

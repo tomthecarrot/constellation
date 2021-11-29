@@ -1,4 +1,7 @@
-use crate::action::{Action, ActionKind, ActionResult, Collaction, CollactionResult};
+use crate::action::{
+    Action, ActionKind, ActionResult, BoxedActions, Collaction, CollactionResult,
+    CollactionReverseResult,
+};
 use crate::baseline::BaselineKind;
 use crate::contract::properties::TPData;
 use crate::Realm;
@@ -69,7 +72,7 @@ impl<T: TPData + PartialEq + Clone> Engine<T> {
 
     fn apply_collaction(&mut self, collaction: Collaction<T>) -> CollactionResult {
         // Keep track of applied Actions
-        let mut applied_actions: Vec<Box<dyn Action<T>>> = Vec::new();
+        let mut applied_actions: BoxedActions<T> = Vec::new();
 
         // Iterate through all Actions in this Collaction.
         for action in collaction.actions() {
@@ -95,7 +98,7 @@ impl<T: TPData + PartialEq + Clone> Engine<T> {
     }
 
     fn apply_action(&mut self, mut action: Box<dyn Action<T>>) -> ActionResult<T> {
-        let mut is_approved = false;
+        let mut was_successful = false;
 
         match action.kind() {
             ActionKind::StateAssert => {
@@ -110,7 +113,7 @@ impl<T: TPData + PartialEq + Clone> Engine<T> {
                 match state_result {
                     Ok(state) => {
                         if &state.0 == data_new {
-                            is_approved = true
+                            was_successful = true
                         }
                     }
                     Err(e) => {
@@ -134,7 +137,7 @@ impl<T: TPData + PartialEq + Clone> Engine<T> {
                         // for its simple reversal if needed.
                         mem::swap(&mut state.0, data_new);
 
-                        is_approved = true;
+                        was_successful = true;
                     }
                     Err(e) => {
                         panic!("[Engine] Could not apply StateWrite action: {}", e);
@@ -142,27 +145,55 @@ impl<T: TPData + PartialEq + Clone> Engine<T> {
                 }
             }
             _ => {
-                panic!(
+                eprintln!(
                     "[Engine] Cannot apply Action of specified ActionKind: not yet implemented."
                 );
+
+                was_successful = false;
             }
         }
 
-        if is_approved {
+        if was_successful {
             Ok(action)
         } else {
             Err(action)
         }
     }
 
-    // TODO[SER-260]: should these `reverse` methods have a return value?
-    fn reverse_action(&mut self, action: Box<dyn Action<T>>) {
-        todo!("Reverse Action by applying the previous value to the BaselineFork.");
+    fn reverse_action(&mut self, action: Box<dyn Action<T>>) -> ActionResult<T> {
+        // Reverse Action by applying the previous value to the BaselineFork,
+        // where applicable.
+        match action.kind() {
+            ActionKind::StateAssert => {
+                // Noop
+                Ok(action)
+            }
+            ActionKind::StateWrite => {
+                // Reverse by re-applying the Action.
+                // This triggers a value swap.
+                self.apply_action(action)
+            }
+            _ => {
+                eprintln!(
+                    "[Engine] Cannot reverse Action of specified ActionKind: not yet implemented."
+                );
+
+                Err(action)
+            }
+        }
     }
 
-    fn reverse_actions(&mut self, actions: Vec<Box<dyn Action<T>>>) {
-        for action in actions {
-            self.reverse_action(action);
+    fn reverse_actions(&mut self, actions: BoxedActions<T>) -> CollactionReverseResult {
+        // Go in FIFO order
+        for action in actions.into_iter().rev() {
+            match self.reverse_action(action) {
+                Ok(_) => {} // this action successfully reversed.
+                Err(_) => {
+                    return Err(false);
+                }
+            }
         }
+
+        Ok(true)
     }
 }
