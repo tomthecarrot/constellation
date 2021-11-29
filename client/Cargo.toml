@@ -12,3 +12,4 @@ eyre = "0.6"
 arena = {path = "../datastructures/arena"}
 typemap = "0.3"
 crossbeam-channel = "0.5"
+tracing = "0.1.29"

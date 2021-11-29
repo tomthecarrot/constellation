@@ -4,6 +4,7 @@ use crate::contract::properties::TPData;
 use crate::Realm;
 
 use crossbeam_channel::{Receiver, RecvTimeoutError, Sender, TryRecvError};
+use tracing;
 
 use std::mem;
 
@@ -142,8 +143,8 @@ impl<T: TPData + PartialEq> Engine<T> {
                 }
             }
             _ => {
-                eprintln!(
-                    "[Engine] Cannot apply Action of specified ActionKind: not yet implemented."
+                tracing::warn!(
+                    "[Engine] Cannot apply Action of specified ActionKind: not yet implemented. Treating as no-op.",
                 );
 
                 was_successful = false;
@@ -171,8 +172,8 @@ impl<T: TPData + PartialEq> Engine<T> {
                 self.apply_action(action)
             }
             _ => {
-                eprintln!(
-                    "[Engine] Cannot reverse Action of specified ActionKind: not yet implemented."
+                tracing::warn!(
+                    "[Engine] Cannot reverse Action of specified ActionKind: not yet implemented. Treating as no-op."
                 );
 
                 Err(action)
