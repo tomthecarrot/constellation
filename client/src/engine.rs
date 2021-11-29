@@ -1,4 +1,6 @@
-use crate::action::{Action, ActionKind, ActionResult, BoxedActions, Collaction, CollactionResult};
+use crate::action::{
+    Action, ActionKind, ActionResult, BoxedAction, BoxedActions, Collaction, CollactionResult,
+};
 use crate::baseline::BaselineKind;
 use crate::contract::properties::TPData;
 use crate::Realm;
@@ -8,9 +10,8 @@ use tracing;
 
 use std::mem;
 
-type TryApplyResult = Result<CollactionResult, TryRecvError>;
-
-type ApplyResult = Result<CollactionResult, RecvTimeoutError>;
+type TryApplyResult<T> = Result<CollactionResult<T>, TryRecvError>;
+type ApplyResult<T> = Result<CollactionResult<T>, RecvTimeoutError>;
 
 pub type ActionSender<T> = Sender<Collaction<T>>;
 
@@ -53,7 +54,7 @@ impl<T: TPData + PartialEq> Engine<T> {
 
     /// Same as `apply_timeout()`, but immediately returns if there are no
     /// collactions pending.
-    pub fn try_apply(&mut self) -> TryApplyResult {
+    pub fn try_apply(&mut self) -> TryApplyResult<T> {
         let collaction = self.receiver.try_recv()?;
         let result = self.apply_collaction(collaction);
         Ok(result)
@@ -62,40 +63,41 @@ impl<T: TPData + PartialEq> Engine<T> {
     /// Blocks until a collaction is applied or rejected from the pending
     /// collactions, and returns the `CollactionResult`. If there are no
     /// collactions found by `timeout`, returns an error.
-    pub fn apply_timeout(&mut self, timeout: std::time::Duration) -> ApplyResult {
+    pub fn apply_timeout(&mut self, timeout: std::time::Duration) -> ApplyResult<T> {
         let collaction = self.receiver.recv_timeout(timeout)?;
         let result = self.apply_collaction(collaction);
         Ok(result)
     }
 
-    fn apply_collaction(&mut self, collaction: Collaction<T>) -> CollactionResult {
+    fn apply_collaction(&mut self, mut collaction: Collaction<T>) -> CollactionResult<T> {
         // Keep track of applied Actions
-        let mut applied_actions: BoxedActions<T> = Vec::new();
+        let mut applied_actions: Vec<&mut BoxedAction<T>> = Vec::new();
 
         // Iterate through all Actions in this Collaction.
-        for action in collaction.actions() {
+        let actions = collaction.actions();
+        for action in actions {
             let action_result = self.apply_action(action);
             match action_result {
-                Ok(action) => {
+                Ok(()) => {
                     // Keep track of previously-applied Actions.
                     applied_actions.push(action);
                 }
-                Err(action) => {
+                Err(()) => {
                     // Reverse previously-applied Actions within this Collaction.
                     applied_actions.push(action);
-                    self.reverse_actions(applied_actions);
+                    self.reverse_actions(&mut applied_actions);
 
                     // Bail and reject this Collaction.
-                    return Err(false);
+                    return Err(collaction);
                 }
             }
         }
 
         // If all Actions succeeded, approve the Collaction.
-        Ok(true)
+        Ok(collaction)
     }
 
-    fn apply_action(&mut self, mut action: Box<dyn Action<T>>) -> ActionResult<T> {
+    fn apply_action(&mut self, action: &mut BoxedAction<T>) -> ActionResult {
         let mut was_successful = false;
 
         match action.kind() {
@@ -152,13 +154,13 @@ impl<T: TPData + PartialEq> Engine<T> {
         }
 
         if was_successful {
-            Ok(action)
+            Ok(())
         } else {
-            Err(action)
+            Err(())
         }
     }
 
-    fn reverse_action(&mut self, action: Box<dyn Action<T>>) {
+    fn reverse_action(&mut self, action: &mut BoxedAction<T>) {
         // Reverse Action by applying the previous value to the BaselineFork,
         // where applicable.
         match action.kind() {
@@ -176,7 +178,7 @@ impl<T: TPData + PartialEq> Engine<T> {
         }
     }
 
-    fn reverse_actions(&mut self, actions: BoxedActions<T>) {
+    fn reverse_actions(&mut self, actions: &mut Vec<&mut BoxedAction<T>>) {
         // Go in FIFO order
         for action in actions.into_iter().rev() {
             self.reverse_action(action);

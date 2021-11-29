@@ -14,20 +14,21 @@ pub trait Action<T: TPData>: Send + Sync {
     // TODO[SER-257]: fn write_into(&self, buf: &mut impl Write) -> Result<(), std::io::Error>;
 }
 
-pub type ActionResult<T> = Result<Box<dyn Action<T>>, Box<dyn Action<T>>>;
-pub type BoxedActions<T> = Vec<Box<dyn Action<T>>>;
+pub type ActionResult = Result<(), ()>;
+pub type BoxedAction<T> = Box<dyn Action<T>>;
+pub type BoxedActions<T> = Vec<BoxedAction<T>>;
 
 pub struct Collaction<T> {
     actions: BoxedActions<T>,
 }
 
 impl<T: TPData> Collaction<T> {
-    pub fn actions(self) -> BoxedActions<T> {
-        self.actions
+    pub fn actions(&mut self) -> &mut BoxedActions<T> {
+        &mut self.actions
     }
 }
 
-pub type CollactionResult = Result<bool, bool>;
+pub type CollactionResult<T> = Result<Collaction<T>, Collaction<T>>;
 
 // ---- Action trait impls ----
 
