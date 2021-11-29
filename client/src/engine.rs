@@ -5,6 +5,8 @@ use crate::Realm;
 
 use crossbeam_channel::{Receiver, RecvTimeoutError, Sender, TryRecvError};
 
+use std::mem;
+
 type TryApplyResult = Result<CollactionResult, TryRecvError>;
 
 type ApplyResult = Result<CollactionResult, RecvTimeoutError>;
@@ -92,7 +94,7 @@ impl<T: TPData + PartialEq + Clone> Engine<T> {
         Ok(true)
     }
 
-    fn apply_action(&mut self, action: Box<dyn Action<T>>) -> ActionResult<T> {
+    fn apply_action(&mut self, mut action: Box<dyn Action<T>>) -> ActionResult<T> {
         let mut is_approved = false;
 
         match action.kind() {
@@ -127,7 +129,12 @@ impl<T: TPData + PartialEq + Clone> Engine<T> {
 
                 match state_result {
                     Ok(state) => {
-                        state.0 = data_new.clone(); // TODO[SER-260]: this deep copy seems inefficient.
+                        // Swap the current value with the new data.
+                        // This optimizes applying the Action and allows
+                        // for its simple reversal if needed.
+                        mem::swap(&mut state.0, data_new);
+
+                        is_approved = true;
                     }
                     Err(e) => {
                         panic!("[Engine] Could not apply StateWrite action: {}", e);

@@ -9,7 +9,7 @@ pub enum PropertyAction<T: TPData> {
 pub trait Action<T: TPData>: Send + Sync {
     fn kind(&self) -> ActionKind;
     fn state_handle(&self) -> StateHandle<T>;
-    fn raw_data(&self) -> &T;
+    fn raw_data(&mut self) -> &mut T;
     fn into_bytes(self) -> Box<[u8]>;
     // TODO[SER-257]: fn write_into(&self, buf: &mut impl Write) -> Result<(), std::io::Error>;
 }
@@ -49,7 +49,7 @@ impl<T: TPData> Action<T> for PropertyAction<T> {
         }
     }
 
-    fn raw_data(&self) -> &T {
+    fn raw_data(&mut self) -> &mut T {
         match self {
             PropertyAction::StateWrite(_, raw_data) => raw_data,
             PropertyAction::StateAssert(_, raw_data) => raw_data,
