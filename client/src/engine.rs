@@ -158,25 +158,20 @@ impl<T: TPData + PartialEq> Engine<T> {
         }
     }
 
-    fn reverse_action(&mut self, action: Box<dyn Action<T>>) -> ActionResult<T> {
+    fn reverse_action(&mut self, action: Box<dyn Action<T>>) {
         // Reverse Action by applying the previous value to the BaselineFork,
         // where applicable.
         match action.kind() {
-            ActionKind::StateAssert => {
-                // Noop
-                Ok(action)
-            }
+            ActionKind::StateAssert => {} // no-op
             ActionKind::StateWrite => {
                 // Reverse by re-applying the Action.
                 // This triggers a value swap.
-                self.apply_action(action)
+                self.apply_action(action);
             }
             _ => {
                 tracing::warn!(
                     "[Engine] Cannot reverse Action of specified ActionKind: not yet implemented. Treating as no-op."
                 );
-
-                Err(action)
             }
         }
     }
