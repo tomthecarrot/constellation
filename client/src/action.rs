@@ -26,7 +26,7 @@ impl<T: TPData> Collaction<T> {
     }
 }
 
-pub type CollactionResult<T> = Result<Collaction<T>, Collaction<T>>;
+pub type CollactionResult = Result<bool, bool>;
 
 // ---- Action trait impls ----
 

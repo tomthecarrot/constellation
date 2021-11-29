@@ -5,9 +5,9 @@ use crate::Realm;
 
 use crossbeam_channel::{Receiver, RecvTimeoutError, Sender, TryRecvError};
 
-type TryApplyResult<T> = Result<CollactionResult<T>, TryRecvError>;
+type TryApplyResult = Result<CollactionResult, TryRecvError>;
 
-type ApplyResult<T> = Result<CollactionResult<T>, RecvTimeoutError>;
+type ApplyResult = Result<CollactionResult, RecvTimeoutError>;
 
 pub type ActionSender<T> = Sender<Collaction<T>>;
 
@@ -50,7 +50,7 @@ impl<T: TPData + PartialEq + Clone> Engine<T> {
 
     /// Same as `apply_timeout()`, but immediately returns if there are no
     /// collactions pending.
-    pub fn try_apply(&mut self) -> TryApplyResult<T> {
+    pub fn try_apply(&mut self) -> TryApplyResult {
         let collaction = self.receiver.try_recv()?;
         let result = self.apply_collaction(collaction);
         Ok(result)
@@ -59,36 +59,37 @@ impl<T: TPData + PartialEq + Clone> Engine<T> {
     /// Blocks until a collaction is applied or rejected from the pending
     /// collactions, and returns the `CollactionResult`. If there are no
     /// collactions found by `timeout`, returns an error.
-    pub fn apply_timeout(&mut self, timeout: std::time::Duration) -> ApplyResult<T> {
+    pub fn apply_timeout(&mut self, timeout: std::time::Duration) -> ApplyResult {
         let collaction = self.receiver.recv_timeout(timeout)?;
         let result = self.apply_collaction(collaction);
         Ok(result)
     }
 
-    fn apply_collaction(&mut self, collaction: Collaction<T>) -> CollactionResult<T> {
+    fn apply_collaction(&mut self, collaction: Collaction<T>) -> CollactionResult {
         // Keep track of applied Actions
         let mut applied_actions: Vec<Box<dyn Action<T>>> = Vec::new();
 
         // Iterate through all Actions in this Collaction.
         for action in collaction.actions() {
             let action_result = self.apply_action(action);
-            applied_actions.push(action);
-
-            // If Action failed
             match action_result {
+                Ok(action) => {
+                    // Keep track of previously-applied Actions.
+                    applied_actions.push(action);
+                }
                 Err(action) => {
-                    // Reverse already applied Actions.
+                    // Reverse previously-applied Actions within this Collaction.
+                    applied_actions.push(action);
                     self.reverse_actions(applied_actions);
 
-                    // Bail and reject the whole Collaction.
-                    return Err(collaction);
+                    // Bail and reject this Collaction.
+                    return Err(false);
                 }
-                _ => {} // unused
             }
         }
 
         // If all Actions succeeded, approve the Collaction.
-        Ok(collaction)
+        Ok(true)
     }
 
     fn apply_action(&mut self, action: Box<dyn Action<T>>) -> ActionResult<T> {
