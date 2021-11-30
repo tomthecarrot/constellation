@@ -9,6 +9,8 @@ rust-version = "1.56"  # Rust 2021
 [dependencies]
 rand = "0.8"
 eyre = "0.6"
-arena = {path = "../datastructures/arena"}
+arena = { path = "../datastructures/arena" }
 typemap = "0.3"
 crossbeam-channel = "0.5"
+derive_more = "0.99"
+enum_dispatch = "0.3"

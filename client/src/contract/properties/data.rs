@@ -3,7 +3,7 @@ use crate::contract::ContractHandle;
 use crate::object::ObjectHandle;
 
 /// Any data that can be stored in a property implements `TPData`.
-pub trait TPData: Sized + 'static + private::Sealed + Send + Sync {}
+pub trait TPData: 'static + private::Sealed + Send + Sync {}
 
 // ---- Trait implementations for funamental datatypes
 
@@ -56,3 +56,6 @@ impl<T: TPData> private::Sealed for StateHandle<T> {}
 
 impl<T: TPData> TPData for ChannelHandle<T> {}
 impl<T: TPData> private::Sealed for ChannelHandle<T> {}
+
+impl<T: TPData + ?Sized> TPData for Box<T> {}
+impl<T: TPData + ?Sized> private::Sealed for Box<T> {}
