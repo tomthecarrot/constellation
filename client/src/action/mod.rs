@@ -1,18 +1,20 @@
 pub mod property;
 
-use crate::contract::properties::{ChannelHandle, StateHandle, TPData};
+use crate::contract::properties::{
+    ChannelHandle, DynTpData, DynTpProperty, ITpData, ITpProperty, StateHandle,
+};
 use property::{ChannelAction, PropertyAction, StateAction};
 
 use enum_dispatch::enum_dispatch;
 
-#[enum_dispatch(TAction)]
-pub enum Action<T: TPData = Box<dyn TPData>> {
+#[enum_dispatch(IAction)]
+pub enum Action<T: ITpProperty = DynTpProperty> {
     Property(PropertyAction<T>),
 }
 
-/// All `Action` variants satisfy `TAction` trait
+/// All `Action` variants satisfy `IAction` trait
 #[enum_dispatch]
-pub trait TAction {
+pub trait IAction {
     fn kind(&self) -> ActionKind;
     fn into_bytes(self) -> Box<[u8]>;
     // TODO[SER-257]: fn write_into(&self, buf: &mut impl Write) -> Result<(), std::io::Error>;

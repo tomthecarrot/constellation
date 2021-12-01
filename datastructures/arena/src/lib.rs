@@ -100,7 +100,6 @@ impl<T> FromIterator<T> for Arena<T> {
 }
 
 /// A type-safe index for [`Arena`]
-#[derive(PartialOrd, Ord)]
 pub struct Index<T> {
     inner: ga::Index,
     _phantom: PhantomData<T>,
@@ -149,6 +148,18 @@ impl<T> std::cmp::PartialEq for Index<T> {
 }
 
 impl<T> std::cmp::Eq for Index<T> {}
+
+impl<T> std::cmp::PartialOrd for Index<T> {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        self.inner.partial_cmp(&other.inner)
+    }
+}
+
+impl<T> std::cmp::Ord for Index<T> {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        self.inner.cmp(&other.inner)
+    }
+}
 
 // ---- Iterator implementations ----
 

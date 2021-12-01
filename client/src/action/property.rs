@@ -1,25 +1,25 @@
-use crate::contract::properties::{ChannelHandle, StateHandle, TPData};
+use crate::contract::properties::{ChannelHandle, ITpProperty, StateHandle};
 
-use crate::action::{ActionKind, TAction};
+use crate::action::{ActionKind, IAction};
 
 use enum_dispatch::enum_dispatch;
 
-#[enum_dispatch(TAction)]
-pub enum PropertyAction<T: TPData> {
+#[enum_dispatch(IAction)]
+pub enum PropertyAction<T: ITpProperty> {
     State(StateAction<T>),
     Channel(ChannelAction<T>),
 }
 
-pub enum ChannelAction<T: TPData> {
+pub enum ChannelAction<T: ITpProperty> {
     Assert { handle: ChannelHandle<T>, data: T },
     Write { handle: ChannelHandle<T>, data: T },
 }
-pub enum StateAction<T: TPData> {
+pub enum StateAction<T: ITpProperty> {
     Assert { handle: StateHandle<T>, data: T },
     Write { handle: StateHandle<T>, data: T },
 }
 
-impl<T: TPData> TAction for StateAction<T> {
+impl<T: ITpProperty> IAction for StateAction<T> {
     fn kind(&self) -> ActionKind {
         match self {
             Self::Write { .. } => ActionKind::StateWrite,
@@ -32,7 +32,7 @@ impl<T: TPData> TAction for StateAction<T> {
     }
 }
 
-impl<T: TPData> TAction for ChannelAction<T> {
+impl<T: ITpProperty> IAction for ChannelAction<T> {
     fn kind(&self) -> ActionKind {
         match self {
             Self::Write { .. } => ActionKind::ChannelWrite,

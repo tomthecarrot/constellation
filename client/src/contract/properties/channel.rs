@@ -1,17 +1,17 @@
-use crate::contract::properties::data::TPData;
+use crate::contract::properties::data::ITpProperty;
 use crate::contract::ContractHandle;
 
 use std::marker::PhantomData;
 use typemap::ShareMap;
 
 // TODO: figure out data in a channel
-pub struct Channel<T: TPData>(T);
+pub struct Channel<T: ITpProperty>(T);
 
 pub type ChannelHandle<T> = arena::Index<Channel<T>>;
 
 /// A `TypeMap` key to access the arena containing `State<T>`s.
-pub struct ChannelArenaHandle<T>(PhantomData<T>);
-impl<T: 'static + TPData> typemap::Key for ChannelArenaHandle<T> {
+pub struct ChannelArenaHandle<T: ITpProperty>(PhantomData<T>);
+impl<T: ITpProperty> typemap::Key for ChannelArenaHandle<T> {
     type Value = arena::Arena<Channel<T>>;
 }
 

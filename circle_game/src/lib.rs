@@ -1,7 +1,7 @@
 mod circle_bundle;
 
 use circle_bundle::CircleBundle;
-use tp_client::engine::{ActionSender, Engine};
+use tp_client::engine::Engine;
 use tp_client::realm::{Realm, RealmID};
 use tp_client::{baseline::BaselineKind, object::ObjectHandle};
 

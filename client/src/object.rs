@@ -1,4 +1,4 @@
-use crate::contract::properties::{ChannelHandle, ChannelID, StateHandle, StateID, TPData};
+use crate::contract::properties::{ChannelHandle, ChannelID, ITpData, StateHandle, StateID};
 use crate::contract::ContractHandle;
 
 use arena::generational_arena as ga;
@@ -12,7 +12,7 @@ pub struct Object {
     contract: ContractHandle,
 }
 impl Object {
-    pub fn state<T: TPData>(&self, id: StateID) -> StateHandle<T> {
+    pub fn state<T: ITpData>(&self, id: StateID) -> StateHandle<T> {
         assert_eq!(
             id.contract(),
             self.contract,
@@ -31,7 +31,7 @@ impl Object {
         StateHandle::new(idx)
     }
 
-    pub fn channel<T: TPData>(&self, id: ChannelID) -> ChannelHandle<T> {
+    pub fn channel<T: ITpData>(&self, id: ChannelID) -> ChannelHandle<T> {
         assert_eq!(
             id.contract(),
             self.contract,
