@@ -1,4 +1,4 @@
-use crate::contract::properties::data::TPData;
+use crate::contract::properties::data::ITpProperty;
 use crate::contract::ContractHandle;
 
 use std::marker::PhantomData;
@@ -6,11 +6,11 @@ use typemap::ShareMap;
 
 pub type StateHandle<T> = arena::Index<State<T>>;
 
-pub struct State<T: TPData>(T);
+pub struct State<T: ITpProperty>(T);
 
 /// A `TypeMap` key to access the arena containing `State<T>`s.
-pub struct StateArenaHandle<T>(PhantomData<T>);
-impl<T: 'static + TPData> typemap::Key for StateArenaHandle<T> {
+pub struct StateArenaHandle<T: ITpProperty>(PhantomData<T>);
+impl<T: ITpProperty> typemap::Key for StateArenaHandle<T> {
     type Value = arena::Arena<State<T>>;
 }
 

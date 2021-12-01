@@ -2,8 +2,8 @@
 // Copyright 2021 WiTag Inc. dba Teleportal
 
 use crate::contract::properties::{
-    Channel, ChannelArenaHandle, ChannelArenaMap, ChannelHandle, State, StateArenaHandle,
-    StateArenaMap, StateHandle, TPData,
+    Channel, ChannelArenaHandle, ChannelArenaMap, ChannelHandle, ITpProperty, State,
+    StateArenaHandle, StateArenaMap, StateHandle,
 };
 use crate::contract::{Contract, ContractHandle};
 use crate::object::{Object, ObjectHandle};
@@ -46,11 +46,11 @@ impl Baseline {
 
     // TODO[SER-259]: determine method for notifying Baseline fork.
 
-    fn on_state_change<T: TPData>(&self, state: StateHandle<T>) {
+    fn on_state_change<T: ITpProperty>(&self, state: StateHandle<T>) {
         todo!("Notify fork");
     }
 
-    fn on_channel_change<T: TPData>(&self, channel: ChannelHandle<T>) {
+    fn on_channel_change<T: ITpProperty>(&self, channel: ChannelHandle<T>) {
         todo!("Notify fork");
     }
 
@@ -90,7 +90,7 @@ impl Baseline {
 
     // ---- Property accessors ----
 
-    pub fn state<T: TPData>(&self, state: StateHandle<T>) -> Result<&State<T>> {
+    pub fn state<T: ITpProperty>(&self, state: StateHandle<T>) -> Result<&State<T>> {
         let arena = self
             .states
             .get::<StateArenaHandle<T>>()
@@ -101,7 +101,7 @@ impl Baseline {
             .ok_or_else(|| eyre!("The given handle doesn't exist in the Arena"))
     }
 
-    pub fn state_mut<T: TPData>(&mut self, state: StateHandle<T>) -> Result<&mut State<T>> {
+    pub fn state_mut<T: ITpProperty>(&mut self, state: StateHandle<T>) -> Result<&mut State<T>> {
         let arena = self
             .states
             .get_mut::<StateArenaHandle<T>>()
@@ -112,7 +112,7 @@ impl Baseline {
             .ok_or_else(|| eyre!("The given handle doesn't exist in the Arena"))
     }
 
-    pub fn channel<T: TPData>(&self, chan: ChannelHandle<T>) -> Result<&Channel<T>> {
+    pub fn channel<T: ITpProperty>(&self, chan: ChannelHandle<T>) -> Result<&Channel<T>> {
         let arena = self
             .states
             .get::<ChannelArenaHandle<T>>()
@@ -123,7 +123,10 @@ impl Baseline {
             .ok_or_else(|| eyre!("The given handle doesn't exist in the Arena"))
     }
 
-    pub fn channel_mut<T: TPData>(&mut self, chan: ChannelHandle<T>) -> Result<&mut Channel<T>> {
+    pub fn channel_mut<T: ITpProperty>(
+        &mut self,
+        chan: ChannelHandle<T>,
+    ) -> Result<&mut Channel<T>> {
         let arena = self
             .states
             .get_mut::<ChannelArenaHandle<T>>()
@@ -163,27 +166,27 @@ impl core::ops::IndexMut<ContractHandle> for Baseline {
     }
 }
 
-impl<'a, T: TPData> core::ops::Index<StateHandle<T>> for Baseline {
+impl<T: ITpProperty> core::ops::Index<StateHandle<T>> for Baseline {
     type Output = State<T>;
 
     fn index(&self, index: StateHandle<T>) -> &Self::Output {
         self.state(index).expect("Invalid handle")
     }
 }
-impl<'a, T: TPData> core::ops::IndexMut<StateHandle<T>> for Baseline {
+impl<T: ITpProperty> core::ops::IndexMut<StateHandle<T>> for Baseline {
     fn index_mut(&mut self, index: StateHandle<T>) -> &mut Self::Output {
         self.state_mut(index).expect("Invalid handle")
     }
 }
 
-impl<'a, T: TPData> core::ops::Index<ChannelHandle<T>> for Baseline {
+impl<T: ITpProperty> core::ops::Index<ChannelHandle<T>> for Baseline {
     type Output = Channel<T>;
 
     fn index(&self, index: ChannelHandle<T>) -> &Self::Output {
         self.channel(index).expect("Invalid handle")
     }
 }
-impl<'a, T: TPData> core::ops::IndexMut<ChannelHandle<T>> for Baseline {
+impl<T: ITpProperty> core::ops::IndexMut<ChannelHandle<T>> for Baseline {
     fn index_mut(&mut self, index: ChannelHandle<T>) -> &mut Self::Output {
         self.channel_mut(index).expect("Invalid handle")
     }
