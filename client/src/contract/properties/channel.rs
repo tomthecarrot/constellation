@@ -1,5 +1,5 @@
 use crate::contract::properties::data::ITpProperty;
-use crate::contract::ContractHandle;
+use crate::contract::ContractId;
 
 use std::marker::PhantomData;
 use typemap::ShareMap;
@@ -20,12 +20,13 @@ pub type ChannelArenaMap = ShareMap;
 /// Represents a particular channel field of a contract. For actual channel data
 /// of a specific object, see [`ChannelHandle`].
 #[derive(Clone, Copy, Hash, Eq, PartialEq)]
-pub struct ChannelID {
+pub struct ChannelId<T: ITpProperty> {
     idx: usize, // idx into an object's channel properties
-    contract: ContractHandle,
+    contract: ContractId,
+    _phantom: PhantomData<T>,
 }
-impl ChannelID {
-    pub fn contract(&self) -> ContractHandle {
+impl<T: ITpProperty> ChannelId<T> {
+    pub fn contract(&self) -> ContractId {
         self.contract
     }
 

@@ -1,8 +1,7 @@
 mod dyn_data;
 mod dyn_property;
 
-use crate::contract::properties::{ChannelHandle, StateHandle};
-use crate::contract::ContractHandle;
+use crate::contract::ContractId;
 use crate::object::ObjectHandle;
 
 use std::fmt::Debug;
@@ -16,10 +15,7 @@ pub use dyn_property::DynTpProperty;
 
 /// Any supported primitive type that can be stored in a property.
 #[enum_dispatch]
-pub trait ITpData:
-    'static + Send + Sync + Debug + PartialEq + PartialOrd + Clone + private::Sealed
-{
-}
+pub trait ITpData: 'static + Send + Sync + Debug + PartialEq + Clone + private::Sealed {}
 
 macro_rules! impl_itpdata {
     // base case
@@ -52,12 +48,12 @@ impl_itpdata!(
     f64,
     String,
     ObjectHandle,
-    ContractHandle,
+    ContractId,
 );
 
 // ---- ITpProperty and containers ----
 
-pub trait ITpProperty: 'static + Send + Sync + Debug + PartialEq + PartialOrd + Clone {
+pub trait ITpProperty: 'static + Send + Sync + Debug + PartialEq + Clone {
     type Data: ITpData;
 }
 

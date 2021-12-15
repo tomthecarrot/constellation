@@ -1,6 +1,6 @@
 use super::{private, DynTpData, ITpData, ITpProperty};
 
-use crate::contract::ContractHandle;
+use crate::contract::ContractId;
 use crate::object::ObjectHandle;
 
 use derive_more::From;
@@ -62,42 +62,6 @@ macro_rules! impl_dyntpproperty {
             }
         }
 
-        impl PartialOrd<$t> for DynTpProperty<$t> {
-            fn partial_cmp(&self, other: &$t) -> Option<std::cmp::Ordering> {
-                match self {
-                    Self::Single(inner) => inner.partial_cmp(other),
-                    _ => None,
-                }
-            }
-        }
-
-        impl PartialOrd<DynTpProperty<$t>> for $t {
-            fn partial_cmp(&self, other: &DynTpProperty<$t>) -> Option<std::cmp::Ordering> {
-                match other {
-                    DynTpProperty::Single(other) => self.partial_cmp(other),
-                    _ => None,
-                }
-            }
-        }
-
-        impl PartialOrd<$t> for DynTpProperty {
-            fn partial_cmp(&self, other: &$t) -> Option<std::cmp::Ordering> {
-                match self {
-                    Self::Single(inner) => inner.partial_cmp(other),
-                    _ => None,
-                }
-            }
-        }
-
-        impl PartialOrd<DynTpProperty> for $t {
-            fn partial_cmp(&self, other: &DynTpProperty) -> Option<std::cmp::Ordering> {
-                match other {
-                    DynTpProperty::Single(other) => self.partial_cmp(other),
-                    _ => None,
-                }
-            }
-        }
-
         // ---- Vec variants ----
 
         impl PartialEq<Vec<$t>> for DynTpProperty<$t> {
@@ -139,30 +103,6 @@ macro_rules! impl_dyntpproperty {
                 }
             }
         }
-
-        impl PartialOrd<Vec<$t>> for DynTpProperty<$t> {
-            fn partial_cmp(&self, other: &Vec<$t>) -> Option<std::cmp::Ordering> {
-                match self {
-                    Self::Vec(inner) => inner.partial_cmp(other),
-                    _ => None,
-                }
-            }
-        }
-
-        impl PartialOrd<DynTpProperty<$t>> for Vec<$t> {
-            fn partial_cmp(&self, other: &DynTpProperty<$t>) -> Option<std::cmp::Ordering> {
-                match other {
-                    DynTpProperty::Vec(other) => self.partial_cmp(other),
-                    _ => None,
-                }
-            }
-        }
-
-        // TODO: These are not implemented because PartialOrd not implemented on
-        // Vec<T> and Vec<U> where T: PartialOrd<U>
-        // impl PartialOrd<Vec<$t>> for DynTpProperty
-        // impl PartialOrd<DynTpProperty> for Vec<$t>
-
     };
     // recursive case
     ($t:ty, $($tail:ty),+) => {
@@ -189,15 +129,13 @@ impl_dyntpproperty!(
     f64,
     String,
     ObjectHandle,
-    ContractHandle,
+    ContractId,
 );
 
 impl private::Sealed for DynTpProperty {}
 
 #[cfg(test)]
 mod test {
-    use std::{cmp::Ordering, vec};
-
     use super::*;
 
     #[test]
@@ -221,31 +159,5 @@ mod test {
         // Compare different container type, different dyn scalar type, same val
         assert_ne!(dyn_u32_1, vec![1u16]);
         assert_ne!(vec![1u16], dyn_u32_1);
-    }
-
-    #[test]
-    fn test_partialord() {
-        let u16_1 = DynTpProperty::from(1u16);
-        let dyn_u32_1 = DynTpProperty::from(DynTpData::from(1u32));
-
-        // Compare same container type & value
-        assert_eq!(u16_1.partial_cmp(&1u16), Some(Ordering::Equal));
-        assert_eq!(1u16.partial_cmp(&u16_1), Some(Ordering::Equal));
-        assert_eq!(
-            dyn_u32_1.partial_cmp(&dyn_u32_1.clone()),
-            Some(Ordering::Equal)
-        );
-        assert!(u16_1 < 2u16);
-        assert!(2u16 > u16_1);
-        assert!(u16_1 > 0u16);
-        assert!(0u16 < u16_1);
-
-        // Compare mismatched container type, same val
-        assert_eq!(u16_1.partial_cmp(&vec![1u16]), None);
-        assert_eq!(vec![1u16].partial_cmp(&u16_1), None);
-
-        // Compare same container type, different dyn scalar type, same val
-        assert_eq!(dyn_u32_1.partial_cmp(&1u16), None);
-        assert_eq!(1u16.partial_cmp(&dyn_u32_1), None);
     }
 }

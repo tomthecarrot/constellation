@@ -1,4 +1,10 @@
 [workspace]
-members = ["client", "datastructures/arena", "circle_game"]
 edition = "2021"
 resolver = "2"  # As of Nov 2021, rust doesn't seem to use new resolver if you don't specify this
+
+members = [
+    "circle_game",
+    "client",
+    "contract_macro",
+    "datastructures/arena",
+]
