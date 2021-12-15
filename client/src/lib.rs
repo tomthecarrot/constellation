@@ -6,7 +6,7 @@ pub mod link;
 pub mod object;
 pub mod realm;
 
-use eyre::{eyre, Result, WrapErr};
+use eyre::{eyre, Result};
 use link::{Link, RealmServerHandle, Session};
 use realm::{Realm, RealmID};
 

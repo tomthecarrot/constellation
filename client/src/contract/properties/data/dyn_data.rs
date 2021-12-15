@@ -1,6 +1,6 @@
-use super::{private, ITpData};
+use super::private;
 
-use crate::contract::ContractHandle;
+use crate::contract::ContractId;
 use crate::object::ObjectHandle;
 
 use enum_dispatch::enum_dispatch;
@@ -8,7 +8,7 @@ use paste::paste;
 
 /// A dynamically typed `ITpData` primitive
 #[enum_dispatch(ITpData)]
-#[derive(Debug, Clone, PartialEq, PartialOrd)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum DynTpData {
     U8(u8),
     U16(u16),
@@ -23,7 +23,7 @@ pub enum DynTpData {
     F64(f64),
     String(String),
     ObjectHandle(ObjectHandle),
-    ContractHandle(ContractHandle),
+    ContractId(ContractId),
 }
 
 impl private::Sealed for DynTpData {}
@@ -50,24 +50,6 @@ macro_rules! impl_dyntpdata {
                         self == other
                     } else {
                         false
-                    }
-                }
-            }
-
-            impl PartialOrd<$t> for DynTpData {
-                fn partial_cmp(&self, other: &$t) -> Option<std::cmp::Ordering> {
-                    match self {
-                        Self::[<$t:camel>](inner) => inner.partial_cmp(other),
-                        _ => None,
-                    }
-                }
-            }
-
-            impl PartialOrd<DynTpData> for $t {
-                fn partial_cmp(&self, other: &DynTpData) -> Option<std::cmp::Ordering> {
-                    match other {
-                        DynTpData::[<$t:camel>](other) => self.partial_cmp(other),
-                        _ => None,
                     }
                 }
             }
@@ -98,7 +80,7 @@ impl_dyntpdata!(
     f64,
     String,
     ObjectHandle,
-    ContractHandle,
+    ContractId,
 );
 
 #[cfg(test)]
@@ -128,38 +110,5 @@ mod test {
         // Compare mismatched type and val
         assert_ne!(dyn_1337, u32_7331);
         assert_ne!(u32_7331, dyn_1337);
-    }
-
-    #[test]
-    fn test_partialord() {
-        use std::cmp::Ordering;
-
-        let u16_1337 = 1337u16;
-        let u16_7331 = 7331u16;
-        let u32_1337 = 1337u32;
-        let u32_7331 = 7331u32;
-        let dyn_1337 = DynTpData::from(1337u16);
-
-        // Compare same type & value
-        assert_eq!(dyn_1337.partial_cmp(&u16_1337), Some(Ordering::Equal));
-        assert_eq!(u16_1337.partial_cmp(&dyn_1337), Some(Ordering::Equal));
-
-        // Compare mismatched type, same val
-        assert_ne!(dyn_1337, u32_1337);
-        assert_ne!(u32_1337, dyn_1337);
-        assert_eq!(dyn_1337.partial_cmp(&u32_1337), None);
-        assert_eq!(u32_1337.partial_cmp(&dyn_1337), None);
-
-        // Compare same type, mismatched val
-        assert_ne!(dyn_1337, u16_7331);
-        assert_ne!(u16_7331, dyn_1337);
-        assert!(dyn_1337 < u16_7331);
-        assert!(u16_7331 > dyn_1337);
-        assert!(dyn_1337 > 1u16);
-        assert!(1u16 < dyn_1337);
-
-        // Compare mismatched type and val
-        assert_eq!(dyn_1337.partial_cmp(&u32_7331), None);
-        assert_eq!(u32_7331.partial_cmp(&dyn_1337), None);
     }
 }

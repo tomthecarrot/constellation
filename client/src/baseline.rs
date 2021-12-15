@@ -5,12 +5,12 @@ use crate::contract::properties::{
     Channel, ChannelArenaHandle, ChannelArenaMap, ChannelHandle, ITpProperty, State,
     StateArenaHandle, StateArenaMap, StateHandle,
 };
-use crate::contract::{Contract, ContractHandle};
+use crate::contract::{Contract, ContractId};
 use crate::object::{Object, ObjectHandle};
 
 use arena::Arena;
 use eyre::{eyre, Result};
-use typemap::{ShareMap, TypeMap};
+use typemap::ShareMap;
 
 #[derive(Copy, Clone, PartialEq, Eq, Debug, Hash)]
 pub enum BaselineKind {
@@ -21,7 +21,7 @@ pub enum BaselineKind {
 pub struct Baseline {
     kind: BaselineKind,
     objects: Arena<Object>,
-    contracts: Arena<Contract>,
+    contracts: Arena<ContractId>,
     states: StateArenaMap,     // maps from T to Arena<State<T>>
     channels: ChannelArenaMap, // maps from T to Arena<Channel<T>>
 }
@@ -60,10 +60,6 @@ impl Baseline {
         self.objects.iter()
     }
 
-    pub fn iter_contracts(&self) -> impl Iterator<Item = (ContractHandle, &Contract)> {
-        self.contracts.iter()
-    }
-
     pub fn object(&self, obj: ObjectHandle) -> eyre::Result<&Object> {
         self.objects
             .get(obj)
@@ -73,18 +69,6 @@ impl Baseline {
     pub fn object_mut(&mut self, obj: ObjectHandle) -> eyre::Result<&mut Object> {
         self.objects
             .get_mut(obj)
-            .ok_or_else(|| eyre!("The given handle doesn't exist in the Arena"))
-    }
-
-    pub fn contract(&self, contract: ContractHandle) -> eyre::Result<&Contract> {
-        self.contracts
-            .get(contract)
-            .ok_or_else(|| eyre!("The given handle doesn't exist in the Arena"))
-    }
-
-    pub fn contract_mut(&mut self, contract: ContractHandle) -> eyre::Result<&mut Contract> {
-        self.contracts
-            .get_mut(contract)
             .ok_or_else(|| eyre!("The given handle doesn't exist in the Arena"))
     }
 
@@ -150,19 +134,6 @@ impl core::ops::Index<ObjectHandle> for Baseline {
 impl core::ops::IndexMut<ObjectHandle> for Baseline {
     fn index_mut(&mut self, index: ObjectHandle) -> &mut Self::Output {
         &mut self.objects[index]
-    }
-}
-
-impl core::ops::Index<ContractHandle> for Baseline {
-    type Output = Contract;
-
-    fn index(&self, index: ContractHandle) -> &Self::Output {
-        &self.contracts[index]
-    }
-}
-impl core::ops::IndexMut<ContractHandle> for Baseline {
-    fn index_mut(&mut self, index: ContractHandle) -> &mut Self::Output {
-        &mut self.contracts[index]
     }
 }
 

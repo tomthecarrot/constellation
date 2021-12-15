@@ -1,5 +1,5 @@
 use crate::contract::properties::data::ITpProperty;
-use crate::contract::ContractHandle;
+use crate::contract::ContractId;
 
 use std::marker::PhantomData;
 use typemap::ShareMap;
@@ -19,12 +19,13 @@ pub type StateArenaMap = ShareMap;
 /// Represents a particular state field of a contract. For actual state data of
 /// a specific object, see [`StateHandle`].
 #[derive(Copy, Clone, Hash, Debug)]
-pub struct StateID {
+pub struct StateId<T: ITpProperty> {
     idx: usize, // idx into an object's state properties
-    contract: ContractHandle,
+    contract: ContractId,
+    _phantom: PhantomData<T>,
 }
-impl StateID {
-    pub fn contract(&self) -> ContractHandle {
+impl<T: ITpProperty> StateId<T> {
+    pub fn contract(&self) -> ContractId {
         self.contract
     }
 

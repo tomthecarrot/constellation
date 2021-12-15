@@ -3,8 +3,6 @@
 
 use crate::baseline::{Baseline, BaselineKind};
 
-use arena::Arena;
-
 use std::time::Duration;
 
 pub struct RealmID(String);
