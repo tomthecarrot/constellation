@@ -1,6 +1,6 @@
 use proc_macro2::TokenStream;
-use quote::quote_spanned;
 use quote::ToTokens;
+use quote::{quote, quote_spanned};
 use syn::parse2;
 use syn::parse_macro_input;
 use syn::spanned::Spanned;
@@ -34,7 +34,8 @@ macro_rules! template {
                 panic!("Only named structs are supported")
             };
 
-            for f in fields {
+            let mut field_init = TokenStream::new();
+            for (i, f) in fields.enumerate() {
                 let inner_t = f.ty.clone();
                 let f_name = f.ident.as_ref().expect("Fields should be named");
 
@@ -51,7 +52,20 @@ macro_rules! template {
                         }
                     }
                 });
+
+                field_init.extend(quote_spanned! {inner_t.span()=>
+                    #f_name: $handle_type::new(#i, id),
+                });
             }
+            impl_ts.extend(quote! {
+                impl #s_name {
+                    pub fn new(id: tp_client::contract::ContractId) -> Self {
+                        Self {
+                            #field_init
+                        }
+                    }
+                }
+            });
 
             // Concatenate and retunrn item tokens and impl tokens
             let mut result = item.into_token_stream();

@@ -11,5 +11,7 @@ proc-macro = true
 [dependencies]
 syn = "1"
 quote = "1"
-tp_client = { path = "../client" }
 proc-macro2 = "1"
+
+[dev-dependencies]
+tp_client = { path = "../client" }
