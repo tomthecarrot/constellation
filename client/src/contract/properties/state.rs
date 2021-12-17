@@ -32,4 +32,12 @@ impl<T: ITpProperty> StateId<T> {
     pub(crate) fn idx(&self) -> usize {
         self.idx
     }
+
+    pub fn new(idx: usize, contract: ContractId) -> Self {
+        Self {
+            idx,
+            contract,
+            _phantom: PhantomData,
+        }
+    }
 }

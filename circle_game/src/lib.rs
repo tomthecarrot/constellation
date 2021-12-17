@@ -1,3 +1,4 @@
+mod circle;
 mod circle_bundle;
 
 use circle_bundle::CircleBundle;
