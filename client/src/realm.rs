@@ -1,7 +1,10 @@
 // Teleportal Platform v3
 // Copyright 2021 WiTag Inc. dba Teleportal
 
-use crate::baseline::{Baseline, BaselineKind};
+use crate::{
+    baseline::{Baseline, BaselineKind},
+    contract::Contract,
+};
 
 use std::time::Duration;
 

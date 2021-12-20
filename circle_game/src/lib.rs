@@ -1,6 +1,7 @@
 mod circle;
 mod circle_bundle;
 
+use circle::Circle;
 use circle_bundle::CircleBundle;
 use tp_client::engine::Engine;
 use tp_client::realm::{Realm, RealmID};
@@ -33,10 +34,16 @@ pub fn configure_app() -> bevy::app::AppBuilder {
     app
 }
 
-fn setup(engine: ResMut<Engine>, mut commands: Commands) {
+fn setup(mut engine: ResMut<Engine>, mut commands: Commands) {
     commands.spawn_bundle(OrthographicCameraBundle::new_2d());
 
     const SQUARE_SIZE: usize = 10;
+
+    let contract: Circle = engine
+        .realm_mut()
+        .baseline_mut(BaselineKind::Fork)
+        .register_contract()
+        .expect("contract failed to register");
 
     for x in 0..SQUARE_SIZE {
         for y in 0..SQUARE_SIZE {
