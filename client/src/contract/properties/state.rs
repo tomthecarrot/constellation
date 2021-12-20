@@ -1,5 +1,5 @@
 use crate::contract::properties::data::ITpProperty;
-use crate::contract::ContractId;
+use crate::contract::ContractIdHandle;
 
 use std::marker::PhantomData;
 use typemap::ShareMap;
@@ -21,11 +21,11 @@ pub type StateArenaMap = ShareMap;
 #[derive(Copy, Clone, Hash, Debug)]
 pub struct StateId<T: ITpProperty> {
     idx: usize, // idx into an object's state properties
-    contract: ContractId,
+    contract: ContractIdHandle,
     _phantom: PhantomData<T>,
 }
 impl<T: ITpProperty> StateId<T> {
-    pub fn contract(&self) -> ContractId {
+    pub fn contract(&self) -> ContractIdHandle {
         self.contract
     }
 
@@ -33,7 +33,7 @@ impl<T: ITpProperty> StateId<T> {
         self.idx
     }
 
-    pub fn new(idx: usize, contract: ContractId) -> Self {
+    pub fn new(idx: usize, contract: ContractIdHandle) -> Self {
         Self {
             idx,
             contract,

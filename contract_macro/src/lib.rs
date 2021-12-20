@@ -59,7 +59,7 @@ macro_rules! template {
             }
             impl_ts.extend(quote! {
                 impl #s_name {
-                    pub fn new(id: tp_client::contract::ContractId) -> Self {
+                    pub fn new(id: tp_client::contract::ContractIdHandle) -> Self {
                         Self {
                             #field_init
                         }

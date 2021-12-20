@@ -10,6 +10,8 @@ use eyre::{eyre, Result};
 use link::{Link, RealmServerHandle, Session};
 use realm::{Realm, RealmID};
 
+pub use engine::Engine;
+
 #[non_exhaustive]
 pub enum Endpoint {
     Local(RealmServerHandle),

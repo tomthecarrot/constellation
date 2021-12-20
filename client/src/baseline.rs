@@ -5,7 +5,7 @@ use crate::contract::properties::{
     Channel, ChannelArenaHandle, ChannelArenaMap, ChannelHandle, ITpProperty, State,
     StateArenaHandle, StateArenaMap, StateHandle,
 };
-use crate::contract::{Contract, ContractId};
+use crate::contract::{Contract, ContractId, ContractIdHandle};
 use crate::object::{Object, ObjectHandle};
 
 use arena::Arena;
@@ -55,6 +55,29 @@ impl Baseline {
     }
 
     // ---- Object and Contract Acessors ----
+
+    pub fn register_contract<C: Contract>(&mut self) -> eyre::Result<C> {
+        for (_, c_id) in self.contracts.iter() {
+            if *c_id == C::ID {
+                return Err(eyre!("Contract already added!"));
+            }
+        }
+        let handle = self.contracts.insert(C::ID);
+        Ok(C::new(handle))
+    }
+
+    pub fn unregister_contract(&mut self, handle: ContractIdHandle) -> eyre::Result<()> {
+        let c_id = self.contracts.remove(handle);
+        if c_id.is_none() {
+            Err(eyre!("There is no contract with that id to unregister!"))
+        } else {
+            Ok(())
+        }
+    }
+
+    pub fn iter_contract_ids(&self) -> impl Iterator<Item = (ContractIdHandle, &ContractId)> {
+        self.contracts.iter()
+    }
 
     pub fn iter_objects(&self) -> impl Iterator<Item = (ObjectHandle, &Object)> {
         self.objects.iter()
