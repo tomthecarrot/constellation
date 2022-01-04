@@ -7,8 +7,8 @@ pub struct Circle {
     channels: (),
 }
 
-#[states]
 #[derive(Debug)]
+#[states]
 pub struct States {
     x: f32,
     y: f32,
