@@ -1,6 +1,7 @@
 use crate::contract::properties::data::ITpProperty;
 use crate::contract::ContractDataHandle;
 
+use std::any::TypeId;
 use std::marker::PhantomData;
 use typemap::ShareMap;
 
@@ -39,5 +40,15 @@ impl<T: ITpProperty> StateId<T> {
             contract,
             _phantom: PhantomData,
         }
+    }
+}
+
+pub trait IStates {
+    fn type_ids() -> &'static [TypeId];
+}
+
+impl IStates for () {
+    fn type_ids() -> &'static [TypeId] {
+        &[]
     }
 }

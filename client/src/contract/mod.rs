@@ -1,10 +1,12 @@
-use std::collections::HashSet;
-
-use crate::{object::ObjectHandle, realm::Realm};
-
+pub use tp_contract_macro::{channels, states};
 pub mod properties;
 
-pub use tp_contract_macro::{channels, states};
+use crate::contract::properties::{IChannels, IStates};
+use crate::object::ObjectHandle;
+use crate::realm::Realm;
+
+use std::any::TypeId;
+use std::collections::HashSet;
 
 /// Represents information that globally and uniquely identifies a contract.
 /// Any two contracts are the same if their `ContractId`s are equal.
@@ -28,8 +30,8 @@ pub type ContractDataHandle = arena::Index<ContractData>;
 /// onto the instantiated `Contract` so that they can access the fields of any
 /// particular object.
 pub trait Contract {
-    type States;
-    type Channels;
+    type States: IStates;
+    type Channels: IChannels;
 
     const ID: ContractId;
 
