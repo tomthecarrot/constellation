@@ -1,6 +1,7 @@
 use crate::contract::properties::data::ITpProperty;
 use crate::contract::ContractDataHandle;
 
+use std::any::TypeId;
 use std::marker::PhantomData;
 use typemap::ShareMap;
 
@@ -40,5 +41,15 @@ impl<T: ITpProperty> ChannelId<T> {
             contract,
             _phantom: PhantomData,
         }
+    }
+}
+
+pub trait IChannels {
+    fn type_ids() -> &'static [TypeId];
+}
+
+impl IChannels for () {
+    fn type_ids() -> &'static [TypeId] {
+        &[]
     }
 }

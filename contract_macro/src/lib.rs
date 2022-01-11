@@ -11,7 +11,7 @@ use syn::Result;
 // keep it DRY we provide a template macro.
 
 macro_rules! template {
-    ($macro_name:ident, $handle_type:ty) => {
+    ($macro_name:ident) => {
         #[proc_macro_attribute]
         pub fn $macro_name(
             _attr: proc_macro::TokenStream,
@@ -27,7 +27,7 @@ macro_rules! template {
     };
 }
 macro_rules! template_impl {
-    ($macro_name:ident, $handle_type:ty) => {
+    ($macro_name:ident, $handle_type:ty, $trait_name:ty,) => {
         pub fn $macro_name(mut item: syn::DeriveInput) -> Result<TokenStream> {
             // ---- Field Names ----
             let type_ids_ident = quote::format_ident!("type_ids");
@@ -106,7 +106,7 @@ macro_rules! template_impl {
                 });
             }
 
-            // Field-agnostic impl block
+            // Field-agnostic impl blocks
             impl_ts.extend(quote! {
                 impl #s_name {
                     pub fn new(id: tp_client::contract::ContractDataHandle) -> Self {
@@ -114,14 +114,17 @@ macro_rules! template_impl {
                             #field_init
                         }
                     }
+                }
 
-                    pub fn #type_ids_ident() -> &'static [::std::any::TypeId] {
+                impl $trait_name for #s_name {
+                    fn #type_ids_ident() -> &'static [::std::any::TypeId] {
                         ::lazy_static::lazy_static! {
                             static ref TYPE_IDS: Vec<::std::any::TypeId> = vec![#(#typeids),*];
                         }
                         TYPE_IDS.as_slice()
                     }
                 }
+
             });
 
             // Concatenate and return item tokens and impl tokens
@@ -132,10 +135,18 @@ macro_rules! template_impl {
     };
 }
 
-template!(states, tp_client::contract::properties::StateId);
-template!(channels, tp_client::contract::properties::ChannelId);
+template!(states);
+template!(channels);
 pub(crate) mod imp {
     use super::*;
-    template_impl!(states, tp_client::contract::properties::StateId);
-    template_impl!(channels, tp_client::contract::properties::ChannelId);
+    template_impl!(
+        states,
+        tp_client::contract::properties::StateId,
+        tp_client::contract::properties::IStates,
+    );
+    template_impl!(
+        channels,
+        tp_client::contract::properties::ChannelId,
+        tp_client::contract::properties::IChannels,
+    );
 }

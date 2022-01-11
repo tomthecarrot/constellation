@@ -2,8 +2,8 @@
 // Copyright 2021 WiTag Inc. dba Teleportal
 
 use crate::contract::properties::{
-    Channel, ChannelArenaHandle, ChannelArenaMap, ChannelHandle, ITpProperty, State,
-    StateArenaHandle, StateArenaMap, StateHandle,
+    Channel, ChannelArenaHandle, ChannelArenaMap, ChannelHandle, IChannels, IStates, ITpProperty,
+    State, StateArenaHandle, StateArenaMap, StateHandle,
 };
 use crate::contract::{Contract, ContractData, ContractDataHandle, ContractId};
 use crate::object::{Object, ObjectHandle};
@@ -116,8 +116,16 @@ impl Baseline {
         todo!("Implement object addition")
     }
 
-    pub fn object_remove<C: Contract>(&mut self, handle: ObjectHandle) -> eyre::Result<()> {
-        todo!("Implement object removal")
+    pub fn object_remove<C: Contract>(&mut self, obj: ObjectHandle) -> eyre::Result<()> {
+        let o = if let Some(o) = self.objects.remove(obj) {
+            o
+        } else {
+            return Err(eyre!("Object did not exist, so it could not be removed"));
+        };
+
+        // remove all fields of the object
+        let state_type_ids = C::States::type_ids();
+        todo!()
     }
 
     // ---- Property accessors ----
