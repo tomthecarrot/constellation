@@ -1,7 +1,10 @@
-use crate::contract::properties::{ChannelHandle, ChannelId, ITpData, StateHandle, StateId};
+use crate::contract::properties::{
+    ChannelHandle, ChannelId, ITpData, ITpProperty, StateHandle, StateId,
+};
 use crate::contract::ContractDataHandle;
 
 use arena::generational_arena as ga;
+use eyre::{eyre, Result};
 
 // TODO: Can we handle mapping from StateID -> StateHandle more sanely?
 
@@ -52,6 +55,33 @@ impl Object {
 
     pub fn contract(&self) -> ContractDataHandle {
         self.contract
+    }
+
+    pub(crate) fn bind_state<T: ITpProperty>(&self, id: StateId<T>) -> Result<StateHandle<T>> {
+        if id.contract() != self.contract() {
+            return Err(eyre!("Supplied id did not match this object's contract"));
+        }
+        let idx = *self.states.get(id.idx()).ok_or_else(|| {
+            eyre!("id's field index out of bounds for this object. Should have been impossible!")
+        })?;
+
+        let handle: StateHandle<T> = arena::Index::new(idx);
+        Ok(handle)
+    }
+
+    pub(crate) fn bind_channel<T: ITpProperty>(
+        &self,
+        id: ChannelId<T>,
+    ) -> Result<ChannelHandle<T>> {
+        if id.contract() != self.contract() {
+            return Err(eyre!("Supplied id did not match this object's contract"));
+        }
+        let idx = *self.channels.get(id.idx()).ok_or_else(|| {
+            eyre!("id's field index out of bounds for this object. Should have been impossible!")
+        })?;
+
+        let handle: ChannelHandle<T> = arena::Index::new(idx);
+        Ok(handle)
     }
 }
 

@@ -2,8 +2,8 @@
 // Copyright 2021 WiTag Inc. dba Teleportal
 
 use crate::contract::properties::{
-    Channel, ChannelArenaHandle, ChannelArenaMap, ChannelHandle, IChannels, IStates, ITpProperty,
-    State, StateArenaHandle, StateArenaMap, StateHandle,
+    Channel, ChannelArenaHandle, ChannelArenaMap, ChannelHandle, ChannelId, IChannels, IStates,
+    ITpProperty, State, StateArenaHandle, StateArenaMap, StateHandle, StateId,
 };
 use crate::contract::{Contract, ContractData, ContractDataHandle, ContractId};
 use crate::object::{Object, ObjectHandle};
@@ -125,6 +125,10 @@ impl Baseline {
 
         // remove all fields of the object
         let state_type_ids = C::States::type_ids();
+        let chan_type_ids = C::Channels::type_ids();
+
+        for t in state_type_ids {}
+
         todo!()
     }
 
@@ -175,6 +179,32 @@ impl Baseline {
         arena
             .get_mut(chan)
             .ok_or_else(|| eyre!("The given handle doesn't exist in the Arena"))
+    }
+
+    // ---- State and Channel bindings ----
+
+    pub fn bind_state<T: ITpProperty>(
+        &self,
+        id: StateId<T>,
+        obj: ObjectHandle,
+    ) -> Result<StateHandle<T>> {
+        let obj = self
+            .objects
+            .get(obj)
+            .ok_or_else(|| eyre!("The given ObjectHandle doesn't exist in the Arena"))?;
+        obj.bind_state(id)
+    }
+
+    pub fn bind_channel<T: ITpProperty>(
+        &self,
+        id: ChannelId<T>,
+        obj: ObjectHandle,
+    ) -> Result<ChannelHandle<T>> {
+        let obj = self
+            .objects
+            .get(obj)
+            .ok_or_else(|| eyre!("The given ObjectHandle doesn't exist in the Arena"))?;
+        obj.bind_channel(id)
     }
 }
 
