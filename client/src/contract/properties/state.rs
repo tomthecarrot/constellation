@@ -1,3 +1,4 @@
+use crate::baseline::Baseline;
 use crate::contract::properties::data::ITpProperty;
 use crate::contract::ContractDataHandle;
 
