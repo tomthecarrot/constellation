@@ -5,7 +5,7 @@ use crate::contract::properties::{
     Channel, ChannelArenaHandle, ChannelArenaMap, ChannelHandle, ITpProperty, State,
     StateArenaHandle, StateArenaMap, StateHandle,
 };
-use crate::contract::{Contract, ContractId, ContractIdHandle};
+use crate::contract::{Contract, ContractData, ContractDataHandle, ContractId};
 use crate::object::{Object, ObjectHandle};
 
 use arena::Arena;
@@ -21,7 +21,7 @@ pub enum BaselineKind {
 pub struct Baseline {
     kind: BaselineKind,
     objects: Arena<Object>,
-    contracts: Arena<ContractId>,
+    contracts: Arena<ContractData>,
     states: StateArenaMap,     // maps from T to Arena<State<T>>
     channels: ChannelArenaMap, // maps from T to Arena<Channel<T>>
 }
@@ -57,26 +57,43 @@ impl Baseline {
     // ---- Object and Contract Acessors ----
 
     pub fn register_contract<C: Contract>(&mut self) -> eyre::Result<C> {
-        for (_, c_id) in self.contracts.iter() {
-            if *c_id == C::ID {
+        for (_, c_data) in self.contracts.iter() {
+            let c_id = c_data.id();
+            if c_id == C::ID {
                 return Err(eyre!("Contract already added!"));
             }
         }
-        let handle = self.contracts.insert(C::ID);
+        let handle = self.contracts.insert(ContractData::new(C::ID));
         Ok(C::new(handle))
     }
 
-    pub fn unregister_contract(&mut self, handle: ContractIdHandle) -> eyre::Result<()> {
-        let c_id = self.contracts.remove(handle);
-        if c_id.is_none() {
-            Err(eyre!("There is no contract with that id to unregister!"))
-        } else {
-            Ok(())
+    pub fn unregister_contract<C: Contract>(
+        &mut self,
+        handle: ContractDataHandle,
+    ) -> eyre::Result<()> {
+        let c_data = self
+            .contracts
+            .get_mut(handle)
+            .ok_or_else(|| eyre!("There is no contract with that id to unregister!"))?;
+
+        if c_data.id() != C::ID {
+            return Err(eyre!("Handle did not match the provided contract type!"));
         }
+
+        // Its ok to steal the hashmap because c_data will be deleted soon anyway
+        let objs = std::mem::take(c_data.objects_mut());
+        for o in objs {
+            self.object_remove::<C>(o.clone())
+                .expect("Failed to remove object!")
+        }
+        self.contracts.remove(handle);
+        Ok(())
     }
 
-    pub fn iter_contract_ids(&self) -> impl Iterator<Item = (ContractIdHandle, &ContractId)> {
-        self.contracts.iter()
+    pub fn contract_data(&self, handle: ContractDataHandle) -> eyre::Result<&ContractData> {
+        self.contracts
+            .get(handle)
+            .ok_or_else(|| eyre!("No contract exists for that handle!"))
     }
 
     pub fn iter_objects(&self) -> impl Iterator<Item = (ObjectHandle, &Object)> {
@@ -93,6 +110,14 @@ impl Baseline {
         self.objects
             .get_mut(obj)
             .ok_or_else(|| eyre!("The given handle doesn't exist in the Arena"))
+    }
+
+    pub fn object_add<C: Contract>(&mut self) -> eyre::Result<ObjectHandle> {
+        todo!("Implement object addition")
+    }
+
+    pub fn object_remove<C: Contract>(&mut self, handle: ObjectHandle) -> eyre::Result<()> {
+        todo!("Implement object removal")
     }
 
     // ---- Property accessors ----

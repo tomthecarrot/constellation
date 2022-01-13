@@ -1,5 +1,5 @@
 use crate::contract::properties::{ChannelHandle, ChannelId, ITpData, StateHandle, StateId};
-use crate::contract::ContractIdHandle;
+use crate::contract::ContractDataHandle;
 
 use arena::generational_arena as ga;
 
@@ -9,7 +9,7 @@ pub struct Object {
     // we have to store type erased index here to get around unsized types
     states: Vec<ga::Index>,   // map from StateID -> StateHandle
     channels: Vec<ga::Index>, // map from ChannelID -> ChannelHandle
-    contract: ContractIdHandle,
+    contract: ContractDataHandle,
 }
 impl Object {
     pub fn state<T: ITpData>(&self, id: StateId<T>) -> StateHandle<T> {
@@ -50,7 +50,7 @@ impl Object {
         ChannelHandle::new(idx)
     }
 
-    pub fn contract(&self) -> ContractIdHandle {
+    pub fn contract(&self) -> ContractDataHandle {
         self.contract
     }
 }
