@@ -109,7 +109,7 @@ macro_rules! template_impl {
             // Field-agnostic impl block
             impl_ts.extend(quote! {
                 impl #s_name {
-                    pub fn new(id: tp_client::contract::ContractIdHandle) -> Self {
+                    pub fn new(id: tp_client::contract::ContractDataHandle) -> Self {
                         Self {
                             #field_init
                         }

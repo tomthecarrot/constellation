@@ -1,8 +1,8 @@
-use tp_client::contract::{states, Contract, ContractId, ContractIdHandle};
+use tp_client::contract::{states, Contract, ContractDataHandle, ContractId};
 
 #[derive(Debug)]
 pub struct Circle {
-    handle: ContractIdHandle,
+    handle: ContractDataHandle,
     states: States,
     channels: (),
 }
@@ -23,7 +23,7 @@ impl Contract for Circle {
         version: (0, 0, 1),
     };
 
-    fn new(handle: ContractIdHandle) -> Self {
+    fn new(handle: ContractDataHandle) -> Self {
         Self {
             handle,
             states: States::new(handle),
@@ -39,7 +39,7 @@ impl Contract for Circle {
         &self.channels
     }
 
-    fn handle(&self) -> ContractIdHandle {
+    fn handle(&self) -> ContractDataHandle {
         self.handle
     }
 }

@@ -1,4 +1,6 @@
-use crate::realm::Realm;
+use std::collections::HashSet;
+
+use crate::{object::ObjectHandle, realm::Realm};
 
 pub mod properties;
 
@@ -15,18 +17,14 @@ pub struct ContractId {
     pub version: (u16, u16, u16),
 }
 
-/// `ContractIdHandle`s are used to uniquely identify a particular contract within
-/// the context of a particular engine. They are less expensive to compare than the
-/// [`ContractId`]s they reference, so they are used instead most places. You need
-/// to register a [`Contract`] with a [`Realm`] to get a `ContractIdHandle`.
-pub type ContractIdHandle = arena::Index<ContractId>;
+pub type ContractDataHandle = arena::Index<ContractData>;
 
 /// Contracts describe the valid set of properties in a category of objects, much
 /// like a struct definition describes the variables in a particular instance of a
 /// struct, or a class describes objects that are instances of that class.
 ///
 /// Note that `Contract`s are not held internally by the [`Realm`], rather only
-/// [`ContractId`]s and [`ContractIdHandle`]s. The API client should therefore hold
+/// [`ContractData`]s and [`ContractDataHandle`]s. The API client should therefore hold
 /// onto the instantiated `Contract` so that they can access the fields of any
 /// particular object.
 pub trait Contract {
@@ -35,9 +33,34 @@ pub trait Contract {
 
     const ID: ContractId;
 
-    fn new(handle: ContractIdHandle) -> Self;
+    fn new(handle: ContractDataHandle) -> Self;
 
     fn states(&self) -> &Self::States;
     fn channels(&self) -> &Self::Channels;
-    fn handle(&self) -> ContractIdHandle;
+    fn handle(&self) -> ContractDataHandle;
+}
+
+/// Contains stateful data about the contract
+pub struct ContractData {
+    id: ContractId,
+    objects: HashSet<ObjectHandle>,
+}
+impl ContractData {
+    pub fn new(id: ContractId) -> Self {
+        Self {
+            id,
+            objects: Default::default(),
+        }
+    }
+    pub fn id(&self) -> ContractId {
+        self.id
+    }
+
+    pub(super) fn objects_mut(&mut self) -> &mut HashSet<ObjectHandle> {
+        &mut self.objects
+    }
+
+    pub fn objects(&self) -> &HashSet<ObjectHandle> {
+        &self.objects
+    }
 }
