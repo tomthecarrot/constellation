@@ -3,9 +3,7 @@ pub mod properties;
 
 use crate::contract::properties::{IChannels, IStates};
 use crate::object::ObjectHandle;
-use crate::realm::Realm;
 
-use std::any::TypeId;
 use std::collections::HashSet;
 
 /// Represents information that globally and uniquely identifies a contract.

@@ -1,3 +1,5 @@
+#![allow(clippy::diverging_sub_expression)]
+
 pub mod action;
 pub mod baseline;
 pub mod contract;

@@ -121,7 +121,7 @@ impl<T> From<Index<T>> for generational_arena::Index {
 impl<T> Clone for Index<T> {
     fn clone(&self) -> Self {
         Self {
-            inner: self.inner.clone(),
+            inner: self.inner,
             _phantom: Default::default(),
         }
     }

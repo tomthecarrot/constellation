@@ -6,7 +6,7 @@ use crate::Realm;
 
 use crossbeam_channel::{Receiver, RecvTimeoutError, Sender, TryRecvError};
 use eyre::{eyre, WrapErr};
-use std::any::{Any, TypeId};
+use std::any::Any;
 use std::mem;
 
 type TryApplyResult = Result<CollactionResult, TryRecvError>;
@@ -151,7 +151,8 @@ impl Engine {
             ActionKind::StateWrite => {
                 // Reverse by re-applying the Action.
                 // This triggers a value swap.
-                self.apply_action(action);
+                self.apply_action(action)
+                    .expect("TODO: How do we handle failure");
             }
             _ => {
                 tracing::warn!(

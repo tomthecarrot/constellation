@@ -1,3 +1,5 @@
+#![allow(clippy::diverging_sub_expression)]
+
 mod circle;
 mod circle_bundle;
 
