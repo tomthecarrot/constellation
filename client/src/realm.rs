@@ -1,10 +1,7 @@
 // Teleportal Platform v3
 // Copyright 2021 WiTag Inc. dba Teleportal
 
-use crate::{
-    baseline::{Baseline, BaselineKind},
-    contract::Contract,
-};
+use crate::baseline::{Baseline, BaselineKind};
 
 use std::time::Duration;
 
@@ -36,8 +33,8 @@ impl Realm {
         let baseline_main = Baseline::new(BaselineKind::Main);
 
         Self {
-            realm_id: realm_id,
-            time: time,
+            realm_id,
+            time,
             baseline_main,
             baseline_fork,
         }

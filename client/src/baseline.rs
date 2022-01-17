@@ -5,7 +5,7 @@ use crate::contract::properties::{
     Channel, ChannelArenaHandle, ChannelArenaMap, ChannelHandle, ChannelId, IChannels, IStates,
     ITpProperty, State, StateArenaHandle, StateArenaMap, StateHandle, StateId,
 };
-use crate::contract::{Contract, ContractData, ContractDataHandle, ContractId};
+use crate::contract::{Contract, ContractData, ContractDataHandle};
 use crate::object::{Object, ObjectHandle};
 
 use arena::Arena;
@@ -83,7 +83,7 @@ impl Baseline {
         // Its ok to steal the hashmap because c_data will be deleted soon anyway
         let objs = std::mem::take(c_data.objects_mut());
         for o in objs {
-            self.object_remove::<C>(o.clone())
+            self.object_remove::<C>(o)
                 .expect("Failed to remove object!")
         }
         self.contracts.remove(handle);
@@ -129,7 +129,7 @@ impl Baseline {
 
         for t in state_type_ids {}
 
-        todo!()
+        todo!("SER-282")
     }
 
     // ---- Property accessors ----
