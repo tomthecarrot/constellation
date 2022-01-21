@@ -1,9 +1,17 @@
-use super::{private, DynTpData, ITpData, ITpProperty};
+use super::{private, DynTpData, ITpData, ITpProperty, TpDataType};
 
 use crate::contract::ContractId;
 use crate::object::ObjectHandle;
 
 use derive_more::From;
+
+/// The type of the ITpProperty
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TpPropertyType {
+    Vec(TpDataType),
+    Single(TpDataType),
+    Dynamic(TpDataType),
+}
 
 /// A dynamically typed container for one or many `T: ITpData`.
 #[derive(Debug, Clone, PartialEq, PartialOrd, From)]
@@ -14,6 +22,8 @@ pub enum DynTpProperty<T: ITpData = DynTpData> {
 
 impl<T: ITpData> ITpProperty for DynTpProperty<T> {
     type Data = T;
+
+    const PROPERTY_TYPE: TpPropertyType = TpPropertyType::Dynamic(T::DATA_TYPE);
 }
 
 // ---- PartialEq and PartialOrd impls ----

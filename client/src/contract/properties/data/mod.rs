@@ -1,26 +1,31 @@
 mod dyn_data;
 mod dyn_property;
 
+pub use dyn_data::{DynTpData, TpDataType};
+pub use dyn_property::{DynTpProperty, TpPropertyType};
+
 use crate::contract::ContractId;
 use crate::object::ObjectHandle;
 
+use paste::paste;
 use std::fmt::Debug;
-
-use enum_dispatch::enum_dispatch;
-
-pub use dyn_data::DynTpData;
-pub use dyn_property::DynTpProperty;
 
 // ---- ITpData and primitives ----
 
 /// Any supported primitive type that can be stored in a property.
-#[enum_dispatch]
-pub trait ITpData: 'static + Send + Sync + Debug + PartialEq + Clone + private::Sealed {}
+pub trait ITpData: 'static + Send + Sync + Debug + PartialEq + Clone + private::Sealed {
+    const DATA_TYPE: TpDataType;
+}
 
 macro_rules! impl_itpdata {
     // base case
     ($t:ty) => {
-        impl ITpData for $t {}
+        paste! {
+            impl ITpData for $t {
+                const DATA_TYPE: TpDataType = TpDataType::[<$t:camel>];
+            }
+        }
+
         impl private::Sealed for $t {}
     };
     // recursive case
@@ -55,16 +60,22 @@ impl_itpdata!(
 
 pub trait ITpProperty: 'static + Send + Sync + Debug + PartialEq + Clone {
     type Data: ITpData;
+
+    const PROPERTY_TYPE: TpPropertyType;
 }
 
 /// Vecs of ITpDatas are valid for storing in a property
 impl<T: ITpData> ITpProperty for Vec<T> {
     type Data = T;
+
+    const PROPERTY_TYPE: TpPropertyType = TpPropertyType::Vec(T::DATA_TYPE);
 }
 
 /// All ITpDatas are also valid for storing in a property
 impl<T: ITpData> ITpProperty for T {
     type Data = T;
+
+    const PROPERTY_TYPE: TpPropertyType = TpPropertyType::Single(T::DATA_TYPE);
 }
 
 mod private {

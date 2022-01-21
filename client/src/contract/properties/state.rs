@@ -1,4 +1,4 @@
-use crate::contract::properties::data::ITpProperty;
+use crate::contract::properties::data::{ITpProperty, TpPropertyType};
 use crate::contract::ContractDataHandle;
 
 use std::any::TypeId;
@@ -45,10 +45,15 @@ impl<T: ITpProperty> StateId<T> {
 
 pub trait IStates {
     fn type_ids() -> &'static [TypeId];
+    fn enumerate_types() -> &'static [TpPropertyType];
 }
 
 impl IStates for () {
     fn type_ids() -> &'static [TypeId] {
+        &[]
+    }
+
+    fn enumerate_types() -> &'static [TpPropertyType] {
         &[]
     }
 }

@@ -124,10 +124,8 @@ impl Baseline {
         };
 
         // remove all fields of the object
-        let state_type_ids = C::States::type_ids();
-        let chan_type_ids = C::Channels::type_ids();
-
-        for t in state_type_ids {}
+        let states = C::States::enumerate_types();
+        let channels = C::Channels::enumerate_types();
 
         todo!("SER-282")
     }

@@ -31,6 +31,7 @@ macro_rules! template_impl {
         pub fn $macro_name(mut item: syn::DeriveInput) -> Result<TokenStream> {
             // ---- Field Names ----
             let type_ids_ident = quote::format_ident!("type_ids");
+            let enumerate_types_ident = quote::format_ident!("enumerate_types");
 
             // Parse struct
             let s: &mut syn::DataStruct = match item.data {
@@ -66,12 +67,14 @@ macro_rules! template_impl {
             let mut field_init = TokenStream::new();
             // Holds the typeids of each field as the contents of vec![...]
             let mut typeids = Vec::new();
+            // Holds the TpPropertyTypes of each field;
+            let mut prop_types = Vec::new();
             let s_name = &item.ident;
             for (i, f) in fields.iter_mut().enumerate() {
                 let inner_t = f.ty.clone();
                 // won't panic because we already checked that the fields were named
                 let f_name = f.ident.as_ref().unwrap();
-                if f_name == &type_ids_ident {
+                if [&type_ids_ident, &enumerate_types_ident].contains(&f_name) {
                     return Err(Error::new(
                         f_name.span(),
                         "this field identifier is reserved",
@@ -104,12 +107,18 @@ macro_rules! template_impl {
                         ::std::any::TypeId::of::<#inner_t>()
                     }
                 });
+
+                prop_types.push({
+                    quote_spanned! {inner_t.span()=>
+                        <#inner_t as ::tp_client::contract::properties::ITpProperty>::PROPERTY_TYPE
+                    }
+                })
             }
 
             // Field-agnostic impl blocks
             impl_ts.extend(quote! {
                 impl #s_name {
-                    pub fn new(id: tp_client::contract::ContractDataHandle) -> Self {
+                    pub fn new(id: ::tp_client::contract::ContractDataHandle) -> Self {
                         Self {
                             #field_init
                         }
@@ -122,6 +131,13 @@ macro_rules! template_impl {
                             static ref TYPE_IDS: Vec<::std::any::TypeId> = vec![#(#typeids),*];
                         }
                         TYPE_IDS.as_slice()
+                    }
+
+                    fn #enumerate_types_ident() -> &'static [::tp_client::contract::properties::TpPropertyType] {
+                        ::lazy_static::lazy_static! {
+                            static ref PROP_TYPES: Vec<::tp_client::contract::properties::TpPropertyType> = vec![#(#prop_types),*];
+                        }
+                        PROP_TYPES.as_slice()
                     }
                 }
 
@@ -141,12 +157,12 @@ pub(crate) mod imp {
     use super::*;
     template_impl!(
         states,
-        tp_client::contract::properties::StateId,
-        tp_client::contract::properties::IStates,
+        ::tp_client::contract::properties::StateId,
+        ::tp_client::contract::properties::IStates,
     );
     template_impl!(
         channels,
-        tp_client::contract::properties::ChannelId,
-        tp_client::contract::properties::IChannels,
+        ::tp_client::contract::properties::ChannelId,
+        ::tp_client::contract::properties::IChannels,
     );
 }
