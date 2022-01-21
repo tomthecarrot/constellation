@@ -1,14 +1,33 @@
-use super::private;
+use super::{private, ITpData};
 
 use crate::contract::ContractId;
 use crate::object::ObjectHandle;
 
-use enum_dispatch::enum_dispatch;
+use derive_more::From;
 use paste::paste;
 
+/// The compile-time type of the ITpData
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+pub enum TpDataType {
+    U8,
+    U16,
+    U32,
+    U64,
+    I8,
+    I16,
+    I32,
+    I64,
+    Bool,
+    F32,
+    F64,
+    String,
+    ObjectHandle,
+    ContractId,
+    Dynamic,
+}
+
 /// A dynamically typed `ITpData` primitive
-#[enum_dispatch(ITpData)]
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, From)]
 pub enum DynTpData {
     U8(u8),
     U16(u16),
@@ -24,6 +43,10 @@ pub enum DynTpData {
     String(String),
     ObjectHandle(ObjectHandle),
     ContractId(ContractId),
+}
+
+impl ITpData for DynTpData {
+    const DATA_TYPE: TpDataType = TpDataType::Dynamic;
 }
 
 impl private::Sealed for DynTpData {}
