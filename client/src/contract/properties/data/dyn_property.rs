@@ -1,6 +1,6 @@
 use super::{private, DynTpData, ITpData, ITpProperty, TpDataType};
 
-use crate::contract::ContractId;
+use crate::contract::ContractDataHandle;
 use crate::object::ObjectHandle;
 
 use derive_more::From;
@@ -139,7 +139,7 @@ impl_dyntpproperty!(
     f64,
     String,
     ObjectHandle,
-    ContractId,
+    ContractDataHandle,
 );
 
 impl private::Sealed for DynTpProperty {}

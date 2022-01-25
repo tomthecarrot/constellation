@@ -4,7 +4,7 @@ mod dyn_property;
 pub use dyn_data::{DynTpData, TpDataType};
 pub use dyn_property::{DynTpProperty, TpPropertyType};
 
-use crate::contract::ContractId;
+use crate::contract::ContractDataHandle;
 use crate::object::ObjectHandle;
 
 use paste::paste;
@@ -53,7 +53,7 @@ impl_itpdata!(
     f64,
     String,
     ObjectHandle,
-    ContractId,
+    ContractDataHandle,
 );
 
 // ---- ITpProperty and containers ----
