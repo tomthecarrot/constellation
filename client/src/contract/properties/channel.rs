@@ -1,4 +1,5 @@
 use crate::contract::properties::data::{ITpProperty, TpPropertyType};
+use crate::contract::properties::dyn_macro::DynTpProperty;
 use crate::contract::ContractDataHandle;
 
 use std::any::TypeId;
@@ -20,7 +21,7 @@ pub type ChannelArenaMap = ShareMap;
 
 /// Represents a particular channel field of a contract. For actual channel data
 /// of a specific object, see [`ChannelHandle`].
-#[derive(Clone, Copy, Hash, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Hash, Eq, PartialEq)]
 pub struct ChannelId<T: ITpProperty> {
     idx: usize, // idx into an object's channel properties
     contract: ContractDataHandle,
@@ -58,3 +59,5 @@ impl IChannels for () {
         &[]
     }
 }
+
+DynTpProperty!(DynChannelId, ChannelId);

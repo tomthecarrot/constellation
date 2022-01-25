@@ -1,6 +1,6 @@
 use super::{private, ITpData};
 
-use crate::contract::ContractId;
+use crate::contract::ContractDataHandle;
 use crate::object::ObjectHandle;
 
 use derive_more::From;
@@ -22,7 +22,7 @@ pub enum TpDataType {
     F64,
     String,
     ObjectHandle,
-    ContractId,
+    ContractDataHandle,
     Dynamic,
 }
 
@@ -42,7 +42,7 @@ pub enum DynTpData {
     F64(f64),
     String(String),
     ObjectHandle(ObjectHandle),
-    ContractId(ContractId),
+    ContractDataHandle(ContractDataHandle),
 }
 
 impl ITpData for DynTpData {
@@ -103,7 +103,7 @@ impl_dyntpdata!(
     f64,
     String,
     ObjectHandle,
-    ContractId,
+    ContractDataHandle,
 );
 
 #[cfg(test)]
