@@ -1,4 +1,5 @@
 use crate::contract::properties::data::{ITpProperty, TpPropertyType};
+use crate::contract::properties::dyn_macro::DynTpProperty;
 use crate::contract::ContractDataHandle;
 
 use std::any::TypeId;
@@ -19,7 +20,7 @@ pub type StateArenaMap = ShareMap;
 
 /// Represents a particular state field of a contract. For actual state data of
 /// a specific object, see [`StateHandle`].
-#[derive(Copy, Clone, Hash, Debug)]
+#[derive(Clone, Copy, Debug, Hash, Eq, PartialEq)]
 pub struct StateId<T: ITpProperty> {
     idx: usize, // idx into an object's state properties
     contract: ContractDataHandle,
@@ -57,3 +58,5 @@ impl IStates for () {
         &[]
     }
 }
+
+DynTpProperty!(DynStateId, StateId);

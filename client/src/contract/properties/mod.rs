@@ -1,5 +1,6 @@
 mod channel;
 mod data;
+pub mod dyn_macro;
 mod state;
 
 pub use channel::{
