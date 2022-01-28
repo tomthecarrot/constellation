@@ -1,7 +1,7 @@
 pub use tp_contract_macro::{channels, states};
 pub mod properties;
 
-use crate::contract::properties::{IChannels, IStates};
+use crate::contract::properties::{ChannelsIter, IChannels, IStates, StatesIter};
 use crate::object::ObjectHandle;
 
 use std::collections::HashSet;
@@ -38,6 +38,12 @@ pub trait Contract {
     fn states(&self) -> &Self::States;
     fn channels(&self) -> &Self::Channels;
     fn handle(&self) -> ContractDataHandle;
+    fn state_iter(&self) -> StatesIter<Self::States> {
+        StatesIter::new(self.handle())
+    }
+    fn chan_iter(&self) -> ChannelsIter<Self::Channels> {
+        ChannelsIter::new(self.handle())
+    }
 }
 
 /// Contains stateful data about the contract

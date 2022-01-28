@@ -71,7 +71,7 @@ macro_rules! DynTpProperty {
             }
         }
     };
-    ($ident:ident, $container:ty) => {
+    ($ident:ident, $container:tt) => {
         ::paste::paste! {
             $crate::contract::properties::dyn_macro::helper!([<$ident Single>], $container);
             $crate::contract::properties::dyn_macro::helper!([<$ident Vec>], $container, Vec);
@@ -80,6 +80,58 @@ macro_rules! DynTpProperty {
             pub enum $ident {
                 Single([<$ident Single>]),
                 Vec([<$ident Vec>]),
+            }
+            impl $ident {
+                pub fn new(contract: ContractDataHandle, idx: usize, typ: TpPropertyType) -> Self {
+                    use $crate::contract::properties::data::{DynTpData, TpDataType};
+                    use $crate::object::ObjectHandle;
+
+                    match typ {
+                        TpPropertyType::Single(dt) => {
+                            let single: [<$ident Single>] = match dt {
+                                TpDataType::U8 => $container::<u8>::new(idx, contract).into(),
+                                TpDataType::U16 => $container::<u16>::new(idx, contract).into(),
+                                TpDataType::U32 => $container::<u32>::new(idx, contract).into(),
+                                TpDataType::U64 => $container::<u64>::new(idx, contract).into(),
+                                TpDataType::I8 => $container::<i8>::new(idx, contract).into(),
+                                TpDataType::I16 => $container::<i16>::new(idx, contract).into(),
+                                TpDataType::I32 => $container::<i32>::new(idx, contract).into(),
+                                TpDataType::I64 => $container::<i64>::new(idx, contract).into(),
+                                TpDataType::Bool => $container::<bool>::new(idx, contract).into(),
+                                TpDataType::F32 => $container::<f32>::new(idx, contract).into(),
+                                TpDataType::F64 => $container::<f64>::new(idx, contract).into(),
+                                TpDataType::String => $container::<String>::new(idx, contract).into(),
+                                TpDataType::ObjectHandle => $container::<ObjectHandle>::new(idx, contract).into(),
+                                TpDataType::ContractDataHandle => $container::<ContractDataHandle>::new(idx, contract).into(),
+                                TpDataType::Dynamic => todo!("how do we handle this?"),
+                            };
+                            single.into()
+                        },
+                        TpPropertyType::Vec(dt) => {
+                            let vec: [<$ident Vec>] = match dt {
+                                TpDataType::U8 => $container::<Vec<u8>>::new(idx, contract).into(),
+                                TpDataType::U16 => $container::<Vec<u16>>::new(idx, contract).into(),
+                                TpDataType::U32 => $container::<Vec<u32>>::new(idx, contract).into(),
+                                TpDataType::U64 => $container::<Vec<u64>>::new(idx, contract).into(),
+                                TpDataType::I8 => $container::<Vec<i8>>::new(idx, contract).into(),
+                                TpDataType::I16 => $container::<Vec<i16>>::new(idx, contract).into(),
+                                TpDataType::I32 => $container::<Vec<i32>>::new(idx, contract).into(),
+                                TpDataType::I64 => $container::<Vec<i64>>::new(idx, contract).into(),
+                                TpDataType::Bool => $container::<Vec<bool>>::new(idx, contract).into(),
+                                TpDataType::F32 => $container::<Vec<f32>>::new(idx, contract).into(),
+                                TpDataType::F64 => $container::<Vec<f64>>::new(idx, contract).into(),
+                                TpDataType::String => $container::<Vec<String>>::new(idx, contract).into(),
+                                TpDataType::ObjectHandle => $container::<Vec<ObjectHandle>>::new(idx, contract).into(),
+                                TpDataType::ContractDataHandle => $container::<Vec<ContractDataHandle>>::new(idx, contract).into(),
+                                TpDataType::Dynamic => todo!("how do we handle this?"),
+                            };
+                            vec.into()
+                        }
+                        TpPropertyType::Dynamic(dt) => {
+                            todo!("how do we handle this?")
+                        }
+                    }
+                }
             }
         }
     };
