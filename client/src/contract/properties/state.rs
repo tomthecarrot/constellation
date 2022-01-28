@@ -1,8 +1,10 @@
+use super::TpDataType;
 use crate::contract::properties::data::{ITpProperty, TpPropertyType};
 use crate::contract::properties::dyn_macro::DynTpProperty;
-use crate::contract::ContractDataHandle;
+use crate::contract::{Contract, ContractData, ContractDataHandle};
 
 use std::any::TypeId;
+use std::iter::FusedIterator;
 use std::marker::PhantomData;
 use typemap::ShareMap;
 
@@ -44,7 +46,7 @@ impl<T: ITpProperty> StateId<T> {
     }
 }
 
-pub trait IStates {
+pub trait IStates: Sized {
     fn type_ids() -> &'static [TypeId];
     fn enumerate_types() -> &'static [TpPropertyType];
 }
@@ -60,3 +62,5 @@ impl IStates for () {
 }
 
 DynTpProperty!(DynStateId, StateId);
+
+super::prop_iter!(StatesIter, IStates, DynStateId);

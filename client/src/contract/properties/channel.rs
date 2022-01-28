@@ -61,3 +61,5 @@ impl IChannels for () {
 }
 
 DynTpProperty!(DynChannelId, ChannelId);
+
+super::prop_iter!(ChannelsIter, IChannels, DynChannelId);
