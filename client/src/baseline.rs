@@ -17,7 +17,6 @@ pub enum BaselineKind {
     Main,
     Fork,
 }
-
 pub struct Baseline {
     kind: BaselineKind,
     objects: Arena<Object>,
