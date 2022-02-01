@@ -1,3 +1,5 @@
+pub use super::dyn_macro::apply_to_channel;
+
 use crate::contract::properties::data::{ITpProperty, TpPropertyType};
 use crate::contract::properties::dyn_macro::DynTpProperty;
 use crate::contract::ContractDataHandle;

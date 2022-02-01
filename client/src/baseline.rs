@@ -1,9 +1,12 @@
 // Teleportal Platform v3
 // Copyright 2021 WiTag Inc. dba Teleportal
 
+use crate::contract::properties::channel::{apply_to_channel, DynChannelId};
+use crate::contract::properties::state::{apply_to_state, DynStateId};
+
 use crate::contract::properties::{
-    Channel, ChannelArenaHandle, ChannelArenaMap, ChannelHandle, ChannelId, IChannels, IStates,
-    ITpProperty, State, StateArenaHandle, StateArenaMap, StateHandle, StateId,
+    Channel, ChannelArenaHandle, ChannelArenaMap, ChannelHandle, ChannelId, ChannelsIter,
+    ITpProperty, State, StateArenaHandle, StateArenaMap, StateHandle, StateId, StatesIter,
 };
 use crate::contract::{Contract, ContractData, ContractDataHandle};
 use crate::object::{Object, ObjectHandle};
@@ -123,10 +126,30 @@ impl Baseline {
         };
 
         // remove all fields of the object
-        let states = C::States::enumerate_types();
-        let channels = C::Channels::enumerate_types();
+        let states = StatesIter::<C::States>::new(o.contract());
+        let channels = ChannelsIter::<C::Channels>::new(o.contract());
 
-        todo!("SER-282")
+        for s in states {
+            apply_to_state!(s, |id| {
+                let handle = self.bind_state(id, obj)?;
+                if let Err(e) = self.state_remove(handle) {
+                    log::warn!("Failed to remove state, state has been leaked: {}", e);
+                }
+                Ok::<(), eyre::Report>(())
+            })?;
+        }
+
+        for c in channels {
+            apply_to_channel!(c, |id| {
+                let handle = self.bind_channel(id, obj)?;
+                if let Err(e) = self.channel_remove(handle) {
+                    log::warn!("Failed to remove channel, channel has been leaked: {}", e);
+                }
+                Ok::<(), eyre::Report>(())
+            })?;
+        }
+
+        Ok(())
     }
 
     // ---- Property accessors ----
@@ -175,6 +198,28 @@ impl Baseline {
 
         arena
             .get_mut(chan)
+            .ok_or_else(|| eyre!("The given handle doesn't exist in the Arena"))
+    }
+
+    fn state_remove<T: ITpProperty>(&mut self, state: StateHandle<T>) -> Result<State<T>> {
+        let arena = self
+            .states
+            .get_mut::<StateArenaHandle<T>>()
+            .ok_or_else(|| eyre!("The given handle doesn't have an associated Arena"))?;
+
+        arena
+            .remove(state)
+            .ok_or_else(|| eyre!("The given handle doesn't exist in the Arena"))
+    }
+
+    fn channel_remove<T: ITpProperty>(&mut self, channel: ChannelHandle<T>) -> Result<Channel<T>> {
+        let arena = self
+            .channels
+            .get_mut::<ChannelArenaHandle<T>>()
+            .ok_or_else(|| eyre!("The given handle doesn't have an associated Arena"))?;
+
+        arena
+            .remove(channel)
             .ok_or_else(|| eyre!("The given handle doesn't exist in the Arena"))
     }
 

@@ -1,4 +1,4 @@
-macro_rules! helper {
+macro_rules! __helper {
     ($ident:ident) => {
         #[derive(Debug, Clone, ::derive_more::From)]
         pub enum $ident {
@@ -57,12 +57,14 @@ macro_rules! helper {
         }
     };
 }
+#[doc(hidden)]
+pub(crate) use __helper;
 
 macro_rules! DynTpProperty {
     ($ident:ident) => {
         ::paste::paste! {
-            $crate::contract::properties::dyn_macro::helper!([<$ident Single>], $container);
-            $crate::contract::properties::dyn_macro::helper!([<$ident Vec>], $container, Vec);
+            $crate::contract::properties::dyn_macro::__helper!([<$ident Single>], $container);
+            $crate::contract::properties::dyn_macro::__helper!([<$ident Vec>], $container, Vec);
 
             #[derive(Debug, Clone, ::derive_more::From)]
             pub enum $ident {
@@ -73,8 +75,8 @@ macro_rules! DynTpProperty {
     };
     ($ident:ident, $container:tt) => {
         ::paste::paste! {
-            $crate::contract::properties::dyn_macro::helper!([<$ident Single>], $container);
-            $crate::contract::properties::dyn_macro::helper!([<$ident Vec>], $container, Vec);
+            $crate::contract::properties::dyn_macro::__helper!([<$ident Single>], $container);
+            $crate::contract::properties::dyn_macro::__helper!([<$ident Vec>], $container, Vec);
 
             #[derive(Debug, Clone, ::derive_more::From)]
             pub enum $ident {
@@ -83,7 +85,7 @@ macro_rules! DynTpProperty {
             }
             impl $ident {
                 pub fn new(contract: ContractDataHandle, idx: usize, typ: TpPropertyType) -> Self {
-                    use $crate::contract::properties::data::{DynTpData, TpDataType};
+                    use $crate::contract::properties::data::TpDataType;
                     use $crate::object::ObjectHandle;
 
                     match typ {
@@ -127,7 +129,7 @@ macro_rules! DynTpProperty {
                             };
                             vec.into()
                         }
-                        TpPropertyType::Dynamic(dt) => {
+                        TpPropertyType::Dynamic(_) => {
                             todo!("how do we handle this?")
                         }
                     }
@@ -136,6 +138,86 @@ macro_rules! DynTpProperty {
         }
     };
 }
-
-pub(crate) use helper;
 pub(crate) use DynTpProperty;
+
+// Not part of public API
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __apply_to_prop {
+    ($mod_path:path, $prop_type:ident, $dyn_prop:expr, $closure:expr) => {{
+        ::paste::paste! {
+            use $mod_path::[<$prop_type Single>] as PS;
+            use $mod_path::[<$prop_type Vec>] as PV;
+        }
+        match $dyn_prop {
+            $prop_type::Single(s) => match s {
+                PS::U8(id) => $closure(id),
+                PS::U16(id) => $closure(id),
+                PS::U32(id) => $closure(id),
+                PS::U64(id) => $closure(id),
+                PS::I8(id) => $closure(id),
+                PS::I16(id) => $closure(id),
+                PS::I32(id) => $closure(id),
+                PS::I64(id) => $closure(id),
+                PS::Bool(id) => $closure(id),
+                PS::F32(id) => $closure(id),
+                PS::F64(id) => $closure(id),
+                PS::String(id) => $closure(id),
+                PS::ObjectHandle(id) => $closure(id),
+                PS::ContractId(id) => $closure(id),
+            },
+            $prop_type::Vec(s) => match s {
+                PV::U8(id) => $closure(id),
+                PV::U16(id) => $closure(id),
+                PV::U32(id) => $closure(id),
+                PV::U64(id) => $closure(id),
+                PV::I8(id) => $closure(id),
+                PV::I16(id) => $closure(id),
+                PV::I32(id) => $closure(id),
+                PV::I64(id) => $closure(id),
+                PV::Bool(id) => $closure(id),
+                PV::F32(id) => $closure(id),
+                PV::F64(id) => $closure(id),
+                PV::String(id) => $closure(id),
+                PV::ObjectHandle(id) => $closure(id),
+                PV::ContractId(id) => $closure(id),
+            },
+        }
+    }};
+}
+pub(crate) use __apply_to_prop;
+
+/// Applies the provided closure expression to a [`DynStateId`].
+///
+/// Under the hood, this is matching on the `DynStateId` and the arms in the match
+/// expression convert to the corresponding `StateId<T>`, filling in the `T`.
+#[macro_export]
+macro_rules! apply_to_state {
+    ($dyn_state_id:expr, $closure:expr) => {
+        $crate::contract::properties::dyn_macro::__apply_to_prop!(
+            $crate::contract::properties::state,
+            DynStateId,
+            $dyn_state_id,
+            $closure
+        )
+    };
+}
+
+/// Applies the provided closure expression to a [`DynChannelId`].
+///
+/// Under the hood, this is matching on the `DynChannelId` and the arms in the match
+/// expression convert to the corresponding `ChannelId<T>`, filling in the `T`.
+#[macro_export]
+macro_rules! apply_to_channel {
+    ($dyn_channel_id:expr, $closure:expr) => {
+        $crate::contract::properties::dyn_macro::__apply_to_prop!(
+            $crate::contract::properties::channel,
+            DynChannelId,
+            $dyn_channel_id,
+            $closure
+        )
+    };
+}
+
+pub use apply_to_channel;
+pub use apply_to_state;
