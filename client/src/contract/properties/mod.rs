@@ -1,7 +1,11 @@
-mod channel;
-mod data;
+pub mod channel;
+pub mod state;
+
+// dyn_macro should not be used directly in the public API
+#[doc(hidden)]
 pub mod dyn_macro;
-mod state;
+
+mod data;
 
 pub use channel::{
     Channel, ChannelArenaHandle, ChannelArenaMap, ChannelHandle, ChannelId, ChannelsIter, IChannels,

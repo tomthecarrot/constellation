@@ -1,10 +1,10 @@
-use super::TpDataType;
+pub use super::dyn_macro::apply_to_state;
+
 use crate::contract::properties::data::{ITpProperty, TpPropertyType};
 use crate::contract::properties::dyn_macro::DynTpProperty;
-use crate::contract::{Contract, ContractData, ContractDataHandle};
+use crate::contract::ContractDataHandle;
 
 use std::any::TypeId;
-use std::iter::FusedIterator;
 use std::marker::PhantomData;
 use typemap::ShareMap;
 
