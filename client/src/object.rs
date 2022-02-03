@@ -1,7 +1,7 @@
 use crate::contract::properties::channel::{ChannelHandle, ChannelId};
 use crate::contract::properties::state::{StateHandle, StateId};
 use crate::contract::properties::traits::{ITpData, ITpProperty};
-use crate::contract::ContractDataHandle;
+use crate::contract::{Contract, ContractDataHandle};
 
 use arena::generational_arena as ga;
 use eyre::{eyre, Result};
@@ -15,6 +15,18 @@ pub struct Object {
     contract: ContractDataHandle,
 }
 impl Object {
+    pub(crate) fn new(
+        states: Vec<ga::Index>,
+        channels: Vec<ga::Index>,
+        contract: ContractDataHandle,
+    ) -> Self {
+        Self {
+            states,
+            channels,
+            contract,
+        }
+    }
+
     pub fn state<T: ITpData>(&self, id: StateId<T>) -> StateHandle<T> {
         assert_eq!(
             id.contract(),

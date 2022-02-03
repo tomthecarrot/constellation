@@ -1,4 +1,4 @@
-pub use crate::contract::properties::dynamic::apply_to_channel;
+pub use crate::contract::properties::dynamic::apply_to_channel_id;
 
 use crate::contract::properties::dynamic::TpPropertyType;
 use crate::contract::properties::dynamic::__macro::DynTpPropId;

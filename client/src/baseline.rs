@@ -2,11 +2,12 @@
 // Copyright 2021 WiTag Inc. dba Teleportal
 
 use crate::contract::properties::channel::{
-    apply_to_channel, Channel, ChannelArenaHandle, ChannelArenaMap, ChannelHandle, ChannelId,
-    ChannelsIter, DynChannelId,
+    apply_to_channel_id, Channel, ChannelArenaHandle, ChannelArenaMap, ChannelHandle, ChannelId,
+    ChannelsIter, IChannels,
 };
+use crate::contract::properties::dynamic::{apply_to_prop, DynTpProperty};
 use crate::contract::properties::state::{
-    apply_to_state, DynStateId, State, StateArenaHandle, StateArenaMap, StateHandle, StateId,
+    apply_to_state_id, IStates, State, StateArenaHandle, StateArenaMap, StateHandle, StateId,
     StatesIter,
 };
 
@@ -16,6 +17,8 @@ use crate::object::{Object, ObjectHandle};
 
 use arena::Arena;
 use eyre::{eyre, Result};
+use itertools::EitherOrBoth;
+use itertools::Itertools;
 use typemap::ShareMap;
 
 #[derive(Copy, Clone, PartialEq, Eq, Debug, Hash)]
@@ -61,7 +64,7 @@ impl Baseline {
 
     // ---- Object and Contract Acessors ----
 
-    pub fn register_contract<C: Contract>(&mut self) -> eyre::Result<C> {
+    pub fn register_contract<C: Contract>(&mut self) -> Result<C> {
         for (_, c_data) in self.contracts.iter() {
             let c_id = c_data.id();
             if c_id == C::ID {
@@ -72,10 +75,7 @@ impl Baseline {
         Ok(C::new(handle))
     }
 
-    pub fn unregister_contract<C: Contract>(
-        &mut self,
-        handle: ContractDataHandle,
-    ) -> eyre::Result<()> {
+    pub fn unregister_contract<C: Contract>(&mut self, handle: ContractDataHandle) -> Result<()> {
         let c_data = self
             .contracts
             .get_mut(handle)
@@ -95,7 +95,7 @@ impl Baseline {
         Ok(())
     }
 
-    pub fn contract_data(&self, handle: ContractDataHandle) -> eyre::Result<&ContractData> {
+    pub fn contract_data(&self, handle: ContractDataHandle) -> Result<&ContractData> {
         self.contracts
             .get(handle)
             .ok_or_else(|| eyre!("No contract exists for that handle!"))
@@ -105,23 +105,87 @@ impl Baseline {
         self.objects.iter()
     }
 
-    pub fn object(&self, obj: ObjectHandle) -> eyre::Result<&Object> {
+    pub fn object(&self, obj: ObjectHandle) -> Result<&Object> {
         self.objects
             .get(obj)
             .ok_or_else(|| eyre!("The given handle doesn't exist in the Arena"))
     }
 
-    pub fn object_mut(&mut self, obj: ObjectHandle) -> eyre::Result<&mut Object> {
+    pub fn object_mut(&mut self, obj: ObjectHandle) -> Result<&mut Object> {
         self.objects
             .get_mut(obj)
             .ok_or_else(|| eyre!("The given handle doesn't exist in the Arena"))
     }
 
-    pub fn object_add<C: Contract>(&mut self) -> eyre::Result<ObjectHandle> {
-        todo!("Implement object addition")
+    /// Create an object with the given `states` and `channels`, corresponding
+    /// to contract `C`
+    ///
+    /// # Errors
+    /// Will error if the types of any of the states and channels don't match
+    /// the contract.
+    pub fn object_create<C: Contract>(
+        &mut self,
+        contract: ContractDataHandle,
+        states: impl Iterator<Item = DynTpProperty>,
+        channels: impl Iterator<Item = DynTpProperty>,
+    ) -> Result<ObjectHandle> {
+        if !self.contracts.contains(contract) {
+            return Err(eyre!("No such contract for that handle"));
+        }
+
+        let state_types = C::States::enumerate_types();
+        let channel_types = C::Channels::enumerate_types();
+
+        // Check that all types match before attempting to create properties
+        macro_rules! check_types {
+            ($prop:ident, $types:ident) => {{
+                let size = $prop.size_hint().0;
+                $prop.zip_longest($types).enumerate().try_fold(
+                    Vec::with_capacity(size),
+                    |mut acc, (i, either)| {
+                        if let EitherOrBoth::Both(p, t) = either {
+                            if p.prop_type() != *t {
+                                return Err(eyre!(
+                                    "Property at field index {i} did not match contract type"
+                                ));
+                            }
+                            acc.push(p);
+                            Ok(acc)
+                        } else {
+                            return Err(eyre!(
+                                "Properties did not match the number of fields in contract"
+                            ));
+                        }
+                    },
+                )
+            }};
+        }
+
+        let states: Vec<DynTpProperty> = check_types!(states, state_types)?;
+        let channels: Vec<DynTpProperty> = check_types!(channels, channel_types)?;
+
+        // actually do the creation
+        let mut state_handles: Vec<arena::generational_arena::Index> = Vec::new();
+        let mut channel_handles: Vec<arena::generational_arena::Index> = Vec::new();
+
+        for s in states {
+            apply_to_prop!(s, |s| state_handles.push(self.state_create(s).into()));
+        }
+        for c in channels {
+            apply_to_prop!(c, |c| channel_handles.push(self.channel_create(c).into()));
+        }
+
+        let object = Object::new(state_handles, channel_handles, contract);
+        let obj_handle = self.objects.insert(object);
+        self.contracts
+            .get_mut(contract)
+            .expect("We already checked this")
+            .objects_mut()
+            .insert(obj_handle);
+        Ok(obj_handle)
     }
 
-    pub fn object_remove<C: Contract>(&mut self, obj: ObjectHandle) -> eyre::Result<()> {
+    pub fn object_remove<C: Contract>(&mut self, obj: ObjectHandle) -> Result<()> {
         let o = if let Some(o) = self.objects.remove(obj) {
             o
         } else {
@@ -133,7 +197,7 @@ impl Baseline {
         let channels = ChannelsIter::<C::Channels>::new(o.contract());
 
         for s in states {
-            apply_to_state!(s, |id| {
+            apply_to_state_id!(s, |id| {
                 let handle = self.bind_state(id, obj)?;
                 if let Err(e) = self.state_remove(handle) {
                     log::warn!("Failed to remove state, state has been leaked: {}", e);
@@ -143,7 +207,7 @@ impl Baseline {
         }
 
         for c in channels {
-            apply_to_channel!(c, |id| {
+            apply_to_channel_id!(c, |id| {
                 let handle = self.bind_channel(id, obj)?;
                 if let Err(e) = self.channel_remove(handle) {
                     log::warn!("Failed to remove channel, channel has been leaked: {}", e);
@@ -224,6 +288,24 @@ impl Baseline {
         arena
             .remove(channel)
             .ok_or_else(|| eyre!("The given handle doesn't exist in the Arena"))
+    }
+
+    fn state_create<T: ITpPropertyStatic>(&mut self, value: T) -> StateHandle<T> {
+        let arena = self
+            .states
+            .entry::<StateArenaHandle<T>>()
+            .or_insert_with(|| Arena::new());
+
+        arena.insert(State(value))
+    }
+
+    fn channel_create<T: ITpPropertyStatic>(&mut self, value: T) -> ChannelHandle<T> {
+        let arena = self
+            .channels
+            .entry::<ChannelArenaHandle<T>>()
+            .or_insert_with(|| Arena::new());
+
+        arena.insert(Channel(value))
     }
 
     // ---- State and Channel bindings ----

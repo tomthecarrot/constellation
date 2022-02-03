@@ -10,4 +10,4 @@ pub use primitive::{DynTpPrimitive, TpPrimitiveType};
 pub use property::{DynTpProperty, TpPropertyType};
 pub use vec::DynTpVec;
 
-pub use __macro::{apply_to_channel, apply_to_state};
+pub use __macro::{apply_to_channel_id, apply_to_prop, apply_to_state_id};

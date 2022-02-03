@@ -126,11 +126,12 @@ pub(in crate::contract::properties) use DynTpPropId;
 // Not part of public API
 #[doc(hidden)]
 #[macro_export]
-macro_rules! apply_to_prop {
-    ($mod_path:path, $prop_type:ident, $dyn_prop:expr, $closure:expr) => {{
+macro_rules! apply_to_dyn {
+    ($mod_path:path, $prop_type:ident, $prim_type:ident, $vec_type:ident, $dyn_prop:expr, $closure:expr) => {{
         ::paste::paste! {
-            use $mod_path::[<$prop_type Primitive>] as PS;
-            use $mod_path::[<$prop_type Vec>] as PV;
+            use $mod_path::$prop_type;
+            use $mod_path::$prim_type as PS;
+            use $mod_path::$vec_type as PV;
         }
         match $dyn_prop {
             $prop_type::Primitive(s) => match s {
@@ -168,18 +169,20 @@ macro_rules! apply_to_prop {
         }
     }};
 }
-pub(crate) use apply_to_prop;
+pub(crate) use apply_to_dyn;
 
 /// Applies the provided closure expression to a [`DynStateId`].
 ///
 /// Under the hood, this is matching on the `DynStateId` and the arms in the match
 /// expression convert to the corresponding `StateId<T>`, filling in the `T`.
 #[macro_export]
-macro_rules! apply_to_state {
+macro_rules! apply_to_state_id {
     ($dyn_state_id:expr, $closure:expr) => {
-        $crate::contract::properties::dynamic::__macro::apply_to_prop!(
+        $crate::contract::properties::dynamic::__macro::apply_to_dyn!(
             $crate::contract::properties::state,
             DynStateId,
+            DynStateIdPrimitive,
+            DynStateIdVec,
             $dyn_state_id,
             $closure
         )
@@ -191,16 +194,38 @@ macro_rules! apply_to_state {
 /// Under the hood, this is matching on the `DynChannelId` and the arms in the match
 /// expression convert to the corresponding `ChannelId<T>`, filling in the `T`.
 #[macro_export]
-macro_rules! apply_to_channel {
+macro_rules! apply_to_channel_id {
     ($dyn_channel_id:expr, $closure:expr) => {
-        $crate::contract::properties::dynamic::__macro::apply_to_prop!(
+        $crate::contract::properties::dynamic::__macro::apply_to_dyn!(
             $crate::contract::properties::channel,
             DynChannelId,
+            DynChannelIdPrimitive,
+            DynChannelIdVec,
             $dyn_channel_id,
             $closure
         )
     };
 }
 
-pub use apply_to_channel;
-pub use apply_to_state;
+pub use apply_to_channel_id;
+pub use apply_to_state_id;
+
+/// Applies the provided closure expression to a [`DynStateId`].
+///
+/// Under the hood, this is matching on the `DynStateId` and the arms in the match
+/// expression convert to the corresponding `StateId<T>`, filling in the `T`.
+#[macro_export]
+macro_rules! apply_to_prop {
+    ($dyn_prop:expr, $closure:expr) => {
+        $crate::contract::properties::dynamic::__macro::apply_to_dyn!(
+            $crate::contract::properties::dynamic,
+            DynTpProperty,
+            DynTpPrimitive,
+            DynTpVec,
+            $dyn_prop,
+            $closure
+        )
+    };
+}
+
+pub use apply_to_prop;
