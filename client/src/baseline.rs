@@ -1,13 +1,16 @@
 // Teleportal Platform v3
 // Copyright 2021 WiTag Inc. dba Teleportal
 
-use crate::contract::properties::channel::{apply_to_channel, DynChannelId};
-use crate::contract::properties::state::{apply_to_state, DynStateId};
-
-use crate::contract::properties::{
-    Channel, ChannelArenaHandle, ChannelArenaMap, ChannelHandle, ChannelId, ChannelsIter,
-    ITpProperty, State, StateArenaHandle, StateArenaMap, StateHandle, StateId, StatesIter,
+use crate::contract::properties::channel::{
+    apply_to_channel, Channel, ChannelArenaHandle, ChannelArenaMap, ChannelHandle, ChannelId,
+    ChannelsIter, DynChannelId,
 };
+use crate::contract::properties::state::{
+    apply_to_state, DynStateId, State, StateArenaHandle, StateArenaMap, StateHandle, StateId,
+    StatesIter,
+};
+
+use crate::contract::properties::traits::{ITpProperty, ITpPropertyStatic};
 use crate::contract::{Contract, ContractData, ContractDataHandle};
 use crate::object::{Object, ObjectHandle};
 
@@ -225,7 +228,7 @@ impl Baseline {
 
     // ---- State and Channel bindings ----
 
-    pub fn bind_state<T: ITpProperty>(
+    pub fn bind_state<T: ITpPropertyStatic>(
         &self,
         id: StateId<T>,
         obj: ObjectHandle,

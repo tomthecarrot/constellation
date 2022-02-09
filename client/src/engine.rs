@@ -1,7 +1,7 @@
 use crate::action::property::{PropertyAction, StateAction};
 use crate::action::{Action, ActionKind, ActionResult, Collaction, CollactionResult, IAction};
 use crate::baseline::BaselineKind;
-use crate::contract::properties::ITpProperty;
+use crate::contract::properties::traits::ITpProperty;
 use crate::Realm;
 
 use crossbeam_channel::{Receiver, RecvTimeoutError, Sender, TryRecvError};

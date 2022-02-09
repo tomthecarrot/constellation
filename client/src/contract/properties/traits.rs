@@ -1,8 +1,8 @@
-mod dyn_data;
-mod dyn_property;
+//! Contains fundamental traits and types for properties.
 
-pub use dyn_data::{DynTpData, TpDataType};
-pub use dyn_property::{DynTpProperty, TpPropertyType};
+use crate::contract::properties::dynamic::{
+    DynTpPrimitive, DynTpProperty, DynTpVec, TpPrimitiveType, TpPropertyType,
+};
 
 use crate::contract::ContractDataHandle;
 use crate::object::ObjectHandle;
@@ -14,7 +14,7 @@ use std::fmt::Debug;
 
 /// Any supported primitive type that can be stored in a property.
 pub trait ITpData: 'static + Send + Sync + Debug + PartialEq + Clone + private::Sealed {
-    const DATA_TYPE: TpDataType;
+    const DATA_TYPE: TpPrimitiveType;
 }
 
 macro_rules! impl_itpdata {
@@ -22,7 +22,7 @@ macro_rules! impl_itpdata {
     ($t:ty) => {
         paste! {
             impl ITpData for $t {
-                const DATA_TYPE: TpDataType = TpDataType::[<$t:camel>];
+                const DATA_TYPE: TpPrimitiveType = TpPrimitiveType::[<$t:camel>];
             }
         }
 
@@ -58,24 +58,33 @@ impl_itpdata!(
 
 // ---- ITpProperty and containers ----
 
+/// An `ITpProperty` is any type that could be stored inside a teleportal
+/// property. For example, the `T` in `State<T>` or `Channel<T>`
 pub trait ITpProperty: 'static + Send + Sync + Debug + PartialEq + Clone {
-    type Data: ITpData;
+    fn prop_type(&self) -> TpPropertyType;
+}
 
+/// An `ITpPropertyStatic` is an [`ITpProperty`], with the additional restriction
+/// that its concrete type is known at compile-time and is not dynamic.
+pub trait ITpPropertyStatic: ITpProperty {
     const PROPERTY_TYPE: TpPropertyType;
 }
 
 /// Vecs of ITpDatas are valid for storing in a property
-impl<T: ITpData> ITpProperty for Vec<T> {
-    type Data = T;
-
+impl<T: ITpData> ITpPropertyStatic for Vec<T> {
     const PROPERTY_TYPE: TpPropertyType = TpPropertyType::Vec(T::DATA_TYPE);
 }
 
 /// All ITpDatas are also valid for storing in a property
-impl<T: ITpData> ITpProperty for T {
-    type Data = T;
+impl<T: ITpData> ITpPropertyStatic for T {
+    const PROPERTY_TYPE: TpPropertyType = TpPropertyType::Primitive(T::DATA_TYPE);
+}
 
-    const PROPERTY_TYPE: TpPropertyType = TpPropertyType::Single(T::DATA_TYPE);
+/// All ITpPropertyStatics are valid ITpProperties (but not the other way around)
+impl<T: ITpPropertyStatic> ITpProperty for T {
+    fn prop_type(&self) -> TpPropertyType {
+        T::PROPERTY_TYPE
+    }
 }
 
 mod private {

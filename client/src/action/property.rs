@@ -1,4 +1,6 @@
-use crate::contract::properties::{ChannelHandle, ITpProperty, StateHandle};
+use crate::contract::properties::channel::ChannelHandle;
+use crate::contract::properties::state::StateHandle;
+use crate::contract::properties::traits::ITpProperty;
 
 use crate::action::{ActionKind, IAction};
 

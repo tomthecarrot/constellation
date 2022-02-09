@@ -1,6 +1,6 @@
-use crate::contract::properties::{
-    ChannelHandle, ChannelId, ITpData, ITpProperty, StateHandle, StateId,
-};
+use crate::contract::properties::channel::{ChannelHandle, ChannelId};
+use crate::contract::properties::state::{StateHandle, StateId};
+use crate::contract::properties::traits::{ITpData, ITpProperty};
 use crate::contract::ContractDataHandle;
 
 use arena::generational_arena as ga;

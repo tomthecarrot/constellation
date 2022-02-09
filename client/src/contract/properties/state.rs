@@ -1,7 +1,8 @@
-pub use super::dyn_macro::apply_to_state;
+pub use crate::contract::properties::dynamic::apply_to_state;
 
-use crate::contract::properties::data::{ITpProperty, TpPropertyType};
-use crate::contract::properties::dyn_macro::DynTpProperty;
+use crate::contract::properties::dynamic::TpPropertyType;
+use crate::contract::properties::dynamic::__macro::DynTpPropId;
+use crate::contract::properties::traits::ITpProperty;
 use crate::contract::ContractDataHandle;
 
 use std::any::TypeId;
@@ -61,6 +62,6 @@ impl IStates for () {
     }
 }
 
-DynTpProperty!(DynStateId, StateId);
+DynTpPropId!(DynStateId, StateId);
 
 super::prop_iter!(StatesIter, IStates, DynStateId);

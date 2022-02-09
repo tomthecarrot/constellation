@@ -3,7 +3,8 @@ use tp_contract_macro::{channels, states};
 
 #[test]
 fn test_macros() {
-    use tp_client::contract::properties::{IChannels, IStates};
+    use tp_client::contract::properties::channel::IChannels;
+    use tp_client::contract::properties::state::IStates;
 
     #[states]
     pub struct MyStates {

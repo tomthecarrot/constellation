@@ -1,7 +1,8 @@
-pub use super::dyn_macro::apply_to_channel;
+pub use crate::contract::properties::dynamic::apply_to_channel;
 
-use crate::contract::properties::data::{ITpProperty, TpPropertyType};
-use crate::contract::properties::dyn_macro::DynTpProperty;
+use crate::contract::properties::dynamic::TpPropertyType;
+use crate::contract::properties::dynamic::__macro::DynTpPropId;
+use crate::contract::properties::traits::ITpProperty;
 use crate::contract::ContractDataHandle;
 
 use std::any::TypeId;
@@ -62,6 +63,6 @@ impl IChannels for () {
     }
 }
 
-DynTpProperty!(DynChannelId, ChannelId);
+DynTpPropId!(DynChannelId, ChannelId);
 
 super::prop_iter!(ChannelsIter, IChannels, DynChannelId);

@@ -1,19 +1,7 @@
 pub mod channel;
+pub mod dynamic;
 pub mod state;
-
-// dyn_macro should not be used directly in the public API
-#[doc(hidden)]
-pub mod dyn_macro;
-
-mod data;
-
-pub use channel::{
-    Channel, ChannelArenaHandle, ChannelArenaMap, ChannelHandle, ChannelId, ChannelsIter, IChannels,
-};
-pub use data::{DynTpData, DynTpProperty, ITpData, ITpProperty, TpDataType, TpPropertyType};
-pub use state::{
-    IStates, State, StateArenaHandle, StateArenaMap, StateHandle, StateId, StatesIter,
-};
+pub mod traits;
 
 macro_rules! prop_iter {
     ($iter_name:ident, $trait_name:ident, $dyn_name:ident) => {
