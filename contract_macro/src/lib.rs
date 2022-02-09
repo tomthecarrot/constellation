@@ -110,7 +110,7 @@ macro_rules! template_impl {
 
                 prop_types.push({
                     quote_spanned! {inner_t.span()=>
-                        <#inner_t as ::tp_client::contract::properties::ITpProperty>::PROPERTY_TYPE
+                        <#inner_t as ::tp_client::contract::properties::traits::ITpPropertyStatic>::PROPERTY_TYPE
                     }
                 })
             }
@@ -133,9 +133,9 @@ macro_rules! template_impl {
                         TYPE_IDS.as_slice()
                     }
 
-                    fn #enumerate_types_ident() -> &'static [::tp_client::contract::properties::TpPropertyType] {
+                    fn #enumerate_types_ident() -> &'static [::tp_client::contract::properties::dynamic::TpPropertyType] {
                         ::lazy_static::lazy_static! {
-                            static ref PROP_TYPES: Vec<::tp_client::contract::properties::TpPropertyType> = vec![#(#prop_types),*];
+                            static ref PROP_TYPES: Vec<::tp_client::contract::properties::dynamic::TpPropertyType> = vec![#(#prop_types),*];
                         }
                         PROP_TYPES.as_slice()
                     }
@@ -157,12 +157,12 @@ pub(crate) mod imp {
     use super::*;
     template_impl!(
         states,
-        ::tp_client::contract::properties::StateId,
-        ::tp_client::contract::properties::IStates,
+        ::tp_client::contract::properties::state::StateId,
+        ::tp_client::contract::properties::state::IStates,
     );
     template_impl!(
         channels,
-        ::tp_client::contract::properties::ChannelId,
-        ::tp_client::contract::properties::IChannels,
+        ::tp_client::contract::properties::channel::ChannelId,
+        ::tp_client::contract::properties::channel::IChannels,
     );
 }

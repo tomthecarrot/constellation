@@ -1,6 +1,7 @@
 pub mod property;
 
-use crate::contract::properties::{DynTpProperty, ITpProperty};
+use crate::contract::properties::dynamic::DynTpProperty;
+use crate::contract::properties::traits::ITpProperty;
 use property::{ChannelAction, PropertyAction, StateAction};
 
 use enum_dispatch::enum_dispatch;
