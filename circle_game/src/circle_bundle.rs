@@ -1,5 +1,4 @@
-use tp_client::baseline::BaselineKind;
-use tp_client::object::ObjectHandle;
+use crate::components::{tp, BaselineKind, ObjectHandle};
 
 use bevy::prelude::*;
 use bevy_prototype_lyon::entity::ShapeBundle;
@@ -29,17 +28,13 @@ impl CircleBundle {
         CircleBundle {
             shape: GeometryBuilder::build_as(
                 &*CIRCLE,
-                ShapeColors::outlined(
-                    if baseline_kind == BaselineKind::Main {
+                DrawMode::Outlined {
+                    fill_mode: FillMode::color(if baseline_kind.0 == tp::BaselineKind::Main {
                         Color::LIME_GREEN
                     } else {
                         Color::ORANGE_RED
-                    },
-                    Color::BLACK,
-                ),
-                DrawMode::Outlined {
-                    fill_options: FillOptions::default(),
-                    outline_options: StrokeOptions::default().with_line_width(0.5),
+                    }),
+                    outline_mode: StrokeMode::new(Color::BLACK, 0.5),
                 },
                 position,
             ),

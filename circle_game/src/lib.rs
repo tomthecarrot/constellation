@@ -2,12 +2,13 @@
 
 mod circle;
 mod circle_bundle;
+mod components;
 
 use circle::Circle;
 use circle_bundle::CircleBundle;
+use components::{tp, BaselineKind, ObjectHandle};
 use tp_client::engine::Engine;
 use tp_client::realm::{Realm, RealmID};
-use tp_client::{baseline::BaselineKind, object::ObjectHandle};
 
 use bevy::prelude::*;
 use bevy_prototype_lyon::prelude::*;
@@ -23,9 +24,9 @@ static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 #[cfg(target_arch = "wasm32")]
 mod wasm_main;
 
-pub fn configure_app() -> bevy::app::AppBuilder {
+pub fn configure_app() -> bevy::app::App {
     let (engine, action_sender) = Engine::new(Realm::new(RealmID::new("tmp id".to_string())), None);
-    let mut app = App::build();
+    let mut app = App::new();
     app.insert_resource(Msaa { samples: 8 })
         .insert_resource(engine)
         .insert_resource(action_sender)
@@ -43,7 +44,7 @@ fn setup(mut engine: ResMut<Engine>, mut commands: Commands) {
 
     let contract: Circle = engine
         .realm_mut()
-        .baseline_mut(BaselineKind::Fork)
+        .baseline_mut(tp::BaselineKind::Fork)
         .register_contract()
         .expect("contract failed to register");
 
@@ -60,12 +61,12 @@ fn setup(mut engine: ResMut<Engine>, mut commands: Commands) {
 
             commands.spawn_bundle(CircleBundle::new(
                 Transform::from_xyz(x, y, 1.),
-                BaselineKind::Main,
+                tp::BaselineKind::Main.into(),
                 obj_handle,
             ));
             commands.spawn_bundle(CircleBundle::new(
                 Transform::from_xyz(x, y, 0.),
-                BaselineKind::Fork,
+                tp::BaselineKind::Fork.into(),
                 obj_handle,
             ));
         }
@@ -77,12 +78,8 @@ fn update_position(
     mut query: Query<(&BaselineKind, &ObjectHandle, &mut Transform)>,
 ) {
     for (kind, obj_handle, transform) in query.iter_mut() {
-        let base = match kind {
-            BaselineKind::Main => engine.realm().baseline(BaselineKind::Main),
-
-            BaselineKind::Fork => engine.realm().baseline(BaselineKind::Fork),
-        };
-        let obj = base.object(*obj_handle);
+        let base = engine.realm().baseline(kind.0);
+        let obj = base.object(obj_handle.0);
         let t = todo!("Read position from obj");
         *transform = t;
     }
