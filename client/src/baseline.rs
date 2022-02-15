@@ -125,11 +125,11 @@ impl Baseline {
     /// the contract.
     pub fn object_create<C: Contract>(
         &mut self,
-        contract: ContractDataHandle,
+        contract: &C,
         states: impl Iterator<Item = DynTpProperty>,
         channels: impl Iterator<Item = DynTpProperty>,
     ) -> Result<ObjectHandle> {
-        if !self.contracts.contains(contract) {
+        if !self.contracts.contains(contract.handle()) {
             return Err(eyre!("No such contract for that handle"));
         }
 
@@ -175,10 +175,10 @@ impl Baseline {
             apply_to_prop!(c, |c| channel_handles.push(self.channel_create(c).into()));
         }
 
-        let object = Object::new(state_handles, channel_handles, contract);
+        let object = Object::new(state_handles, channel_handles, contract.handle());
         let obj_handle = self.objects.insert(object);
         self.contracts
-            .get_mut(contract)
+            .get_mut(contract.handle())
             .expect("We already checked this")
             .objects_mut()
             .insert(obj_handle);
