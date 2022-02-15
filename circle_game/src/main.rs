@@ -1,8 +1,11 @@
 #[cfg(not(target_arch = "wasm32"))]
-fn main() {
-    let mut app = circle_game::configure_app();
+fn main() -> eyre::Result<()> {
+    color_eyre::install()?;
 
-    app.run()
+    let mut app = circle_game::configure_app();
+    app.run();
+
+    Ok(())
 }
 
 #[cfg(target_arch = "wasm32")]
