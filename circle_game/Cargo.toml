@@ -1,12 +1,13 @@
 # You must change these to your own details.
 [package]
 name = "circle_game"
-description = "My super awesome Rust, WebAssembly, and Webpack project!"
+description = "Simple demo of teleportal platform engine"
 version = "0.0.1"
 authors = ["Ryan Butler <ryan.butler@teleportal.app>"]
 categories = ["wasm"]
 readme = "README.md"
 edition = "2021"
+rust-version = "1.58"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
