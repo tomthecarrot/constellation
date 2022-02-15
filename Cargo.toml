@@ -1,5 +1,4 @@
 [workspace]
-edition = "2021"
 resolver = "2"  # As of Nov 2021, rust doesn't seem to use new resolver if you don't specify this
 
 members = [
