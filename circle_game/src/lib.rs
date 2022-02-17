@@ -4,9 +4,9 @@ mod circle;
 mod circle_bundle;
 mod components;
 
-use circle::Circle;
-use circle_bundle::CircleBundle;
-use components::{tp, BaselineKind, ObjectHandle};
+use crate::circle::Circle;
+use crate::circle_bundle::CircleBundle;
+use crate::components::{tp, BaselineKind, ObjectHandle, PosHandle};
 use tp_client::contract::properties::dynamic::{DynTpPrimitive, DynTpProperty};
 use tp_client::contract::Contract;
 use tp_client::engine::Engine;
@@ -14,6 +14,7 @@ use tp_client::realm::{Realm, RealmID};
 
 use bevy::prelude::*;
 use bevy_prototype_lyon::prelude::*;
+use eyre::WrapErr;
 
 // When the `wee_alloc` feature is enabled, this uses `wee_alloc` as the global
 // allocator.
@@ -37,19 +38,27 @@ pub fn configure_app() -> bevy::app::App {
         .expect("contract failed to register");
 
     let mut app = App::new();
-    app.insert_resource(Msaa { samples: 8 })
+    app.insert_resource(Msaa { samples: 4 })
         .insert_resource(engine)
         .insert_resource(action_sender)
         .insert_resource(contract)
         .add_plugins(DefaultPlugins)
         .add_plugin(ShapePlugin)
-        .add_startup_system(setup)
-        .add_system(update_position);
-
+        .add_startup_system(setup.chain(report_eyre))
+        .add_system(random_walk.chain(report_eyre))
+        .add_system(sync_transforms);
     app
 }
 
-fn setup(mut engine: ResMut<Engine>, contract: Res<Circle>, mut commands: Commands) {
+fn report_eyre(In(err): In<eyre::Result<()>>) {
+    err.unwrap()
+}
+
+fn setup(
+    mut engine: ResMut<Engine>,
+    contract: Res<Circle>,
+    mut commands: Commands,
+) -> eyre::Result<()> {
     commands.spawn_bundle(OrthographicCameraBundle::new_2d());
 
     const SQUARE_SIZE: usize = 10;
@@ -63,9 +72,9 @@ fn setup(mut engine: ResMut<Engine>, contract: Res<Circle>, mut commands: Comman
             let x = offset_and_scale(x);
             let y = offset_and_scale(y);
 
-            let obj_handle = engine
-                .realm_mut()
-                .baseline_mut(tp::BaselineKind::Fork)
+            let baseline = engine.realm_mut().baseline_mut(tp::BaselineKind::Fork);
+
+            let obj_handle = baseline
                 .object_create(
                     &*contract,
                     [x, y]
@@ -74,40 +83,70 @@ fn setup(mut engine: ResMut<Engine>, contract: Res<Circle>, mut commands: Comman
                         .map(DynTpProperty::from),
                     [].into_iter(),
                 )
-                .expect("Failed to create object");
+                .wrap_err("Failed to create object")?;
 
-            commands.spawn_bundle(CircleBundle::new(
-                Transform::from_xyz(x, y, 1.),
-                tp::BaselineKind::Main.into(),
-                obj_handle.into(),
-            ));
+            let pos_handle = {
+                let x_id = contract.states().x();
+                let y_id = contract.states().y();
+
+                let x_h = baseline
+                    .bind_state(x_id, obj_handle)
+                    .wrap_err("Failed to bind to object handle")?;
+                let y_h = baseline
+                    .bind_state(y_id, obj_handle)
+                    .wrap_err("Failed to bind to object handle")?;
+
+                PosHandle {
+                    x: x_h.into(),
+                    y: y_h.into(),
+                }
+            };
+
+            // We need to deal with the main baseline eventually
+            // commands.spawn_bundle(CircleBundle::new(
+            //     Transform::from_xyz(x, y, 0.),
+            //     tp::BaselineKind::Main.into(),
+            //     obj_handle.into(),
+            //     pos_handle,
+            // ));
+
             commands.spawn_bundle(CircleBundle::new(
                 Transform::from_xyz(x, y, 0.),
                 tp::BaselineKind::Fork.into(),
                 obj_handle.into(),
+                pos_handle,
             ));
         }
     }
+    Ok(())
 }
 
-fn update_position(
+fn random_walk(
+    mut engine: ResMut<Engine>,
+    mut query: Query<(&BaselineKind, &PosHandle)>,
+) -> eyre::Result<()> {
+    for (kind, pos) in query.iter_mut() {
+        match kind.0 {
+            tp::BaselineKind::Fork => (),
+            _ => continue, // Shouldn't directly modify main baseline
+        }
+
+        let base = engine.realm_mut().baseline_mut(kind.0);
+
+        base[pos.x].0 += (rand::random::<f32>() - 0.5) * 2.;
+        base[pos.y].0 += (rand::random::<f32>() - 0.5) * 2.;
+    }
+    Ok(())
+}
+
+fn sync_transforms(
     engine: Res<Engine>,
-    contract: Res<Circle>,
-    mut query: Query<(&BaselineKind, &ObjectHandle, &mut Transform)>,
+    mut query: Query<(&BaselineKind, &PosHandle, &mut Transform)>,
 ) {
-    for (kind, obj, mut transform) in query.iter_mut() {
-        let obj = obj.0;
+    for (kind, pos, mut transform) in query.iter_mut() {
         let base = engine.realm().baseline(kind.0);
-        let x_id = contract.states().x();
-        let y_id = contract.states().y();
 
-        let x_h = base.bind_state(x_id, obj).unwrap();
-        let y_h = base.bind_state(y_id, obj).unwrap();
-
-        let x = base[x_h].0;
-        let y = base[y_h].0;
-
-        transform.translation.x = x;
-        transform.translation.y = y;
+        transform.translation.x = base[pos.x].0;
+        transform.translation.y = base[pos.y].0;
     }
 }
