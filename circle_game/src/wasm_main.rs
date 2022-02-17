@@ -10,7 +10,6 @@ pub fn wasm_main() -> Result<(), JsValue> {
     console_error_panic_hook::set_once();
 
     let mut app = crate::configure_app();
-    app.add_plugin(bevy_webgl2::WebGL2Plugin);
     app.run();
 
     Ok(())

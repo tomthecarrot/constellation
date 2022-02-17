@@ -1,4 +1,4 @@
-use crate::components::{tp, BaselineKind, ObjectHandle};
+use crate::components::{tp, BaselineKind, ObjectHandle, PosHandle};
 
 use bevy::prelude::*;
 use bevy_prototype_lyon::entity::ShapeBundle;
@@ -12,12 +12,14 @@ pub struct CircleBundle {
     shape: ShapeBundle,
     baseline_kind: BaselineKind,
     object_handle: ObjectHandle,
+    pos_handle: PosHandle,
 }
 impl CircleBundle {
     pub fn new(
         position: Transform,
         baseline_kind: BaselineKind,
         object_handle: ObjectHandle,
+        pos_handle: PosHandle,
     ) -> Self {
         lazy_static! {
             static ref CIRCLE: shapes::Circle = shapes::Circle {
@@ -40,6 +42,7 @@ impl CircleBundle {
             ),
             baseline_kind,
             object_handle,
+            pos_handle,
         }
     }
 }
