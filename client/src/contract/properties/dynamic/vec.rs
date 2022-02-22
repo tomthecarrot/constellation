@@ -1,12 +1,13 @@
-use super::__macro::DynEnum;
+// Re-export to relocate the type into the current module
+pub use super::property::DynTpVec;
+
 use super::primitive::TpPrimitiveType;
-use super::property::TpPropertyType;
+use super::TpPropertyType;
 use crate::contract::ContractDataHandle;
 use crate::object::ObjectHandle;
 
 use paste::paste;
 
-DynEnum!(DynTpVec, Vec);
 impl DynTpVec {
     pub const fn prop_type(&self) -> TpPropertyType {
         match self {
@@ -43,6 +44,26 @@ macro_rules! impl_equality {
             }
 
             impl PartialEq<DynTpVec> for Vec<$t> {
+                fn eq(&self, other: &DynTpVec) -> bool {
+                    if let DynTpVec::[<$t:camel>](other) = other {
+                        self == other
+                    } else {
+                        false
+                    }
+                }
+            }
+
+            impl PartialEq<&[$t]> for DynTpVec {
+                fn eq(&self, other: &&[$t]) -> bool {
+                    if let Self::[<$t:camel>](inner) = self {
+                        inner == other
+                    } else {
+                        false
+                    }
+                }
+            }
+
+            impl PartialEq<DynTpVec> for &[$t] {
                 fn eq(&self, other: &DynTpVec) -> bool {
                     if let DynTpVec::[<$t:camel>](other) = other {
                         self == other

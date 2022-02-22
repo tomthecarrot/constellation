@@ -1,27 +1,39 @@
-use crate::contract::properties::channels::ChannelHandle;
-use crate::contract::properties::states::StateHandle;
-use crate::contract::properties::traits::ITpProperty;
+use crate::contract::properties::channels::DynChannelHandle;
+use crate::contract::properties::dynamic::DynTpProperty;
+use crate::contract::properties::states::DynStateHandle;
 
 use crate::action::{ActionKind, IAction};
 
 use enum_dispatch::enum_dispatch;
 
 #[enum_dispatch(IAction)]
-pub enum PropertyAction<T: ITpProperty> {
-    State(StateAction<T>),
-    Channel(ChannelAction<T>),
+pub enum PropertyAction {
+    State(StateAction),
+    Channel(ChannelAction),
 }
 
-pub enum ChannelAction<T: ITpProperty> {
-    Assert { handle: ChannelHandle<T>, data: T },
-    Write { handle: ChannelHandle<T>, data: T },
+pub enum ChannelAction {
+    Assert {
+        handle: DynChannelHandle,
+        data: DynTpProperty,
+    },
+    Write {
+        handle: DynChannelHandle,
+        data: DynTpProperty,
+    },
 }
-pub enum StateAction<T: ITpProperty> {
-    Assert { handle: StateHandle<T>, data: T },
-    Write { handle: StateHandle<T>, data: T },
+pub enum StateAction {
+    Assert {
+        handle: DynStateHandle,
+        data: DynTpProperty,
+    },
+    Write {
+        handle: DynStateHandle,
+        data: DynTpProperty,
+    },
 }
 
-impl<T: ITpProperty> IAction for StateAction<T> {
+impl IAction for StateAction {
     fn kind(&self) -> ActionKind {
         match self {
             Self::Write { .. } => ActionKind::StateWrite,
@@ -34,7 +46,7 @@ impl<T: ITpProperty> IAction for StateAction<T> {
     }
 }
 
-impl<T: ITpProperty> IAction for ChannelAction<T> {
+impl IAction for ChannelAction {
     fn kind(&self) -> ActionKind {
         match self {
             Self::Write { .. } => ActionKind::ChannelWrite,

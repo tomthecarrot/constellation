@@ -1,14 +1,12 @@
 pub mod property;
 
-use crate::contract::properties::dynamic::DynTpProperty;
-use crate::contract::properties::traits::ITpProperty;
 use property::{ChannelAction, PropertyAction, StateAction};
 
 use enum_dispatch::enum_dispatch;
 
 #[enum_dispatch(IAction)]
-pub enum Action<T: ITpProperty = DynTpProperty> {
-    Property(PropertyAction<T>),
+pub enum Action {
+    Property(PropertyAction),
 }
 
 /// All `Action` variants satisfy `IAction` trait

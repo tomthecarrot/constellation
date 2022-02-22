@@ -1,34 +1,15 @@
-use super::primitive::{DynTpPrimitive, TpPrimitiveType};
+use super::primitive::TpPrimitiveType;
+use super::TpPropertyType;
+use crate::contract::properties::dynamic::__macro::DynEnum;
+use crate::contract::properties::primitives;
 use crate::contract::properties::traits::ITpProperty;
-
-use super::vec::DynTpVec;
-
 use crate::contract::ContractDataHandle;
 use crate::object::ObjectHandle;
 
-use derive_more::{From, TryInto};
+use derive_more::From;
+use paste::paste;
 
-/// The static type of the ITpPropertyStatic
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum TpPropertyType {
-    Vec(TpPrimitiveType),
-    Primitive(TpPrimitiveType),
-}
-impl TpPropertyType {
-    const fn primitive_type(&self) -> TpPrimitiveType {
-        match self {
-            Self::Vec(pt) => *pt,
-            Self::Primitive(pt) => *pt,
-        }
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, From, TryInto)]
-pub enum DynTpProperty {
-    Primitive(DynTpPrimitive),
-    Vec(DynTpVec),
-}
-
+DynEnum!(DynTpProperty, DynTpPrimitive, DynTpVec);
 impl DynTpProperty {
     pub const fn prop_type(&self) -> TpPropertyType {
         match self {
@@ -44,110 +25,139 @@ impl ITpProperty for DynTpProperty {
     }
 }
 
-// ---- PartialEq and PartialOrd impls ----
+// ---- DynTpPropertyRef and DynTpPropertyMut ----
 
-macro_rules! impl_equality {
-    // base case
-    ($t:ty) => {
-        // ---- Single variants ----
-        impl PartialEq<$t> for DynTpProperty {
-            fn eq(&self, other: &$t) -> bool {
-                if let Self::Primitive(inner) = self {
-                    inner == other
-                } else {
-                    false
+macro_rules! dyn_helper {
+    ($suffix:ident, $attr:meta, $($maybe_mut:tt)?) => {
+        paste! {
+
+            #[$attr]
+            pub enum [<DynTpPrimitive $suffix>]<'a> {
+                U8(&'a $($maybe_mut)? u8),
+                U16(&'a $($maybe_mut)? u16),
+                U32(&'a $($maybe_mut)? u32),
+                U64(&'a $($maybe_mut)? u64),
+                I8(&'a $($maybe_mut)? i8),
+                I16(&'a $($maybe_mut)? i16),
+                I32(&'a $($maybe_mut)? i32),
+                I64(&'a $($maybe_mut)? i64),
+                Bool(&'a $($maybe_mut)? bool),
+                F32(&'a $($maybe_mut)? f32),
+                F64(&'a $($maybe_mut)? f64),
+                String(&'a $($maybe_mut)? String),
+                ObjectHandle(&'a $($maybe_mut)? ObjectHandle),
+                ContractDataHandle(&'a $($maybe_mut)? ContractDataHandle),
+            }
+            impl [<DynTpPrimitive $suffix>]<'_> {
+                pub const fn prop_type(&self) -> TpPropertyType {
+                    match self {
+                        Self::U8(_) => TpPropertyType::Primitive(TpPrimitiveType::U8),
+                        Self::U16(_) => TpPropertyType::Primitive(TpPrimitiveType::U16),
+                        Self::U32(_) => TpPropertyType::Primitive(TpPrimitiveType::U32),
+                        Self::U64(_) => TpPropertyType::Primitive(TpPrimitiveType::U64),
+                        Self::I8(_) => TpPropertyType::Primitive(TpPrimitiveType::I8),
+                        Self::I16(_) => TpPropertyType::Primitive(TpPrimitiveType::I16),
+                        Self::I32(_) => TpPropertyType::Primitive(TpPrimitiveType::I32),
+                        Self::I64(_) => TpPropertyType::Primitive(TpPrimitiveType::I64),
+                        Self::Bool(_) => TpPropertyType::Primitive(TpPrimitiveType::Bool),
+                        Self::F32(_) => TpPropertyType::Primitive(TpPrimitiveType::F32),
+                        Self::F64(_) => TpPropertyType::Primitive(TpPrimitiveType::F64),
+                        Self::String(_) => TpPropertyType::Primitive(TpPrimitiveType::String),
+                        Self::ObjectHandle(_) => {
+                            TpPropertyType::Primitive(TpPrimitiveType::ObjectHandle)
+                        }
+                        Self::ContractDataHandle(_) => {
+                            TpPropertyType::Primitive(TpPrimitiveType::ContractDataHandle)
+                        }
+                    }
                 }
             }
-        }
 
-        impl PartialEq<DynTpProperty> for $t {
-            fn eq(&self, other: &DynTpProperty) -> bool {
-                if let DynTpProperty::Primitive(other) = other {
-                    self == other
-                } else {
-                    false
+            #[$attr]
+            pub enum [<DynTpVec $suffix>]<'a> {
+                U8(&'a $($maybe_mut)? [u8]),
+                U16(&'a $($maybe_mut)? [u16]),
+                U32(&'a $($maybe_mut)? [u32]),
+                U64(&'a $($maybe_mut)? [u64]),
+                I8(&'a $($maybe_mut)? [i8]),
+                I16(&'a $($maybe_mut)? [i16]),
+                I32(&'a $($maybe_mut)? [i32]),
+                I64(&'a $($maybe_mut)? [i64]),
+                Bool(&'a $($maybe_mut)? [bool]),
+                F32(&'a $($maybe_mut)? [f32]),
+                F64(&'a $($maybe_mut)? [f64]),
+                String(&'a $($maybe_mut)? [String]),
+                ObjectHandle(&'a $($maybe_mut)? [ObjectHandle]),
+                ContractDataHandle(&'a $($maybe_mut)? [ContractDataHandle]),
+            }
+            impl [<DynTpVec $suffix>]<'_> {
+                pub const fn prop_type(&self) -> TpPropertyType {
+                    match self {
+                        Self::U8(_) => TpPropertyType::Vec(TpPrimitiveType::U8),
+                        Self::U16(_) => TpPropertyType::Vec(TpPrimitiveType::U16),
+                        Self::U32(_) => TpPropertyType::Vec(TpPrimitiveType::U32),
+                        Self::U64(_) => TpPropertyType::Vec(TpPrimitiveType::U64),
+                        Self::I8(_) => TpPropertyType::Vec(TpPrimitiveType::I8),
+                        Self::I16(_) => TpPropertyType::Vec(TpPrimitiveType::I16),
+                        Self::I32(_) => TpPropertyType::Vec(TpPrimitiveType::I32),
+                        Self::I64(_) => TpPropertyType::Vec(TpPrimitiveType::I64),
+                        Self::Bool(_) => TpPropertyType::Vec(TpPrimitiveType::Bool),
+                        Self::F32(_) => TpPropertyType::Vec(TpPrimitiveType::F32),
+                        Self::F64(_) => TpPropertyType::Vec(TpPrimitiveType::F64),
+                        Self::String(_) => TpPropertyType::Vec(TpPrimitiveType::String),
+                        Self::ObjectHandle(_) => TpPropertyType::Vec(TpPrimitiveType::ObjectHandle),
+                        Self::ContractDataHandle(_) => {
+                            TpPropertyType::Vec(TpPrimitiveType::ContractDataHandle)
+                        }
+                    }
                 }
             }
-        }
 
-        // ---- Vec variants ----
-
-        impl PartialEq<Vec<$t>> for DynTpProperty {
-            fn eq(&self, other: &Vec<$t>) -> bool {
-                if let Self::Vec(inner) = self {
-                    inner == other
-                } else {
-                    false
-                }
+            #[$attr]
+            pub enum [<DynTpProperty $suffix>]<'a> {
+                Primitive([<DynTpPrimitive $suffix>]<'a>),
+                Vec([<DynTpVec $suffix>]<'a>),
             }
         }
-
-        impl PartialEq<DynTpProperty> for Vec<$t> {
-            fn eq(&self, other: &DynTpProperty) -> bool {
-                if let DynTpProperty::Vec(other) = other {
-                    self == other
-                } else {
-                    false
-                }
-            }
-        }
-
-    };
-    // recursive case
-    ($t:ty, $($tail:ty),+) => {
-        impl_equality!($t);
-        impl_equality!($($tail),+);
-    };
-    // handle trailing comma
-    ($($tail:ty),+,) => {
-        impl_equality!($($tail),+);
     };
 }
 
-impl_equality!(
-    u8,
-    u16,
-    u32,
-    u64,
-    i8,
-    i16,
-    i32,
-    i64,
-    bool,
-    f32,
-    f64,
-    String,
-    ObjectHandle,
-    ContractDataHandle,
-);
+dyn_helper!(Ref, derive(Debug, From, PartialEq, Clone),);
+dyn_helper!(Mut, derive(Debug, From, PartialEq), mut);
 
-#[cfg(test)]
-mod test {
-    use super::*;
+// Maps enum to `TpPrimitiveType` by expanding to match on variants
+macro_rules! helper_match {
+    ($enum:ident, $enum_type:ident, $($variant:ident),+ $(,)?) => {
+        match $enum {
+            $(
+                $enum_type::$variant(_) => TpPrimitiveType::$variant,
+            )*
+        }
+    };
+}
 
-    #[test]
-    fn test_partialeq() {
-        let u16_1 = DynTpProperty::Primitive(1u16.into());
-        let u32_1 = DynTpProperty::from(DynTpPrimitive::from(1u32));
+impl<'a> DynTpPropertyMut<'a> {
+    pub fn prop_type(&self) -> TpPropertyType {
+        use DynTpPrimitiveMut as P;
+        use DynTpVecMut as V;
+        match self {
+            Self::Primitive(p) => {
+                TpPropertyType::Primitive(primitives!(idents, helper_match, p, P))
+            }
+            Self::Vec(v) => TpPropertyType::Vec(primitives!(idents, helper_match, v, V)),
+        }
+    }
+}
 
-        // Compare same container type, same primitive type, same val
-        assert_eq!(u16_1, 1u16);
-        assert_eq!(1u16, u16_1);
-        assert_eq!(u32_1, u32_1.clone());
-
-        // Compare different container type, same primitive type, same val
-        assert_ne!(u16_1, vec![1u16]);
-        assert_ne!(vec![1u16], u16_1);
-
-        // Compare same container type, different primitive type, same val
-        assert_ne!(u32_1, 1u16);
-        assert_ne!(1u16, u32_1);
-
-        // Compare different container type, different primitive type, same val
-        assert_ne!(u32_1, vec![1u16]);
-        assert_ne!(vec![1u16], u32_1);
-
-        // compare different container type, different primitive, different val
-        assert_ne!(u16_1, vec![2u32])
+impl<'a> DynTpPropertyRef<'a> {
+    pub fn prop_type(&self) -> TpPropertyType {
+        use DynTpPrimitiveRef as P;
+        use DynTpVecRef as V;
+        match self {
+            Self::Primitive(p) => {
+                TpPropertyType::Primitive(primitives!(idents, helper_match, p, P))
+            }
+            Self::Vec(v) => TpPropertyType::Vec(primitives!(idents, helper_match, v, V)),
+        }
     }
 }
