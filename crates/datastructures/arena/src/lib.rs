@@ -222,7 +222,7 @@ impl<'a, T> ExactSizeIterator for IterMut<'a, T> {
 impl<'a, T> FusedIterator for IterMut<'a, T> {}
 
 #[cfg(test)]
-mod test {
+mod tests {
     use super::{ga, Arena, Index};
 
     #[test]

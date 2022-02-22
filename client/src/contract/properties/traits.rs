@@ -1,8 +1,6 @@
 //! Contains fundamental traits and types for properties.
 
-use crate::contract::properties::dynamic::{
-    DynTpPrimitive, DynTpProperty, DynTpVec, TpPrimitiveType, TpPropertyType,
-};
+use crate::contract::properties::dynamic::{TpPrimitiveType, TpPropertyType};
 
 use crate::contract::ContractDataHandle;
 use crate::object::ObjectHandle;
@@ -60,13 +58,24 @@ impl_itpdata!(
 
 /// An `ITpProperty` is any type that could be stored inside a teleportal
 /// property. For example, the `T` in `State<T>` or `Channel<T>`
-pub trait ITpProperty: 'static + Send + Sync + Debug + PartialEq + Clone {
+pub trait ITpProperty: Send + Sync + Debug + PartialEq + Clone {
     fn prop_type(&self) -> TpPropertyType;
+
+    // TODO: Make casts const when rust supports it
+
+    // /// Casts to the static type `T`, or `None` if the types did not match
+    // fn cast<T: ITpPropertyStatic>(self) -> Option<T>;
+
+    // /// Same as [`Self::cast`], but works on & types.
+    // fn cast_ref<T: ITpPropertyStatic>(&self) -> Option<&T>;
+
+    // /// Same as [`Self::cast`], but works on &mut types.
+    // fn cast_<T: ITpPropertyStatic>(&mut self) -> Option<&mut T>;
 }
 
 /// An `ITpPropertyStatic` is an [`ITpProperty`], with the additional restriction
 /// that its concrete type is known at compile-time and is not dynamic.
-pub trait ITpPropertyStatic: ITpProperty {
+pub trait ITpPropertyStatic: ITpProperty + 'static {
     const PROPERTY_TYPE: TpPropertyType;
 }
 

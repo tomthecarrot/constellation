@@ -1,10 +1,13 @@
-use super::__macro::DynEnum;
+// Re-export to relocate the type into the current module
+pub use super::property::DynTpPrimitive;
+
+use crate::contract::properties::primitives;
 use crate::contract::ContractDataHandle;
 use crate::object::ObjectHandle;
 
 use paste::paste;
 
-use super::property::TpPropertyType;
+use super::TpPropertyType;
 
 /// The static type of the ITpData
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
@@ -24,8 +27,6 @@ pub enum TpPrimitiveType {
     ObjectHandle,
     ContractDataHandle,
 }
-
-DynEnum!(DynTpPrimitive);
 
 impl DynTpPrimitive {
     pub const fn prop_type(&self) -> TpPropertyType {
@@ -88,25 +89,10 @@ macro_rules! impl_dyntpdata {
     };
 }
 
-impl_dyntpdata!(
-    u8,
-    u16,
-    u32,
-    u64,
-    i8,
-    i16,
-    i32,
-    i64,
-    bool,
-    f32,
-    f64,
-    String,
-    ObjectHandle,
-    ContractDataHandle,
-);
+primitives!(types, impl_dyntpdata ;);
 
 #[cfg(test)]
-mod test {
+mod tests {
     use super::*;
 
     #[test]

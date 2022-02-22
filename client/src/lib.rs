@@ -1,4 +1,5 @@
 #![allow(clippy::diverging_sub_expression)]
+#![feature(generic_associated_types)]
 
 pub mod action;
 pub mod baseline;
@@ -39,6 +40,7 @@ impl RealmClientBuilder {
 }
 
 /// Represents an API client for the realm.
+#[allow(unused)]
 pub struct RealmClient {
     session: Session,
     link: Link,

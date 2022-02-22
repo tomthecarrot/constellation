@@ -1,7 +1,7 @@
 use crate::contract::properties::channels::{ChannelHandle, ChannelId};
 use crate::contract::properties::states::{StateHandle, StateId};
-use crate::contract::properties::traits::{ITpData, ITpProperty};
-use crate::contract::{Contract, ContractDataHandle};
+use crate::contract::properties::traits::{ITpData, ITpPropertyStatic};
+use crate::contract::ContractDataHandle;
 
 use arena::generational_arena as ga;
 use eyre::{eyre, Result};
@@ -69,7 +69,10 @@ impl Object {
         self.contract
     }
 
-    pub(crate) fn bind_state<T: ITpProperty>(&self, id: StateId<T>) -> Result<StateHandle<T>> {
+    pub(crate) fn bind_state<T: ITpPropertyStatic>(
+        &self,
+        id: StateId<T>,
+    ) -> Result<StateHandle<T>> {
         if id.contract() != self.contract() {
             return Err(eyre!("Supplied id did not match this object's contract"));
         }
@@ -81,7 +84,7 @@ impl Object {
         Ok(handle)
     }
 
-    pub(crate) fn bind_channel<T: ITpProperty>(
+    pub(crate) fn bind_channel<T: ITpPropertyStatic>(
         &self,
         id: ChannelId<T>,
     ) -> Result<ChannelHandle<T>> {

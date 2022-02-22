@@ -6,7 +6,7 @@ mod components;
 
 use crate::circle::Circle;
 use crate::circle_bundle::CircleBundle;
-use crate::components::{tp, BaselineKind, ObjectHandle, PosHandle};
+use crate::components::{tp, BaselineKind, PosHandle};
 use tp_client::contract::properties::dynamic::{DynTpPrimitive, DynTpProperty};
 use tp_client::contract::Contract;
 use tp_client::engine::Engine;

@@ -1,13 +1,11 @@
 use crate::action::property::{PropertyAction, StateAction};
 use crate::action::{Action, ActionKind, ActionResult, Collaction, CollactionResult, IAction};
 use crate::baseline::BaselineKind;
-use crate::contract::properties::traits::ITpProperty;
 use crate::Realm;
 
+use better_borrow::BBorrow;
 use crossbeam_channel::{Receiver, RecvTimeoutError, Sender, TryRecvError};
 use eyre::{eyre, WrapErr};
-use std::any::Any;
-use std::mem;
 
 type TryApplyResult = Result<CollactionResult, TryRecvError>;
 type ApplyResult = Result<CollactionResult, RecvTimeoutError>;
@@ -97,20 +95,17 @@ impl Engine {
         Ok(collaction)
     }
 
-    fn apply_action<T: ITpProperty>(&mut self, action: &mut Action<T>) -> ActionResult {
+    fn apply_action(&mut self, action: &mut Action) -> ActionResult {
         match action {
             Action::Property(PropertyAction::State(action)) => {
                 // Get data from the Action and compare it against the BaselineFork.
 
                 match action {
                     StateAction::Assert { handle, data } => {
-                        let state = self
-                            .realm()
-                            .baseline(BaselineKind::Fork)
-                            .state(*handle)
-                            .wrap_err("Invalid Handle")?;
+                        let baseline = self.realm().baseline(BaselineKind::Fork);
+                        let state = baseline.state(*handle).wrap_err("Invalid Handle")?;
 
-                        if state.0 == *data {
+                        if state.0 == BBorrow::borrow(data) {
                             Ok(())
                         } else {
                             Err(eyre!("Assert failed!"))
@@ -125,14 +120,16 @@ impl Engine {
                             .wrap_err("Invalid Handle")?;
 
                         // Sanity check that all types remain the same
-                        debug_assert!(state.0.type_id() == (*data).type_id());
+                        debug_assert!(state.0.prop_type() == data.prop_type());
                         // TODO[SER-272]: handle DynTpProperty<DynTpData> and DynTpData in general
 
                         // Swap the current value with the new data.
                         // This optimizes applying the Action and allows
                         // for its simple reversal if needed.
-                        mem::swap(&mut state.0, data);
-                        Ok(())
+
+                        // TODO: hard ;(
+                        //mem::swap(&mut state.0, data);
+                        todo!("Figure out how to swap")
                     }
                 }
             }
