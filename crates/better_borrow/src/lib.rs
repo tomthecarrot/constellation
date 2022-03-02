@@ -44,6 +44,19 @@ where
         'a: 'b;
 }
 
+impl<'b, B, T> BBorrow<'b, &'b B> for T
+where
+    T: std::borrow::Borrow<B> + ?Sized,
+    B: ?Sized,
+{
+    fn borrow<'a>(&'a self) -> &'b B
+    where
+        'a: 'b,
+    {
+        self.borrow()
+    }
+}
+
 /// Mutable version of [`BBorrow`]. Allows borrowing a `MyOwned` as a `MyMut<'a>`
 /// instead of as a `&'a mut MyOwned`.
 ///
@@ -89,9 +102,24 @@ pub trait BBorrowMut<'b, Borrowed>: BBorrow<'b, Borrowed>
 where
     Borrowed: ?Sized,
 {
-    type BorrowedMut;
+    type BorrowedMut: ?Sized;
 
     fn borrow_mut<'a>(&'a mut self) -> Self::BorrowedMut
     where
         'a: 'b;
+}
+
+impl<'b, B, T> BBorrowMut<'b, &'b B> for T
+where
+    T: std::borrow::BorrowMut<B> + ?Sized,
+    B: ?Sized,
+{
+    type BorrowedMut = &'b mut B;
+
+    fn borrow_mut<'a>(&'a mut self) -> Self::BorrowedMut
+    where
+        'a: 'b,
+    {
+        self.borrow_mut()
+    }
 }
