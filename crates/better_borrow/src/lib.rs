@@ -8,7 +8,7 @@
 /// The `'b` lifetime only exists so that implementors of this trait have access
 /// to the lifetime in their implementation. Because `'a: 'b` in the `borrow(&'a self)`
 /// function, implementors can use the `'b` lifetime to parameterize their choice of
-/// `Borrow` such that their reference type lives no longer than `b`, and by extension,
+/// `Borrow` such that their reference type lives no longer than `'b`, and by extension,
 /// no longer than `&'a self`.
 ///
 /// # Example
@@ -26,7 +26,7 @@
 ///
 /// //...
 ///
-/// let my_ref;
+/// let my_ref: MyRef;
 /// {
 ///     let s = String::from("hello");
 ///     my_ref = s.borrow();
@@ -65,7 +65,7 @@ where
 /// to the lifetime in their implementation. Because `'a: 'b` in the
 /// `borrow_mut(&'a mut self)` function, implementors can use the `'b` lifetime
 /// to parameterize their choice of `BorrowedMut` such that their reference type
-/// lives no longer than `b`, and by extension, no longer than `&'a mut self`.
+/// lives no longer than `'b`, and by extension, no longer than `&'a mut self`.
 ///
 /// # Example
 /// ```
@@ -76,10 +76,10 @@ where
 /// # }
 /// // ...assuming `BBorrow<MyRef>` has alredy been implemented for `String`
 /// struct MyMut<'inner>(&'inner mut str);
-/// impl<'b> BBorrowMut<'b, MyRef<'b>> for String {
-///     type BorrowedMut = MyMut<'b>;
+/// impl<'b> BBorrowMut<'b, MyMut<'b>> for String {
+///     type Borrowed = MyRef<'b>;
 ///
-///     fn borrow_mut<'a>(&'a mut self) -> Self::BorrowedMut
+///     fn borrow_mut<'a>(&'a mut self) -> MyMut<'b>
 ///     where
 ///         'a: 'b,
 ///     {
@@ -89,7 +89,7 @@ where
 ///
 /// //...
 ///
-/// let my_mut;
+/// let my_mut: MyMut;
 /// {
 ///     let mut s = String::from("hello");
 ///     my_mut = s.borrow_mut();
@@ -98,25 +98,25 @@ where
 /// // The following gives a borrow checker error, because `s` has been dropped
 /// // assert_eq!(my_mut.0, "hello")
 /// ```
-pub trait BBorrowMut<'b, Borrowed>: BBorrow<'b, Borrowed>
+pub trait BBorrowMut<'b, BorrowedMut>: BBorrow<'b, Self::Borrowed>
 where
-    Borrowed: ?Sized,
+    BorrowedMut: ?Sized,
 {
-    type BorrowedMut: ?Sized;
+    type Borrowed: ?Sized;
 
-    fn borrow_mut<'a>(&'a mut self) -> Self::BorrowedMut
+    fn borrow_mut<'a>(&'a mut self) -> BorrowedMut
     where
         'a: 'b;
 }
 
-impl<'b, B, T> BBorrowMut<'b, &'b B> for T
+impl<'b, B, T> BBorrowMut<'b, &'b mut B> for T
 where
     T: std::borrow::BorrowMut<B> + ?Sized,
     B: ?Sized,
 {
-    type BorrowedMut = &'b mut B;
+    type Borrowed = &'b B;
 
-    fn borrow_mut<'a>(&'a mut self) -> Self::BorrowedMut
+    fn borrow_mut<'a>(&'a mut self) -> &'b mut B
     where
         'a: 'b,
     {

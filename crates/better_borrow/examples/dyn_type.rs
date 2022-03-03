@@ -32,24 +32,37 @@ pub enum DynMut<'a> {
     U8(&'a mut [u8]),
 }
 
-impl<'b> BBorrowMut<'b, DynRef<'b>> for Dyn {
-    type BorrowedMut = DynMut<'b>;
+impl<'b> BBorrowMut<'b, DynMut<'b>> for Dyn {
+    type Borrowed = DynRef<'b>;
 
-    fn borrow_mut<'a>(&'a mut self) -> Self::BorrowedMut
+    fn borrow_mut<'a>(&'a mut self) -> DynMut<'b>
     where
         'a: 'b,
     {
-        todo!()
+        match self {
+            Self::String(v) => v.as_mut_str().into(),
+            Self::U8(v) => v.as_mut_slice().into(),
+        }
     }
 }
 
 fn main() {
-    let d_ref;
-    let d_mut;
-    {
-        let mut d = Dyn::String(String::from("hello"));
+    let d = Dyn::String(String::from("hello"));
+    foo(d);
+}
 
-        d_ref = d.borrow();
+fn foo<B>(mut d: B)
+where
+    // this is a HRTB because we say that this generic bound is upheld for *every*
+    // lifetime `'b`. Otherwise since `'b` is completely unconstrained, so the
+    // implementation must assume that the caller might provide a `'b` that is
+    // `'static`, which would make implementing the function impossible.
+    for<'b> B: BBorrowMut<'b, DynMut<'b>> + BBorrow<'b, DynRef<'b>>,
+{
+    let d_ref: DynRef;
+    let d_mut: DynMut;
+    {
+        d_ref = d.borrow(); // if `'b` was `'static` this would be an error
         println!("{d_ref:?}");
         d_mut = d.borrow_mut();
         println!("{d_mut:?}")
