@@ -1,12 +1,12 @@
 // Teleportal Platform v3
 // Copyright 2021 WiTag Inc. dba Teleportal
 
-use crate::contract::properties::channel::{
+use crate::contract::properties::channels::{
     apply_to_channel_id, Channel, ChannelArenaHandle, ChannelArenaMap, ChannelHandle, ChannelId,
     ChannelsIter, IChannels,
 };
 use crate::contract::properties::dynamic::{apply_to_prop, DynTpProperty};
-use crate::contract::properties::state::{
+use crate::contract::properties::states::{
     apply_to_state_id, IStates, State, StateArenaHandle, StateArenaMap, StateHandle, StateId,
     StatesIter,
 };

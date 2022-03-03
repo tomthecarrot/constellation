@@ -1,5 +1,5 @@
-use crate::contract::properties::channel::{ChannelHandle, ChannelId};
-use crate::contract::properties::state::{StateHandle, StateId};
+use crate::contract::properties::channels::{ChannelHandle, ChannelId};
+use crate::contract::properties::states::{StateHandle, StateId};
 use crate::contract::properties::traits::{ITpData, ITpProperty};
 use crate::contract::{Contract, ContractDataHandle};
 

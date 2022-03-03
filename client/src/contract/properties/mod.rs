@@ -1,6 +1,6 @@
-pub mod channel;
+pub mod channels;
 pub mod dynamic;
-pub mod state;
+pub mod states;
 pub mod traits;
 
 macro_rules! prop_iter {
