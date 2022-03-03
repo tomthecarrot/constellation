@@ -179,7 +179,7 @@ pub(crate) use apply_to_dyn;
 macro_rules! apply_to_state_id {
     ($dyn_state_id:expr, $closure:expr) => {
         $crate::contract::properties::dynamic::__macro::apply_to_dyn!(
-            $crate::contract::properties::state,
+            $crate::contract::properties::states,
             DynStateId,
             DynStateIdPrimitive,
             DynStateIdVec,
@@ -197,7 +197,7 @@ macro_rules! apply_to_state_id {
 macro_rules! apply_to_channel_id {
     ($dyn_channel_id:expr, $closure:expr) => {
         $crate::contract::properties::dynamic::__macro::apply_to_dyn!(
-            $crate::contract::properties::channel,
+            $crate::contract::properties::channels,
             DynChannelId,
             DynChannelIdPrimitive,
             DynChannelIdVec,

@@ -4,7 +4,7 @@ use derive_more::From;
 // Local reexport for convenience
 pub mod tp {
     pub use tp_client::baseline::BaselineKind;
-    pub use tp_client::contract::properties::state::StateHandle;
+    pub use tp_client::contract::properties::states::StateHandle;
     pub use tp_client::object::ObjectHandle;
 }
 

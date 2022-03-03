@@ -157,12 +157,12 @@ pub(crate) mod imp {
     use super::*;
     template_impl!(
         states,
-        ::tp_client::contract::properties::state::StateId,
-        ::tp_client::contract::properties::state::IStates,
+        ::tp_client::contract::properties::states::StateId,
+        ::tp_client::contract::properties::states::IStates,
     );
     template_impl!(
         channels,
-        ::tp_client::contract::properties::channel::ChannelId,
-        ::tp_client::contract::properties::channel::IChannels,
+        ::tp_client::contract::properties::channels::ChannelId,
+        ::tp_client::contract::properties::channels::IChannels,
     );
 }

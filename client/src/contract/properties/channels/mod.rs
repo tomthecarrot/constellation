@@ -1,3 +1,6 @@
+mod channel;
+
+pub use self::channel::Channel;
 pub use crate::contract::properties::dynamic::apply_to_channel_id;
 
 use crate::contract::properties::dynamic::TpPropertyType;
@@ -8,9 +11,6 @@ use crate::contract::ContractDataHandle;
 use std::any::TypeId;
 use std::marker::PhantomData;
 use typemap::ShareMap;
-
-// TODO: figure out data in a channel
-pub struct Channel<T: ITpProperty>(pub T);
 
 pub type ChannelHandle<T> = arena::Index<Channel<T>>;
 

@@ -1,8 +1,8 @@
 pub use tp_contract_macro::{channels, states};
 pub mod properties;
 
-use crate::contract::properties::channel::{ChannelsIter, IChannels};
-use crate::contract::properties::state::{IStates, StatesIter};
+use crate::contract::properties::channels::{ChannelsIter, IChannels};
+use crate::contract::properties::states::{IStates, StatesIter};
 use crate::object::ObjectHandle;
 
 use std::collections::HashSet;
