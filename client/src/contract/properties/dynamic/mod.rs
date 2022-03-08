@@ -13,6 +13,7 @@ pub use primitive::{DynTpPrimitive, TpPrimitiveType};
 pub use property::{DynTpProperty, DynTpPropertyMut, DynTpPropertyRef};
 pub use vec::DynTpVec;
 
+pub(in crate::contract::properties) use __macro::DynEnum;
 pub use __macro::{apply_to_channel_id, apply_to_prop, apply_to_state_id};
 
 /// The static type of the ITpPropertyStatic

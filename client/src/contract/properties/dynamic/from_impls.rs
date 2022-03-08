@@ -88,4 +88,4 @@ macro_rules! impl_from {
     };
 }
 
-primitives!(types, impl_from ;);
+primitives!(; types, impl_from);

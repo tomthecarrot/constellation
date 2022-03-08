@@ -57,6 +57,80 @@ use prop_iter; // re-export for use
 
 macro_rules! primitives {
     // repetition necessary to support multiple arguments to `macro_name`
+    (; idents, $macro_name:ident, $($x:tt)+) => {
+        $macro_name!(
+            $($x)+,
+            U8,
+            U16,
+            U32,
+            U64,
+            I8,
+            I16,
+            I32,
+            I64,
+            Bool,
+            F32,
+            F64,
+            String,
+            ObjectHandle,
+            ContractDataHandle,
+        );
+    };
+    (; types, $macro_name:ident, $($x:tt)+) => {
+        $macro_name!(
+            $($x)+,
+            u8,
+            u16,
+            u32,
+            u64,
+            i8,
+            i16,
+            i32,
+            i64,
+            bool,
+            f32,
+            f64,
+            String,
+            ObjectHandle,
+            ContractDataHandle,
+        );
+    };
+    (; idents, $macro_name:ident) => {
+        $macro_name!(
+            U8,
+            U16,
+            U32,
+            U64,
+            I8,
+            I16,
+            I32,
+            I64,
+            Bool,
+            F32,
+            F64,
+            String,
+            ObjectHandle,
+            ContractDataHandle,
+        );
+    };
+    (; types, $macro_name:ident) => {
+        $macro_name!(
+            u8,
+            u16,
+            u32,
+            u64,
+            i8,
+            i16,
+            i32,
+            i64,
+            bool,
+            f32,
+            f64,
+            String,
+            ObjectHandle,
+            ContractDataHandle,
+        );
+    };
     (idents, $macro_name:ident, $($x:tt)+) => {
         $macro_name!(
             $($x)+,
@@ -130,80 +204,6 @@ macro_rules! primitives {
             ObjectHandle,
             ContractDataHandle,
         )
-    };
-    (idents, $macro_name:ident, $($x:tt)+ ;) => {
-        $macro_name!(
-            $($x)+,
-            U8,
-            U16,
-            U32,
-            U64,
-            I8,
-            I16,
-            I32,
-            I64,
-            Bool,
-            F32,
-            F64,
-            String,
-            ObjectHandle,
-            ContractDataHandle,
-        );
-    };
-    (types, $macro_name:ident, $($x:tt)+ ;) => {
-        $macro_name!(
-            $($x)+,
-            u8,
-            u16,
-            u32,
-            u64,
-            i8,
-            i16,
-            i32,
-            i64,
-            bool,
-            f32,
-            f64,
-            String,
-            ObjectHandle,
-            ContractDataHandle,
-        );
-    };
-    (idents, $macro_name:ident ;) => {
-        $macro_name!(
-            U8,
-            U16,
-            U32,
-            U64,
-            I8,
-            I16,
-            I32,
-            I64,
-            Bool,
-            F32,
-            F64,
-            String,
-            ObjectHandle,
-            ContractDataHandle,
-        );
-    };
-    (types, $macro_name:ident ;) => {
-        $macro_name!(
-            u8,
-            u16,
-            u32,
-            u64,
-            i8,
-            i16,
-            i32,
-            i64,
-            bool,
-            f32,
-            f64,
-            String,
-            ObjectHandle,
-            ContractDataHandle,
-        );
     };
     (idents) => {
         U8,

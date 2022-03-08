@@ -89,7 +89,7 @@ macro_rules! impl_dyntpdata {
     };
 }
 
-primitives!(types, impl_dyntpdata ;);
+primitives!(; types, impl_dyntpdata);
 
 #[cfg(test)]
 mod tests {

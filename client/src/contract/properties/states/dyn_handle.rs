@@ -8,7 +8,7 @@ use crate::contract::properties::dynamic::{
 use crate::contract::properties::primitives;
 use crate::contract::properties::traits::ITpPropertyStatic;
 
-DynEnum!(DynStateHandle, StateHandle);
+DynEnum!(DynStateHandle, StateHandle | derive(Clone, PartialEq));
 impl IStateHandle for DynStateHandle {
     type OutputRef<'a> = DynStateRef<'a>;
     type OutputMut<'a> = DynStateMut<'a>;

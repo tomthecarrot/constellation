@@ -1,13 +1,13 @@
 use super::dyn_channel::{DynChannelMut, DynChannelRef};
 use super::{handle::ChannelHandle, IChannelHandle};
 use crate::apply_to_channel_handle;
+use crate::contract::properties::channels::Channel;
 use crate::contract::properties::dynamic::__macro::DynEnum;
-use crate::contract::properties::dynamic::{DynTpPropertyMut, TpPropertyType};
-use crate::contract::properties::dynamic::{DynTpPropertyRef, TpPrimitiveType};
+use crate::contract::properties::dynamic::{TpPrimitiveType, TpPropertyType};
 use crate::contract::properties::primitives;
 use crate::contract::properties::traits::ITpPropertyStatic;
 
-DynEnum!(DynChannelHandle, ChannelHandle);
+DynEnum!(DynChannelHandle, ChannelHandle | derive(Clone, PartialEq));
 
 impl Copy for DynChannelHandlePrimitive {}
 impl Copy for DynChannelHandleVec {}
@@ -23,9 +23,8 @@ impl IChannelHandle for DynChannelHandle {
     ) -> eyre::Result<Self::OutputRef<'a>> {
         // Matches on the type and then calls the appropriate generic function in baseline
         apply_to_channel_handle!(*self, |h: ChannelHandle<_>| {
-            let state = h.get(baseline)?;
-            let prop_ref: DynTpPropertyRef<'a> = DynTpPropertyRef::from(&state.0);
-            Ok(prop_ref.into())
+            let chan = h.get(baseline)?;
+            Ok(DynChannelRef::from(chan))
         })
     }
 
@@ -39,11 +38,10 @@ impl IChannelHandle for DynChannelHandle {
         ) -> eyre::Result<DynChannelMut<'a>>
         where
             T: ITpPropertyStatic,
-            &'a mut T: Into<DynTpPropertyMut<'a>>,
+            DynChannelMut<'a>: From<&'a mut Channel<T>>,
         {
-            let state = h.get_mut(baseline)?;
-            let prop_mut: DynTpPropertyMut<'a> = (&mut state.0).into();
-            Ok(prop_mut.into())
+            let chan = h.get_mut(baseline)?;
+            Ok(DynChannelMut::from(chan))
         }
 
         // Not sure why this can't just use `apply_to_channel_handle!()`, but it
