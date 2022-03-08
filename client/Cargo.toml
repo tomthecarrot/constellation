@@ -19,3 +19,4 @@ typemap = "0.3"
 tp_contract_macro = { path = "../contract_macro" }
 log = "0.4"
 itertools = "0.10"
+keyframe = "1"
