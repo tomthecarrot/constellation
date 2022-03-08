@@ -19,6 +19,7 @@ use arena::Arena;
 use eyre::{eyre, Result};
 use itertools::EitherOrBoth;
 use itertools::Itertools;
+use keyframe::Keyframe;
 use typemap::ShareMap;
 
 #[derive(Copy, Clone, PartialEq, Eq, Debug, Hash)]
@@ -299,13 +300,16 @@ impl Baseline {
         arena.insert(State(value))
     }
 
-    fn channel_create<T: ITpPropertyStatic>(&mut self, value: T) -> ChannelHandle<T> {
+    fn channel_create<T: ITpPropertyStatic>(
+        &mut self,
+        value: impl Iterator<Item = Keyframe<T>>,
+    ) -> ChannelHandle<T> {
         let arena = self
             .channels
             .entry::<ChannelArenaHandle<T>>()
             .or_insert_with(|| Arena::new());
 
-        arena.insert(Channel(value))
+        arena.insert(Channel::new(value))
     }
 
     // ---- State and Channel bindings ----
