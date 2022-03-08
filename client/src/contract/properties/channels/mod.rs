@@ -1,4 +1,5 @@
 mod channel;
+mod misc;
 
 pub use self::channel::Channel;
 pub use crate::contract::properties::dynamic::apply_to_channel_id;
