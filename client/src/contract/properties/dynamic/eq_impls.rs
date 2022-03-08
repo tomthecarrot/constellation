@@ -78,7 +78,7 @@ macro_rules! impl_eq {
     };
 }
 
-primitives!(types, impl_eq ;);
+primitives!(; types, impl_eq);
 
 #[cfg(test)]
 mod tests {

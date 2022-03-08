@@ -1,7 +1,8 @@
 /// Creates enum variants for each primitive type
 macro_rules! dyn_enum_helper {
-    ($ident:ident) => {
-        #[derive(Debug, Clone, PartialEq, ::derive_more::From, ::derive_more::TryInto)]
+    ($ident:ident$( | $attr:meta)?) => {
+        #[derive(Debug, ::derive_more::From, ::derive_more::TryInto)]
+        $(#[$attr])?
         pub enum $ident {
             U8(u8),
             U16(u16),
@@ -19,8 +20,9 @@ macro_rules! dyn_enum_helper {
             ContractDataHandle($crate::contract::ContractDataHandle),
         }
     };
-    ($ident:ident, $t:tt) => {
-        #[derive(Debug, Clone, PartialEq, ::derive_more::From, ::derive_more::TryInto)]
+    ($ident:ident, $t:tt$( | $attr:meta)?) => {
+        #[derive(Debug, ::derive_more::From, ::derive_more::TryInto)]
+        $(#[$attr])?
         pub enum $ident {
             U8($t<u8>),
             U16($t<u16>),
@@ -38,8 +40,9 @@ macro_rules! dyn_enum_helper {
             ContractDataHandle($t<$crate::contract::ContractDataHandle>),
         }
     };
-    ($ident:ident, $outer:tt, $inner:tt) => {
-        #[derive(Debug, Clone, PartialEq, ::derive_more::From, ::derive_more::TryInto)]
+    ($ident:ident, $outer:tt, $inner:tt$( | $attr:meta)?) => {
+        #[derive(Debug, ::derive_more::From, ::derive_more::TryInto)]
+        $(#[$attr])?
         pub enum $ident {
             U8($outer<$inner<u8>>),
             U16($outer<$inner<u16>>),
@@ -65,38 +68,38 @@ pub(in crate::contract::properties) use dyn_enum_helper;
 
 /// Creates an enum that holds all possible types, possibly wrapped by a `container` type
 macro_rules! DynEnum {
-    ($ident:ident, $container:tt, $prim_ident:ident, $vec_ident:ident$(, $attr:meta)?) => {
-        $crate::contract::properties::dynamic::__macro::dyn_enum_helper!($prim_ident, $container);
+    ($ident:ident, $container:tt, $prim_ident:ident, $vec_ident:ident$( | $attr:meta)?) => {
+        $crate::contract::properties::dynamic::__macro::dyn_enum_helper!($prim_ident, $container$( | $attr)?);
         $crate::contract::properties::dynamic::__macro::dyn_enum_helper!(
-            $vec_ident, $container, Vec
+            $vec_ident, $container, Vec$( | $attr)?
         );
 
-        #[derive(Debug, Clone, PartialEq, ::derive_more::From, ::derive_more::TryInto)]
+        #[derive(Debug, ::derive_more::From, ::derive_more::TryInto)]
         $(#[$attr])?
         pub enum $ident {
             Primitive($prim_ident),
             Vec($vec_ident),
         }
     };
-    ($ident:ident, $prim_ident:ident, $vec_ident:ident$(, $attr:meta)?) => {
-        $crate::contract::properties::dynamic::__macro::dyn_enum_helper!($prim_ident);
-        $crate::contract::properties::dynamic::__macro::dyn_enum_helper!($vec_ident, Vec);
+    ($ident:ident, $prim_ident:ident, $vec_ident:ident$( | $attr:meta)?) => {
+        $crate::contract::properties::dynamic::__macro::dyn_enum_helper!($prim_ident$( | $attr)?);
+        $crate::contract::properties::dynamic::__macro::dyn_enum_helper!($vec_ident, Vec$( | $attr)?);
 
-        #[derive(Debug, Clone, ::derive_more::From, ::derive_more::TryInto, PartialEq)]
+        #[derive(Debug, ::derive_more::From, ::derive_more::TryInto)]
         $(#[$attr])?
         pub enum $ident {
             Primitive($prim_ident),
             Vec($vec_ident),
         }
     };
-    ($ident:ident, $container:tt) => {
+    ($ident:ident, $container:tt$( | $attr:meta)?) => {
         ::paste::paste! {
-            DynEnum!($ident, $container, [<$ident Primitive>], [<$ident Vec>]);
+            DynEnum!($ident, $container, [<$ident Primitive>], [<$ident Vec>]$( | $attr)?);
         }
     };
-    ($ident:ident) => {
+    ($ident:ident$( | $attr:meta)?) => {
         ::paste::paste! {
-            DynEnum!($ident, [<$ident Primitive>], [<$ident Vec>]);
+            DynEnum!($ident, [<$ident Primitive>], [<$ident Vec>]$( | $attr)?);
         }
     };
 }
@@ -268,6 +271,63 @@ macro_rules! apply_to_prop {
     };
 }
 pub use apply_to_prop;
+
+/// Applies the provided closure expression to a [`DynChannel`].
+///
+/// Under the hood, this is matching on the `DynChannel` and the arms in the match
+/// expression convert to the corresponding concrete type.
+#[macro_export]
+macro_rules! apply_to_channel {
+    ($dyn_prop:expr, $closure:expr) => {
+        $crate::contract::properties::dynamic::__macro::apply_to_dyn!(
+            $crate::contract::properties::channels::dyn_channel,
+            DynChannel,
+            DynChannelPrimitive,
+            DynChannelVec,
+            $dyn_prop,
+            $closure
+        )
+    };
+}
+pub use apply_to_channel;
+
+/// Applies the provided closure expression to a [`DynChannelRef`].
+///
+/// Under the hood, this is matching on the `DynChannelRef` and the arms in the match
+/// expression convert to the corresponding concrete type.
+#[macro_export]
+macro_rules! apply_to_channel_ref {
+    ($dyn_prop:expr, $closure:expr) => {
+        $crate::contract::properties::dynamic::__macro::apply_to_dyn!(
+            $crate::contract::properties::channels::dyn_channel,
+            DynChannelRef,
+            DynChannelPrimitiveRef,
+            DynChannelVecRef,
+            $dyn_prop,
+            $closure
+        )
+    };
+}
+pub use apply_to_channel_ref;
+
+/// Applies the provided closure expression to a [`DynChannelMut`].
+///
+/// Under the hood, this is matching on the `DynChannelMut` and the arms in the match
+/// expression convert to the corresponding concrete type.
+#[macro_export]
+macro_rules! apply_to_channel_mut {
+    ($dyn_prop:expr, $closure:expr) => {
+        $crate::contract::properties::dynamic::__macro::apply_to_dyn!(
+            $crate::contract::properties::channels::dyn_channel,
+            DynChannelMut,
+            DynChannelPrimitiveMut,
+            DynChannelVecMut,
+            $dyn_prop,
+            $closure
+        )
+    };
+}
+pub use apply_to_channel_mut;
 
 /// Applies the provided closure expression to a [`DynStateHandle`].
 ///

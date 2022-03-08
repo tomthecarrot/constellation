@@ -1,9 +1,12 @@
+mod channel;
 pub mod dyn_channel;
 pub mod dyn_handle;
 mod handle;
 
 mod misc;
 
+pub use self::channel::{Channel, Keyframe};
+pub use self::dyn_channel::{apply_to_channel, apply_to_channel_mut, apply_to_channel_ref};
 pub use self::dyn_channel::{DynChannel, DynChannelMut, DynChannelRef};
 pub use self::dyn_handle::DynChannelHandle;
 pub use self::handle::{ChannelHandle, IChannelHandle};
@@ -17,9 +20,6 @@ use crate::contract::ContractDataHandle;
 use std::any::TypeId;
 use std::marker::PhantomData;
 use typemap::ShareMap;
-
-// TODO: figure out data in a channel
-pub struct Channel<T: ITpPropertyStatic>(pub T);
 
 /// A `TypeMap` key to access the arena containing `State<T>`s.
 pub struct ChannelArenaHandle<T: ITpPropertyStatic>(PhantomData<T>);

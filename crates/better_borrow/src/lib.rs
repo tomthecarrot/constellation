@@ -2,7 +2,7 @@
 //! spirit as [`std::borrow::Borrow`], but without the restriction that the
 //! return type must be itself a reference.
 
-/// Allows borrowing a `MyOwned` as a `MyRef<'a>` instead of as `&'a MyOwned`.
+/// Allows borrowing a `MyOwned` as a `MyRef<'b>` instead of as `&'b MyOwned`.
 ///
 /// # Lifetimes
 /// The `'b` lifetime only exists so that implementors of this trait have access
@@ -57,8 +57,8 @@ where
     }
 }
 
-/// Mutable version of [`BBorrow`]. Allows borrowing a `MyOwned` as a `MyMut<'a>`
-/// instead of as a `&'a mut MyOwned`.
+/// Mutable version of [`BBorrow`]. Allows borrowing a `MyOwned` as a `MyMut<'b>`
+/// instead of as a `&'b mut MyOwned`.
 ///
 /// # Lifetimes
 /// The `'b` lifetime only exists so that implementors of this trait have access

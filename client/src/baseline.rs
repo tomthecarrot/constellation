@@ -2,8 +2,8 @@
 // Copyright 2021 WiTag Inc. dba Teleportal
 
 use crate::contract::properties::channels::{
-    apply_to_channel_id, Channel, ChannelArenaHandle, ChannelArenaMap, ChannelHandle, ChannelId,
-    ChannelsIter, IChannels,
+    apply_to_channel, apply_to_channel_id, Channel, ChannelArenaHandle, ChannelArenaMap,
+    ChannelHandle, ChannelId, ChannelsIter, DynChannel, IChannels,
 };
 use crate::contract::properties::dynamic::{apply_to_prop, DynTpProperty};
 use crate::contract::properties::states::{
@@ -132,7 +132,7 @@ impl Baseline {
         &mut self,
         contract: &C,
         states: impl Iterator<Item = DynTpProperty>,
-        channels: impl Iterator<Item = DynTpProperty>,
+        channels: impl Iterator<Item = DynChannel>,
     ) -> Result<ObjectHandle> {
         if !self.contracts.contains(contract.handle()) {
             return Err(eyre!("No such contract for that handle"));
@@ -168,7 +168,7 @@ impl Baseline {
         }
 
         let states: Vec<DynTpProperty> = check_types!(states, state_types)?;
-        let channels: Vec<DynTpProperty> = check_types!(channels, channel_types)?;
+        let channels: Vec<DynChannel> = check_types!(channels, channel_types)?;
 
         // actually do the creation
         let mut state_handles: Vec<arena::generational_arena::Index> = Vec::new();
@@ -178,7 +178,7 @@ impl Baseline {
             apply_to_prop!(s, |s| state_handles.push(self.state_create(s).into()));
         }
         for c in channels {
-            apply_to_prop!(c, |c| channel_handles.push(self.channel_create(c).into()));
+            apply_to_channel!(c, |c| channel_handles.push(self.channel_create(c).into()));
         }
 
         let object = Object::new(
@@ -299,13 +299,13 @@ impl Baseline {
         arena.insert(State(value))
     }
 
-    fn channel_create<T: ITpPropertyStatic>(&mut self, value: T) -> ChannelHandle<T> {
+    fn channel_create<T: ITpPropertyStatic>(&mut self, channel: Channel<T>) -> ChannelHandle<T> {
         let arena = self
             .channels
             .entry::<ChannelArenaHandle<T>>()
             .or_insert_with(|| Arena::new());
 
-        arena.insert(Channel(value))
+        arena.insert(channel)
     }
 
     // ---- State and Channel bindings ----
