@@ -33,7 +33,11 @@ impl ObjectTime {
         parent_diff_precise *= self.scalar as i64;
         parent_diff_precise >>= 10;
         parent_diff_precise += self.offset_local.ticks() as i64;
-        parent_diff_precise %= self.interval as i64;
+
+        // If modulo is enabled
+        if (self.interval != 0) {
+            parent_diff_precise %= self.interval as i64;
+        }
 
         // Convert from i64 -> u32
         let result: Result<u32, TryFromIntError> = parent_diff_precise.try_into();
@@ -44,5 +48,50 @@ impl ObjectTime {
                 Time(0)
             }
         }
+    }
+}
+
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_resolve_time() {
+        let parent_time = Time(4096);
+
+        let object_time_1 = ObjectTime {
+            offset_parent: Time(0),
+            offset_local: Time(2048),
+            scalar: 1024,
+            interval: 0,
+        };
+        let resolved_time_1 = object_time_1.resolve_time(&parent_time);
+        assert_eq!(resolved_time_1.ticks(), 6144);
+
+        let object_time_2 = ObjectTime {
+            offset_parent: Time(2048),
+            offset_local: Time(512),
+            scalar: 512,
+            interval: 0,
+        };
+        let resolved_time_2 = object_time_2.resolve_time(&parent_time);
+        assert_eq!(resolved_time_2.ticks(), 1536);
+
+        let object_time_3 = ObjectTime {
+            offset_parent: Time(2048),
+            offset_local: Time(200),
+            scalar: 0,
+            interval: 0,
+        };
+        let resolved_time_3 = object_time_3.resolve_time(&parent_time);
+        assert_eq!(resolved_time_3.ticks(), 200);
+
+        let object_time_4 = ObjectTime {
+            offset_parent: Time(2048),
+            offset_local: Time(200),
+            scalar: 0,
+            interval: 3,
+        };
+        let resolved_time_4 = object_time_4.resolve_time(&parent_time);
+        assert_eq!(resolved_time_4.ticks(), 2);
     }
 }
