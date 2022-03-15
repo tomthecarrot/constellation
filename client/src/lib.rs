@@ -7,6 +7,7 @@ pub mod engine;
 pub mod link;
 pub mod object;
 pub mod realm;
+pub mod time;
 
 use eyre::{eyre, Result};
 use link::{Link, RealmServerHandle, Session};
