@@ -70,21 +70,15 @@ impl ObjectTime {
         parent_diff_precise += self.offset_local.as_millis() as i64;
 
         // Apply modulo if applicable.
-        match self.interval {
-            Some(value) => {
-                parent_diff_precise %= value as i64;
-            }
-            None => {}
+        if let Some(value) = self.interval {
+            parent_diff_precise %= value as i64;
         }
 
         // Convert from i64 -> u32.
         let result: Result<u32, TryFromIntError> = parent_diff_precise.try_into();
         match result {
             Ok(value) => Ok(Time(value)),
-            Err(err) => {
-                log::error!("ObjectTime could not resolve time: {}", err);
-                Err(err)
-            }
+            Err(err) => Err(err),
         }
     }
 }
