@@ -1,6 +1,7 @@
 use crate::action::property::{PropertyAction, StateAction};
 use crate::action::{Action, ActionKind, ActionResult, Collaction, CollactionResult, IAction};
 use crate::baseline::BaselineKind;
+use crate::time::Ticks;
 use crate::Realm;
 
 use better_borrow::BBorrow;
@@ -39,6 +40,10 @@ impl Engine {
 
         let this = Self { realm, receiver };
         (this, sender)
+    }
+
+    pub fn tick(&mut self, ticks_since_last_call: Ticks) {
+        *self.realm.time_mut().ticks_mut() += ticks_since_last_call;
     }
 
     pub fn realm(&self) -> &Realm {

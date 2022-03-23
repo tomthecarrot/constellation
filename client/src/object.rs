@@ -1,7 +1,8 @@
 use crate::contract::properties::channels::{ChannelHandle, ChannelId};
 use crate::contract::properties::states::{StateHandle, StateId};
 use crate::contract::properties::traits::{ITpData, ITpPropertyStatic};
-use crate::contract::ContractDataHandle;
+use crate::contract::{Contract, ContractDataHandle};
+use crate::time::TimeWarp;
 
 use arena::generational_arena as ga;
 use eyre::{eyre, Result};
@@ -13,17 +14,20 @@ pub struct Object {
     states: Vec<ga::Index>,   // map from StateID -> StateHandle
     channels: Vec<ga::Index>, // map from ChannelID -> ChannelHandle
     contract: ContractDataHandle,
+    time_warp: TimeWarp,
 }
 impl Object {
     pub(crate) fn new(
         states: Vec<ga::Index>,
         channels: Vec<ga::Index>,
         contract: ContractDataHandle,
+        time_warp: TimeWarp,
     ) -> Self {
         Self {
             states,
             channels,
             contract,
+            time_warp,
         }
     }
 
@@ -67,6 +71,14 @@ impl Object {
 
     pub fn contract(&self) -> ContractDataHandle {
         self.contract
+    }
+
+    pub fn time_warp(&self) -> &TimeWarp {
+        &self.time_warp
+    }
+
+    pub fn time_warp_mut(&mut self) -> &mut TimeWarp {
+        &mut self.time_warp
     }
 
     pub(crate) fn bind_state<T: ITpPropertyStatic>(

@@ -1,9 +1,10 @@
 // Teleportal Platform v3
 // Copyright 2021 WiTag Inc. dba Teleportal
 
-use crate::baseline::{Baseline, BaselineKind};
-
-use std::time::Duration;
+use crate::{
+    baseline::{Baseline, BaselineKind},
+    time::RealmTime,
+};
 
 pub struct RealmID(String);
 impl RealmID {
@@ -17,14 +18,14 @@ impl RealmID {
 /// additional data global to that virtual space.
 pub struct Realm {
     realm_id: RealmID,
-    time: Duration,
+    time: RealmTime,
     baseline_main: Baseline,
     baseline_fork: Baseline,
 }
 impl Realm {
     pub fn new(realm_id: RealmID) -> Self {
         // Initialize time and arena allocators.
-        let time = Duration::ZERO;
+        let time = RealmTime::default();
 
         // Create the BaselineFork.
         let baseline_fork = Baseline::new(BaselineKind::Fork);
@@ -44,8 +45,12 @@ impl Realm {
         &self.realm_id
     }
 
-    pub fn time(&self) -> &Duration {
-        &self.time
+    pub fn time(&self) -> RealmTime {
+        self.time
+    }
+
+    pub fn time_mut(&mut self) -> &mut RealmTime {
+        &mut self.time
     }
 
     // ---- Baseline Accessors ----
