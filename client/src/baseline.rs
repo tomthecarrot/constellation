@@ -14,9 +14,10 @@ use crate::contract::properties::states::{
 use crate::contract::properties::traits::ITpPropertyStatic;
 use crate::contract::{Contract, ContractData, ContractDataHandle};
 use crate::object::{Object, ObjectHandle};
+use crate::time::{ChannelTime, RealmTime, TimeWarp};
 
 use arena::Arena;
-use eyre::{eyre, Result};
+use eyre::{eyre, Context, Result};
 use itertools::EitherOrBoth;
 use itertools::Itertools;
 use typemap::ShareMap;
@@ -180,7 +181,12 @@ impl Baseline {
             apply_to_prop!(c, |c| channel_handles.push(self.channel_create(c).into()));
         }
 
-        let object = Object::new(state_handles, channel_handles, contract.handle());
+        let object = Object::new(
+            state_handles,
+            channel_handles,
+            contract.handle(),
+            TimeWarp::default(),
+        );
         let obj_handle = self.objects.insert(object);
         self.contracts
             .get_mut(contract.handle())
