@@ -22,6 +22,7 @@ tracing = "0.1"
 typemap = "0.3"
 tp_contract_macro = { path = "../contract_macro" }
 lazy_mut = "0.1.0"
+lazy_static = "1"
 log = "0.4"
 itertools = "0.10"
 keyframe = "1"
