@@ -4,11 +4,15 @@ version = "3.0.0"
 edition = "2021"
 rust-version = "1.58"
 
+[lib]
+crate-type = ["cdylib"]
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 arena = { path = "../crates/datastructures/arena" }
 crossbeam-channel = "0.5"
+cxx = "1.0"
 derive_more = "0.99"
 enum_dispatch = "0.3"
 eyre = "0.6"
@@ -17,7 +21,11 @@ rand = "0.8"
 tracing = "0.1"
 typemap = "0.3"
 tp_contract_macro = { path = "../contract_macro" }
+lazy_mut = "0.1.0"
 log = "0.4"
 itertools = "0.10"
 keyframe = "1"
 better_borrow = { path = "../crates/better_borrow" }
+
+[build-dependencies]
+cxx-build = "1.0"
