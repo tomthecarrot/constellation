@@ -110,7 +110,7 @@ macro_rules! template_impl {
 
                 prop_types.push({
                     quote_spanned! {inner_t.span()=>
-                        <#inner_t as ::tp_client::contract::properties::traits::ITpPropertyStatic>::PROPERTY_TYPE
+                        <#inner_t as crate::contract::properties::traits::ITpPropertyStatic>::PROPERTY_TYPE
                     }
                 })
             }
@@ -118,7 +118,7 @@ macro_rules! template_impl {
             // Field-agnostic impl blocks
             impl_ts.extend(quote! {
                 impl #s_name {
-                    pub fn new(id: ::tp_client::contract::ContractDataHandle) -> Self {
+                    pub fn new(id: crate::contract::ContractDataHandle) -> Self {
                         Self {
                             #field_init
                         }
@@ -133,9 +133,9 @@ macro_rules! template_impl {
                         TYPE_IDS.as_slice()
                     }
 
-                    fn #enumerate_types_ident() -> &'static [::tp_client::contract::properties::dynamic::TpPropertyType] {
+                    fn #enumerate_types_ident() -> &'static [crate::contract::properties::dynamic::TpPropertyType] {
                         ::lazy_static::lazy_static! {
-                            static ref PROP_TYPES: Vec<::tp_client::contract::properties::dynamic::TpPropertyType> = vec![#(#prop_types),*];
+                            static ref PROP_TYPES: Vec<crate::contract::properties::dynamic::TpPropertyType> = vec![#(#prop_types),*];
                         }
                         PROP_TYPES.as_slice()
                     }
@@ -157,12 +157,12 @@ pub(crate) mod imp {
     use super::*;
     template_impl!(
         states,
-        ::tp_client::contract::properties::states::StateId,
-        ::tp_client::contract::properties::states::IStates,
+        crate::contract::properties::states::StateId,
+        crate::contract::properties::states::IStates,
     );
     template_impl!(
         channels,
-        ::tp_client::contract::properties::channels::ChannelId,
-        ::tp_client::contract::properties::channels::IChannels,
+        crate::contract::properties::channels::ChannelId,
+        crate::contract::properties::channels::IChannels,
     );
 }

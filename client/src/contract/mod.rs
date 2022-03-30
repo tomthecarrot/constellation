@@ -1,5 +1,5 @@
 pub use tp_contract_macro::{channels, states};
-pub mod ffi_default_contract;
+pub mod ffi_testing_contract;
 pub mod properties;
 
 use crate::contract::properties::channels::{ChannelsIter, IChannels};

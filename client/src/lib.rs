@@ -11,7 +11,8 @@ pub mod realm;
 pub mod time;
 
 use baseline::BaselineKind;
-use contract::ffi_testing_contract::FfiDefaultContract;
+use contract::ffi_testing_contract::FfiTestingContract;
+use contract::properties::dynamic::{DynTpPrimitive, DynTpProperty};
 use contract::properties::states::{StateHandle, StateId};
 use contract::{Contract, ContractDataHandle};
 use eyre::{eyre, Result};
@@ -72,32 +73,41 @@ impl RealmClient {
 
 #[no_mangle]
 pub unsafe extern "C" fn teleportal_engine_init() -> *mut Engine {
-    let mut engine = Engine::new(Realm::new(RealmID::new(String::from("main"))), None).0;
-    &mut engine
+    let realm = Realm::new(RealmID::new(String::from("main")));
+    let engine = Engine::new(realm, None).0;
+    let engine_box = Box::new(engine);
+    Box::into_raw(engine_box)
 }
 
 #[no_mangle]
 pub unsafe extern "C" fn teleportal_engine_get_contract_ffi_testing(
     engine: &mut Engine,
-) -> *const FfiDefaultContract {
-    let contract: FfiDefaultContract = engine
-        .realm()
+) -> *const FfiTestingContract {
+    let contract: FfiTestingContract = engine
+        .realm_mut()
         .baseline_mut(BaselineKind::Fork)
         .register_contract()
         .expect("Contract failed to register");
-    &contract
+    let contract_box = Box::new(contract);
+    Box::into_raw(contract_box)
 }
 
 #[no_mangle]
 pub extern "C" fn teleportal_engine_create_object(
-    engine: &Engine,
-    contract: &FfiDefaultContract,
+    engine: &mut Engine,
+    contract: &FfiTestingContract,
 ) -> *const ObjectHandle {
+    let state_defaults = [1u8, 2u8, 3u8]
+        .into_iter()
+        .map(DynTpPrimitive::from)
+        .map(DynTpProperty::from);
+    let channel_defaults = [].into_iter();
+
     let object_result = engine
-        .realm()
-        .baseline(BaselineKind::Fork)
-        .object_create(contract, None, None);
-    let object = object_result.expect("Object could not be created.");
+        .realm_mut()
+        .baseline_mut(BaselineKind::Fork)
+        .object_create(contract, state_defaults, channel_defaults);
+    let mut object = object_result.expect("Object could not be created.");
     &mut object
 }
 
@@ -105,7 +115,6 @@ pub extern "C" fn teleportal_engine_create_object(
 pub extern "C" fn teleportal_engine_get_state_handle_u8(
     engine: &Engine,
     object_handle: &ObjectHandle,
-    contract_handle: &ContractDataHandle,
     state_idx: usize,
 ) -> *const StateHandle<u8> {
     if let Ok(object) = engine
@@ -113,7 +122,7 @@ pub extern "C" fn teleportal_engine_get_state_handle_u8(
         .baseline(BaselineKind::Fork)
         .object(*object_handle)
     {
-        let state_id = StateId::new(state_idx, *contract_handle);
+        let state_id = StateId::new(state_idx, object.contract());
         let state_handle = object.state(state_id);
         &state_handle
     } else {
@@ -123,13 +132,13 @@ pub extern "C" fn teleportal_engine_get_state_handle_u8(
 
 #[no_mangle]
 pub extern "C" fn teleportal_engine_get_state_value_u8(
-    engine: Box<Engine>,
-    state_handle: StateHandle<u8>,
+    engine: &Engine,
+    state_handle: &StateHandle<u8>,
 ) -> u8 {
     let value = engine
         .realm()
         .baseline(BaselineKind::Fork)
-        .state(state_handle)
+        .state(*state_handle)
         .unwrap();
     value.0
 }
