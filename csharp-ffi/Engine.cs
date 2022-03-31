@@ -28,41 +28,46 @@ namespace Teleportal.Platform
         public static extern byte teleportal_engine_get_state_value_u8(IntPtr engine, IntPtr state_handle);
 
         private EngineRef engine;
-        private IntPtr defaultContractHandle;
+        private ContractHandle defaultContractHandle;
 
         public Engine()
         {
-            this.engine = teleportal_engine_init();
-            this.defaultContractHandle = teleportal_engine_get_contract_ffi_testing(this.engine);
-
-            IntPtr testStateHandle =
-            byte testStateValue = GetState<byte>(testStateHandle);
-            Debug.Log($"[Teleportal] U8 test: {testStateValue}");
+            this.engine = new EngineRef(teleportal_engine_init());
+            this.defaultContractHandle = new ContractHandle(teleportal_engine_get_contract_ffi_testing(this.engine.Ptr));
+            Test();
         }
 
-        public IntPtr CreateObjectWithTestContract()
+        private void Test()
         {
-            return teleportal_engine_create_object(this.engine, this.defaultContractHandle);
+            ObjectHandle testObject = CreateObjectWithTestContract();
+            StateHandle<byte> testState = GetStateHandle/*<byte>*/(testObject, 0);
+            byte testValue = GetStateValue/*<byte>*/(testState);
+            Debug.Log($"[Teleportal] U8 test: {testValue}");
         }
 
-        public IntPtr GetStateHandle(IntPtr objectHandle, int index)
+        public ObjectHandle CreateObjectWithTestContract()
         {
-            return teleportal_engine_get_state_handle_u8(this.engine, this.objectHandle, 0);
+            return new ObjectHandle(teleportal_engine_create_object(this.engine.Ptr, this.defaultContractHandle.Ptr));
         }
 
-        private IntPtr GetStateHandle<T>(IntPtr objectHandle, int index)
+        // private StateHandle<T> GetStateHandle(ObjectHandle objectHandle, int index)
+        // {
+        //     return GetStateHandle<T>(objectHandle, index);
+        // }
+
+        public StateHandle<byte> GetStateHandle(ObjectHandle objectHandle, int index)
         {
-            StateHandle<T> handle = GetStateHandle
+            return new StateHandle<byte>(teleportal_engine_get_state_handle_u8(this.engine.Ptr, objectHandle.Ptr, 0));
         }
 
-        public T GetStateValue<T>(IntPtr stateHandle)
-        {
-            return GetStateValue((dynamic)stateHandle);
-        }
+        // public T GetStateValue<T>(StateHandle<T> stateHandle)
+        // {
+        //     return GetStateValue((dynamic) stateHandle);
+        // }
 
-        private byte GetStateValue(IntPtr stateHandle)
+        private byte GetStateValue(StateHandle<byte> stateHandle)
         {
-            return Engine.teleportal_engine_get_state_value_u8(this.engine, stateHandle);
+            return Engine.teleportal_engine_get_state_value_u8(this.engine.Ptr, stateHandle.Ptr);
         }
 
     }

@@ -97,18 +97,21 @@ pub extern "C" fn teleportal_engine_create_object(
     engine: &mut Engine,
     contract: &FfiTestingContract,
 ) -> *const ObjectHandle {
-    let state_defaults = [1u8, 2u8, 3u8]
-        .into_iter()
-        .map(DynTpPrimitive::from)
-        .map(DynTpProperty::from);
+    let state_defaults = [
+        DynTpProperty::from(DynTpPrimitive::from(1u8)),
+        DynTpProperty::from(DynTpPrimitive::from(2u16)),
+        DynTpProperty::from(DynTpPrimitive::from(3i64)),
+    ]
+    .into_iter();
     let channel_defaults = [].into_iter();
 
     let object_result = engine
         .realm_mut()
         .baseline_mut(BaselineKind::Fork)
         .object_create(contract, state_defaults, channel_defaults);
-    let mut object = object_result.expect("Object could not be created.");
-    &mut object
+    let object = object_result.expect("Object could not be created.");
+    let object_box = Box::new(object);
+    Box::into_raw(object_box)
 }
 
 #[no_mangle]
@@ -124,7 +127,8 @@ pub extern "C" fn teleportal_engine_get_state_handle_u8(
     {
         let state_id = StateId::new(state_idx, object.contract());
         let state_handle = object.state(state_id);
-        &state_handle
+        let state_handle_box = Box::new(state_handle);
+        Box::into_raw(state_handle_box)
     } else {
         panic!("TODO");
     }
