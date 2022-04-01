@@ -146,3 +146,6 @@ pub extern "C" fn teleportal_engine_get_state_value_u8(
         .unwrap();
     value.0
 }
+
+#[repr(C)]
+struct TeleportalEngineFnTable {}

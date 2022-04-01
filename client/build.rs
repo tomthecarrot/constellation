@@ -1,5 +1,11 @@
+extern crate cbindgen;
+
+use std::env;
+
 fn main() {
-    // cxx_build::bridge("src/lib.rs")
-    //     .flag("-std=c++14")
-    //     .compile("teleportal-platform");
+    let crate_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
+
+    cbindgen::generate(crate_dir)
+        .unwrap()
+        .write_to_file("bindings.h");
 }
