@@ -14,13 +14,12 @@ use crate::contract::properties::states::{
 use crate::contract::properties::traits::ITpPropertyStatic;
 use crate::contract::{Contract, ContractData, ContractDataHandle};
 use crate::object::{Object, ObjectHandle};
-use crate::time::{ChannelTime, RealmTime, TimeWarp};
+use crate::time::TimeWarp;
 
 use arena::Arena;
-use eyre::{eyre, Context, Result};
+use eyre::{eyre, Result};
 use itertools::EitherOrBoth;
 use itertools::Itertools;
-use typemap::ShareMap;
 
 #[derive(Copy, Clone, PartialEq, Eq, Debug, Hash)]
 pub enum BaselineKind {
@@ -39,8 +38,8 @@ impl Baseline {
     pub fn new(kind: BaselineKind) -> Self {
         let objects = Arena::new();
         let contracts = Arena::new();
-        let states = ShareMap::custom();
-        let channels = ShareMap::custom();
+        let states = StateArenaMap::new();
+        let channels = ChannelArenaMap::new();
 
         Self {
             kind,
@@ -242,8 +241,8 @@ impl Baseline {
 
     pub fn channel<T: ITpPropertyStatic>(&self, chan: ChannelHandle<T>) -> Result<&Channel<T>> {
         let arena = self
-            .states
-            .get::<ChannelArenaHandle<T>>()
+            .channels
+            .get()
             .ok_or_else(|| eyre!("The given handle doesn't have an associated Arena"))?;
 
         arena
@@ -256,8 +255,8 @@ impl Baseline {
         chan: ChannelHandle<T>,
     ) -> Result<&mut Channel<T>> {
         let arena = self
-            .states
-            .get_mut::<ChannelArenaHandle<T>>()
+            .channels
+            .get_mut()
             .ok_or_else(|| eyre!("The given handle doesn't have an associated Arena"))?;
 
         arena
@@ -268,7 +267,7 @@ impl Baseline {
     fn state_remove<T: ITpPropertyStatic>(&mut self, state: StateHandle<T>) -> Result<State<T>> {
         let arena = self
             .states
-            .get_mut::<StateArenaHandle<T>>()
+            .get_mut()
             .ok_or_else(|| eyre!("The given handle doesn't have an associated Arena"))?;
 
         arena
@@ -282,7 +281,7 @@ impl Baseline {
     ) -> Result<Channel<T>> {
         let arena = self
             .channels
-            .get_mut::<ChannelArenaHandle<T>>()
+            .get_mut()
             .ok_or_else(|| eyre!("The given handle doesn't have an associated Arena"))?;
 
         arena
@@ -293,6 +292,7 @@ impl Baseline {
     fn state_create<T: ITpPropertyStatic>(&mut self, value: T) -> StateHandle<T> {
         let arena = self
             .states
+            .0
             .entry::<StateArenaHandle<T>>()
             .or_insert_with(|| Arena::new());
 
@@ -302,6 +302,7 @@ impl Baseline {
     fn channel_create<T: ITpPropertyStatic>(&mut self, channel: Channel<T>) -> ChannelHandle<T> {
         let arena = self
             .channels
+            .0
             .entry::<ChannelArenaHandle<T>>()
             .or_insert_with(|| Arena::new());
 

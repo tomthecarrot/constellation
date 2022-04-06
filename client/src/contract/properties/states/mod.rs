@@ -21,9 +21,22 @@ use typemap::ShareMap;
 pub struct State<T: ITpPropertyStatic>(pub T);
 
 /// A `TypeMap` key to access the arena containing `State<T>`s.
-pub struct StateArenaHandle<T: ITpPropertyStatic>(PhantomData<T>);
+pub(crate) struct StateArenaHandle<T: ITpPropertyStatic>(PhantomData<T>);
 impl<T: ITpPropertyStatic> typemap::Key for StateArenaHandle<T> {
     type Value = arena::Arena<State<T>>;
 }
 
-pub type StateArenaMap = ShareMap;
+pub struct StateArenaMap(pub ShareMap);
+impl StateArenaMap {
+    pub fn new() -> Self {
+        Self(ShareMap::custom())
+    }
+
+    pub fn get<T: ITpPropertyStatic>(&self) -> Option<&arena::Arena<State<T>>> {
+        self.0.get::<StateArenaHandle<T>>()
+    }
+
+    pub fn get_mut<T: ITpPropertyStatic>(&mut self) -> Option<&mut arena::Arena<State<T>>> {
+        self.0.get_mut::<StateArenaHandle<T>>()
+    }
+}

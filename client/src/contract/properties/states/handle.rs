@@ -1,4 +1,4 @@
-use super::{State, StateArenaHandle};
+use super::State;
 use crate::baseline::Baseline;
 use crate::contract::properties::dynamic::TpPropertyType;
 use crate::contract::properties::traits::ITpPropertyStatic;
@@ -26,7 +26,7 @@ impl<T: ITpPropertyStatic> IStateHandle for StateHandle<T> {
     fn get<'a>(&self, baseline: &'a Baseline) -> Result<Self::OutputRef<'a>> {
         let arena = baseline
             .states
-            .get::<StateArenaHandle<T>>()
+            .get()
             .ok_or_else(|| eyre!("The given handle doesn't have an associated Arena"))?;
 
         arena
@@ -37,7 +37,7 @@ impl<T: ITpPropertyStatic> IStateHandle for StateHandle<T> {
     fn get_mut<'a>(&self, baseline: &'a mut Baseline) -> Result<Self::OutputMut<'a>> {
         let arena = baseline
             .states
-            .get_mut::<StateArenaHandle<T>>()
+            .get_mut()
             .ok_or_else(|| eyre!("The given handle doesn't have an associated Arena"))?;
 
         arena
