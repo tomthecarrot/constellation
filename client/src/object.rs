@@ -1,7 +1,7 @@
 use crate::contract::properties::channels::{ChannelHandle, ChannelId};
 use crate::contract::properties::states::{StateHandle, StateId};
 use crate::contract::properties::traits::{ITpData, ITpPropertyStatic};
-use crate::contract::{Contract, ContractDataHandle};
+use crate::contract::ContractDataHandle;
 use crate::time::TimeWarp;
 
 use arena::generational_arena as ga;

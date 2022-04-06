@@ -1,4 +1,4 @@
-use crate::contract::properties::{dynamic::TpPropertyType, traits::ITpProperty};
+use crate::contract::properties::traits::ITpProperty;
 
 #[derive(Debug, PartialEq)]
 pub struct Keyframe<T: ITpProperty> {

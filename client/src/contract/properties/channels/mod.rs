@@ -22,12 +22,25 @@ use std::marker::PhantomData;
 use typemap::ShareMap;
 
 /// A `TypeMap` key to access the arena containing `State<T>`s.
-pub struct ChannelArenaHandle<T: ITpPropertyStatic>(PhantomData<T>);
+pub(crate) struct ChannelArenaHandle<T: ITpPropertyStatic>(PhantomData<T>);
 impl<T: ITpPropertyStatic> typemap::Key for ChannelArenaHandle<T> {
     type Value = arena::Arena<Channel<T>>;
 }
 
-pub type ChannelArenaMap = ShareMap;
+pub struct ChannelArenaMap(pub ShareMap);
+impl ChannelArenaMap {
+    pub fn new() -> Self {
+        Self(ShareMap::custom())
+    }
+
+    pub fn get<T: ITpPropertyStatic>(&self) -> Option<&arena::Arena<Channel<T>>> {
+        self.0.get::<ChannelArenaHandle<T>>()
+    }
+
+    pub fn get_mut<T: ITpPropertyStatic>(&mut self) -> Option<&mut arena::Arena<Channel<T>>> {
+        self.0.get_mut::<ChannelArenaHandle<T>>()
+    }
+}
 
 /// Represents a particular channel field of a contract. For actual channel data
 /// of a specific object, see [`ChannelHandle`].

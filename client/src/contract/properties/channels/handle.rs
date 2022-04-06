@@ -4,7 +4,7 @@ use crate::contract::properties::traits::ITpPropertyStatic;
 
 use eyre::{eyre, Result};
 
-use super::{Channel, ChannelArenaHandle};
+use super::Channel;
 
 /// Any type that can be used as a handle for a `State<T>` (or a `DynState`).
 ///
@@ -27,7 +27,7 @@ impl<T: ITpPropertyStatic> IChannelHandle for ChannelHandle<T> {
     fn get<'a>(&self, baseline: &'a Baseline) -> Result<Self::OutputRef<'a>> {
         let arena = baseline
             .channels
-            .get::<ChannelArenaHandle<T>>()
+            .get()
             .ok_or_else(|| eyre!("The given handle doesn't have an associated Arena"))?;
 
         arena
@@ -38,7 +38,7 @@ impl<T: ITpPropertyStatic> IChannelHandle for ChannelHandle<T> {
     fn get_mut<'a>(&self, baseline: &'a mut Baseline) -> Result<Self::OutputMut<'a>> {
         let arena = baseline
             .channels
-            .get_mut::<ChannelArenaHandle<T>>()
+            .get_mut()
             .ok_or_else(|| eyre!("The given handle doesn't have an associated Arena"))?;
 
         arena
