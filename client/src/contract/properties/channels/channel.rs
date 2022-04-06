@@ -1,6 +1,7 @@
 use crate::contract::properties::traits::ITpProperty;
 
 #[derive(Debug, PartialEq)]
+#[repr(C)]
 pub struct Keyframe<T: ITpProperty> {
     value: T,
     time: f64,
