@@ -5,6 +5,9 @@ use crate::contract::properties::channels::{ChannelsIter, IChannels};
 use crate::contract::properties::states::{IStates, StatesIter};
 use crate::object::ObjectHandle;
 
+#[cfg(feature = "safer-ffi")]
+use safer_ffi::derive_ReprC;
+
 use std::collections::HashSet;
 
 /// Represents information that globally and uniquely identifies a contract.
@@ -48,6 +51,7 @@ pub trait Contract {
 }
 
 /// Contains stateful data about the contract
+#[cfg_attr(feature = "safer-ffi", derive_ReprC, ReprC::opaque)]
 pub struct ContractData {
     id: ContractId,
     objects: HashSet<ObjectHandle>,

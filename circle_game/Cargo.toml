@@ -15,6 +15,7 @@ crate-type = ["cdylib", "rlib"]
 [features]
 # If you uncomment this line, it will enable `wee_alloc`:
 #default = ["wee_alloc"]
+# default = ["bevy/dynamic"]
 
 # Dependencies shared by both native and WASM
 [dependencies]
@@ -23,7 +24,7 @@ crate-type = ["cdylib", "rlib"]
 # allocator, so it's not enabled by default.
 wee_alloc = { version = "0.4.2", optional = true }
 
-tp_client = { path = "../client" }
+tp_client = { path = "../client/rust" }
 bevy_prototype_lyon = "0.4"
 lazy_static = "1"
 bevy = "0.6"

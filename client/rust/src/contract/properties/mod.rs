@@ -1,5 +1,6 @@
 pub mod channels;
 pub mod dynamic;
+pub mod rbox;
 pub mod states;
 pub mod traits;
 
