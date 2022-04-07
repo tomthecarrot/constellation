@@ -21,7 +21,7 @@ log = "0.4"
 itertools = "0.10"
 keyframe = "1"
 better_borrow = { path = "../crates/better_borrow" }
-rsharp = { path = "../crates/rsharp", optional = true }
+rsharp = { path = "../crates/rsharp/rust", optional = true }
 
 
 [features]

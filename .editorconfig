@@ -1,0 +1,4 @@
+root = true
+
+# csharp code uses default autoformatter settings
+[*.cs]
