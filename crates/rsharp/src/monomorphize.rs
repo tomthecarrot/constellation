@@ -8,11 +8,11 @@ macro_rules! monomorphize {
             #[repr(C)]
             pub struct [<$item_name _ $t:camel>](pub $item_name<$t>);
 
-            // #[$crate::remangle($path)]
-            // #[no_mangle]
-            // pub extern "C" fn get_keyframe_value_ <$t> (keyframe_c: [<$item_name _ $t:camel>]) -> $t {
-            //     keyframe_c.0.value
-            // }
+            #[$crate::remangle($path)]
+            #[no_mangle]
+            pub extern "C" fn [<get_keyframe_value_ $t>](keyframe_c: [<$item_name _ $t:camel>]) -> $t {
+                keyframe_c.0.value
+            }
         }
     };
     // recursive case

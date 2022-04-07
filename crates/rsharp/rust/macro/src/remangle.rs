@@ -1,5 +1,5 @@
 use proc_macro2::TokenStream;
-use quote::ToTokens;
+use quote::{quote_spanned, ToTokens};
 use syn::spanned::Spanned;
 use syn::{self, Error, Result};
 
@@ -17,22 +17,28 @@ fn mangle_path(m: &str) -> Result<String> {
 
 pub fn remangle(path: syn::LitStr, mut item: syn::Item) -> Result<TokenStream> {
     let path = path.value();
-    let mangle = |ident: &mut syn::Ident| -> Result<()> {
+    let mangle = |ident: &mut syn::Ident| -> Result<(syn::Ident, syn::Ident)> {
+        let original_ident = ident.clone();
         *ident = syn::Ident::new(
             &format!("{}{}", &mangle_path(&path)?, ident.to_string()),
             ident.span(),
         );
-        Ok(())
+        Ok((original_ident, ident.clone()))
     };
     use syn::Item::*;
-    match item {
+    let (original_ident, mangled_ident) = match item {
         Struct(ref mut i) => mangle(&mut i.ident),
         Fn(ref mut f) => mangle(&mut f.sig.ident),
         Enum(ref mut e) => mangle(&mut e.ident),
         _ => return Err(Error::new(item.span(), "This item type is not supported")),
     }?;
 
-    Ok(item.into_token_stream())
+    let output = quote_spanned! {item.span() =>
+        #item
+        use #mangled_ident as #original_ident;
+    };
+
+    Ok(output)
 }
 
 #[cfg(test)]
