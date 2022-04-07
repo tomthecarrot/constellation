@@ -7,8 +7,8 @@ members = [
     "contract_macro",
     "crates/datastructures/arena",
     "crates/better_borrow",
-    "crates/rsharp",
-    "crates/rsharp/macro",
+    "crates/rsharp/rust",
+    "crates/rsharp/rust/macro",
 ]
 
 [profile.release]
