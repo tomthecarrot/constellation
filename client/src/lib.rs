@@ -1,4 +1,4 @@
-#![deny(improper_ctypes_definitions, improper_ctypes)]
+// TODO[SER-338] uncomment me // #![deny(improper_ctypes_definitions, improper_ctypes)]
 #![allow(clippy::diverging_sub_expression)]
 #![feature(generic_associated_types)]
 
