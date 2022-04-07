@@ -1,5 +1,7 @@
+// TODO[SER-338] uncomment me // #![deny(improper_ctypes_definitions, improper_ctypes)]
 #![allow(clippy::diverging_sub_expression)]
 #![feature(generic_associated_types)]
+#![feature(trivial_bounds)]
 
 pub mod action;
 pub mod baseline;
@@ -62,5 +64,20 @@ impl RealmClient {
             _ => return Err(eyre!("We only support local endpoints!")),
         };
         Ok(result)
+    }
+}
+
+// This generates the C header file for the bindings. See safer-ffi's guide.
+#[safer_ffi::cfg_headers]
+#[test]
+fn generate_headers() -> ::std::io::Result<()> {
+    let builder = ::safer_ffi::headers::builder();
+    if ::std::env::var("HEADERS_TO_STDOUT")
+        .ok()
+        .map_or(false, |it| it == "1")
+    {
+        builder.to_writer(::std::io::stdout()).generate()
+    } else {
+        builder.to_file(&"generated.h".to_string())?.generate()
     }
 }

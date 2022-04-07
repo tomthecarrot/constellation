@@ -16,4 +16,4 @@ proc-macro2 = "1"
 lazy_static = "1"
 
 [dev-dependencies]
-tp_client = { path = "../client" }
+tp_client = { path = "../client/rust" }

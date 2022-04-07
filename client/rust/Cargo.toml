@@ -4,10 +4,13 @@ version = "3.0.0"
 edition = "2021"
 rust-version = "1.58"
 
+[lib]
+crate-type = ["rlib", "cdylib"]
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-arena = { path = "../crates/datastructures/arena" }
+arena = { path = "../../crates/datastructures/arena" }
 crossbeam-channel = "0.5"
 derive_more = "0.99"
 enum_dispatch = "0.3"
@@ -16,14 +19,14 @@ paste = "1"
 rand = "0.8"
 tracing = "0.1"
 typemap = "0.3"
-tp_contract_macro = { path = "../contract_macro" }
+tp_contract_macro = { path = "../../contract_macro" }
 log = "0.4"
 itertools = "0.10"
 keyframe = "1"
-better_borrow = { path = "../crates/better_borrow" }
-rsharp = { path = "../crates/rsharp/rust", optional = true }
-
+better_borrow = { path = "../../crates/better_borrow" }
+rsharp = { path = "../../crates/rsharp/rust", optional = true }
+safer-ffi = { version = "0.0.7", features = ["proc_macros"], optional = true }
 
 [features]
 default = ["c_api"]
-c_api = ["rsharp"]
+c_api = ["rsharp", "safer-ffi/headers", "arena/safer-ffi"]

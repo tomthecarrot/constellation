@@ -21,11 +21,18 @@ use eyre::{eyre, Result};
 use itertools::EitherOrBoth;
 use itertools::Itertools;
 
+#[cfg(feature = "safer-ffi")]
+use safer_ffi::derive_ReprC;
+
+#[cfg_attr(feature = "safer-ffi", derive_ReprC)]
+#[repr(u8)]
 #[derive(Copy, Clone, PartialEq, Eq, Debug, Hash)]
 pub enum BaselineKind {
     Main,
     Fork,
 }
+
+#[cfg_attr(feature = "safer-ffi", derive_ReprC, ReprC::opaque)]
 pub struct Baseline {
     kind: BaselineKind,
     objects: Arena<Object>,
