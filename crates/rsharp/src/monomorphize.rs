@@ -7,6 +7,12 @@ macro_rules! monomorphize {
             #[$crate::remangle($path)]
             #[repr(C)]
             pub struct [<$item_name _ $t:camel>](pub $item_name<$t>);
+
+            // #[$crate::remangle($path)]
+            // #[no_mangle]
+            // pub extern "C" fn get_keyframe_value_ <$t> (keyframe_c: [<$item_name _ $t:camel>]) -> $t {
+            //     keyframe_c.0.value
+            // }
         }
     };
     // recursive case
@@ -14,11 +20,6 @@ macro_rules! monomorphize {
         monomorphize!($path, $item_name, $first_t);
         monomorphize!($path, $item_name, $($tail_t),+);
     };
-}
-
-#[macro_export]
-macro_rules! monomorphize_primitives {
-    () => {};
 }
 
 #[cfg(test)]

@@ -37,7 +37,7 @@ impl<T: ITpProperty> Channel<T> {
 
 #[cfg(feature = "c_api")]
 #[rsharp::substitute("tp_client::contract::properties::channels")]
-mod c_api {
+pub mod c_api {
     #![allow(non_camel_case_types, unused)]
 
     use super::*;
@@ -48,4 +48,10 @@ mod c_api {
 
     // This is like doing `monomorphize!("whatever", Keyframe, u8, u16, ...)
     primitives!(; types, monomorphize, "tp_client::contract::properties::channels", Keyframe);
+
+    #[no_mangle]
+    pub extern "C" fn tp_client__contract__properties__channels__get_sample_keyframe_u8(
+    ) -> tp_client__contract__properties__channels__Keyframe_U8 {
+        tp_client__contract__properties__channels__Keyframe_U8(Keyframe::new(1, 0.0))
+    }
 }
