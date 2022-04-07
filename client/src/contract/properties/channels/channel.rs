@@ -34,3 +34,18 @@ impl<T: ITpProperty> Channel<T> {
         Self(keyframes)
     }
 }
+
+#[cfg(feature = "c_api")]
+#[rsharp::substitute("tp_client::contract::properties::channels")]
+mod c_api {
+    #![allow(non_camel_case_types, unused)]
+
+    use super::*;
+    use crate::contract::properties::primitives;
+    use crate::contract::ContractDataHandle;
+    use crate::object::ObjectHandle;
+    use rsharp::{monomorphize, remangle};
+
+    // This is like doing `monomorphize!("whatever", Keyframe, u8, u16, ...)
+    primitives!(; types, monomorphize, "tp_client::contract::properties::channels", Keyframe);
+}

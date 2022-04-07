@@ -7,3 +7,4 @@ edition = "2021"
 
 [dependencies]
 rsharp_macro = { path = "macro" }
+paste = "1"
