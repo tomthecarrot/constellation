@@ -1,70 +1,77 @@
 using System;
 using System.Runtime.InteropServices;
 
-/// Stuff imported by PInvoke
-namespace c_ffi
+namespace Teleportal
 {
-
-    public class Metadata
+    /// Stuff imported by PInvoke
+    namespace C_FFI
     {
-#if UNITY_IOS && !UNITY_EDITOR
-        internal const string LIBRARY_NAME = "__Internal";
-#else
-        internal const string LIBRARY_NAME = "tp_client";
-#endif
-    }
 
-    public struct MyType
-    {
-        [DllImport(Metadata.LIBRARY_NAME)]
-        internal static extern unsafe MyType* MyType__new(int a, float b);
-
-        [DllImport(Metadata.LIBRARY_NAME)]
-        internal static extern unsafe MyType* MyType__drop(MyType* ptr);
-    }
-}
-
-namespace rsharp
-{
-    /// An `OwnedHandle<T>` owns a rust `*mut T`, so it will also be in charge
-    /// of dropping it. To do anything useful with an instance of this class,
-    /// use the `Ptr` property.
-    public unsafe interface OwnedHandle<T> : IDisposable where T : unmanaged
-    {
-        /// Gets a rust `*mut T`
-        T* Ptr
+        public class Metadata
         {
-            get; set;
-
+#if UNITY_IOS && !UNITY_EDITOR
+            internal const string LIBRARY_NAME = "__Internal";
+#else
+            internal const string LIBRARY_NAME = "tp_rsharp";
+#endif
         }
 
+        public struct MyType
+        {
+            public int a;
+            public float b;
+
+            [DllImport(Metadata.LIBRARY_NAME)]
+            internal static extern unsafe MyType* MyType__new(int a, float b);
+
+            [DllImport(Metadata.LIBRARY_NAME)]
+            internal static extern unsafe void MyType__drop(MyType* ptr);
+        }
     }
 
-    namespace ffi
+    namespace Rsharp
     {
-        public unsafe class MyType : rsharp.OwnedHandle<c_ffi.MyType>
+        /// An `OwnedHandle<T>` owns a rust `*mut T`, so it will also be in charge
+        /// of dropping it. To do anything useful with an instance of this class,
+        /// use the `Ptr` property.
+        public unsafe interface OwnedHandle<T> : IDisposable where T : unmanaged
         {
-            public c_ffi.MyType* _ptr;
+            /// Gets a rust `*mut T`
+            T* Ptr
+            {
+                get; set;
+            }
+        }
+
+        public unsafe class MyType : Rsharp.OwnedHandle<C_FFI.MyType>
+        {
+            public C_FFI.MyType* _ptr;
 
             public MyType(int a, float b)
             {
-                this._ptr = c_ffi.MyType.MyType__new(a, b);
+                this._ptr = C_FFI.MyType.MyType__new(a, b);
             }
 
-            public MyType(c_ffi.MyType* ptr)
+            public MyType(C_FFI.MyType* ptr)
             {
                 this._ptr = ptr;
             }
 
+            public int A => (*this._ptr).a;
+
+            public float B => (*this._ptr).b;
+
             public void Dispose()
             {
-                c_ffi.MyType.MyType__drop(this._ptr);
+                C_FFI.MyType.MyType__drop(this._ptr);
             }
 
-            public c_ffi.MyType* Ptr
+            public C_FFI.MyType* Ptr
             {
-                get => _ptr;
-                set => _ptr = value;
+                get => this._ptr;
+                set => this._ptr = value;
             }
         }
     }
+
+}
