@@ -3,6 +3,8 @@ name = "tp_client"
 version = "3.0.0"
 edition = "2021"
 rust-version = "1.58"
+# Prevent accidental `cargo publish`
+publish = false
 
 [lib]
 crate-type = ["rlib", "cdylib"]

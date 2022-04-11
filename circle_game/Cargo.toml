@@ -8,21 +8,17 @@ categories = ["wasm"]
 readme = "README.md"
 edition = "2021"
 rust-version = "1.58"
+# Prevent accidental `cargo publish`
+publish = false
 
 [lib]
 crate-type = ["cdylib", "rlib"]
 
 [features]
-# If you uncomment this line, it will enable `wee_alloc`:
-#default = ["wee_alloc"]
 # default = ["bevy/dynamic"]
 
 # Dependencies shared by both native and WASM
 [dependencies]
-# `wee_alloc` is a tiny allocator for wasm that is only ~1K in code size
-# compared to the default allocator's ~10K. However, it is slower than the default
-# allocator, so it's not enabled by default.
-wee_alloc = { version = "0.4.2", optional = true }
 
 tp_client = { path = "../client/rust" }
 bevy_prototype_lyon = "0.4"
