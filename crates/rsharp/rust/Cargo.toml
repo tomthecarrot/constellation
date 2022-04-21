@@ -5,9 +5,6 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[lib]
-crate-type = ["lib", "cdylib"]
-
 [dependencies]
 rsharp_macro = { path = "macro" }
 paste = "1"
