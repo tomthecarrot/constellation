@@ -9,6 +9,7 @@ members = [
     "crates/better_borrow",
     "crates/rsharp/rust",
     "crates/rsharp/rust/macro",
+    "crates/cs_codegen",
 ]
 
 [profile.release]

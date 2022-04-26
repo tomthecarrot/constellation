@@ -44,9 +44,9 @@ pub mod c_api {
     #![allow(non_camel_case_types, non_snake_case, dead_code)]
 
     use super::*;
+    use crate::contract::properties::c_api::simple_primitives;
     use crate::contract::ContractDataHandle;
     use crate::object::ObjectHandle;
-    use rsharp::primitives;
     // use crate::contract::properties::primitives;
     use derive_more::From;
     use rsharp::remangle;
@@ -104,5 +104,5 @@ pub mod c_api {
     }
 
     // This is like doing `monomorphize!("whatever", Keyframe, u8, u16, ...)
-    primitives!(; types, monomorphize, "tp_client::contract::properties::channels");
+    simple_primitives!(; types, monomorphize, "tp_client::contract::properties::channels");
 }
