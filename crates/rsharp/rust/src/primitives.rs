@@ -1,6 +1,3 @@
-// TODO: It doesn't make sense to refer to tp_client types in here, these should
-// just be regular primitives. This stuff is only here as a stopgap.
-
 #[macro_export]
 macro_rules! primitives {
     (; types, $macro_name:ident, $($x:tt)+) => {
@@ -18,8 +15,8 @@ macro_rules! primitives {
             f32,
             f64,
             // String,
-            ObjectHandle,
-            ContractDataHandle,
+            // ObjectHandle,
+            // ContractDataHandle,
         );
     };
     (; types, $macro_name:ident) => {
@@ -36,8 +33,8 @@ macro_rules! primitives {
             f32,
             f64,
             // String,
-            ObjectHandle,
-            ContractDataHandle,
+            // ObjectHandle,
+            // ContractDataHandle,
         );
     };
 }

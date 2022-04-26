@@ -1,6 +1,5 @@
 pub mod channels;
 pub mod dynamic;
-pub mod rbox;
 pub mod states;
 pub mod traits;
 
@@ -240,3 +239,47 @@ macro_rules! primitives {
     };
 }
 pub(crate) use primitives;
+
+#[cfg(feature = "c_api")]
+pub mod c_api {
+    macro_rules! simple_primitives {
+        (; types, $macro_name:ident, $($x:tt)+) => {
+            $macro_name!(
+                $($x)+,
+                u8,
+                u16,
+                u32,
+                u64,
+                i8,
+                i16,
+                i32,
+                i64,
+                bool,
+                f32,
+                f64,
+                // String,
+                ObjectHandle,
+                ContractDataHandle,
+            );
+        };
+        (; types, $macro_name:ident) => {
+            $macro_name!(
+                u8,
+                u16,
+                u32,
+                u64,
+                i8,
+                i16,
+                i32,
+                i64,
+                bool,
+                f32,
+                f64,
+                // String,
+                ObjectHandle,
+                ContractDataHandle,
+            );
+        };
+    }
+    pub(crate) use simple_primitives;
+}

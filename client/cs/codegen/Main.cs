@@ -66,13 +66,13 @@ namespace Codegen
 
             var options = driver.Options;
             options.GeneratorKind = Gen.GeneratorKind.CSharp;
+            options.OutputDir = this.output_dir.FullName;
 
             var module = options.AddModule("Client");
             module.IncludeDirs.Add(Path.Join(project_dir.FullName, "client", "rust"));
             module.Headers.Add("generated.h");
             module.LibraryDirs.Add(cargo_artifact_dir);
             module.Libraries.Add("libtp_client.so");
-            driver.Options.OutputDir = this.output_dir.FullName;
         }
 
         /// Setup your passes here.
