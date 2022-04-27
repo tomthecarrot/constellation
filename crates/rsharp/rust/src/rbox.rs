@@ -1,9 +1,6 @@
 #![allow(non_camel_case_types, non_snake_case)]
 
-use crate::contract::ContractDataHandle;
-use crate::object::ObjectHandle;
-
-use rsharp::{primitives, remangle};
+use crate::{primitives, remangle};
 use safer_ffi::prelude::*;
 
 macro_rules! boxes {
@@ -13,13 +10,13 @@ macro_rules! boxes {
             /// Copies `value` into a rust `Box`
             #[remangle($path)]
             #[ffi_export]
-            fn [<Box _ $t:camel __new>](value: &$t) -> repr_c::Box<$t> {
-                repr_c::Box::new(*value)
+            pub fn [<Box _ $t:camel __new>](value: $t) -> repr_c::Box<$t> {
+                repr_c::Box::new(value)
             }
 
             #[remangle($path)]
             #[ffi_export]
-            fn [<Box _ $t:camel __drop>](value: repr_c::Box<$t>) {
+            pub fn [<Box _ $t:camel __drop>](value: repr_c::Box<$t>) {
                 drop(value)
             }
         }
@@ -31,8 +28,4 @@ macro_rules! boxes {
     };
 }
 
-// TODO: we should switch this to just be actual non-tp-client primitives, and put that
-// in rsharp crate. The tp primitives like ObjectHandle should have their new and drop
-// functions defined where the rust types are defined. This will avoid double-defining
-// such functions.
-primitives!(; types, boxes, "tp_client::contract::properties");
+primitives!(; types, boxes, "rsharp");

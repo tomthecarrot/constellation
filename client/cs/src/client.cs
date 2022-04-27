@@ -12,6 +12,30 @@ namespace Teleportal.Client
     }
 }
 
+namespace Teleportal.Client.Contract.Properties
+{
+    class ToManaged
+    {
+        public static unsafe Channels.Keyframe_U8 f(OwnershipSemantics ownershipSemantics, Channels.Keyframe_U8_Ptr ptr)
+        {
+            return new Channels.Keyframe_U8(ptr, ownershipSemantics);
+        }
+
+
+        public static unsafe byte f(OwnershipSemantics ownershipSemantics, byte* ptr)
+        {
+            return *ptr;
+        }
+
+        public static unsafe double f(OwnershipSemantics ownershipSemantics, double* ptr)
+        {
+            return *ptr;
+        }
+
+    }
+
+}
+
 namespace Teleportal.Client.Contract.Properties.Channels
 {
 
@@ -33,9 +57,6 @@ namespace Teleportal.Client.Contract.Properties.Channels
     {
         private Keyframe_U8_Ptr? ptr;
 
-        // Box -> owned
-        // Reference -> not owned
-
         private OwnershipSemantics ownershipSemantics;
 
         public OwnershipSemantics OwnershipSemantics
@@ -54,23 +75,8 @@ namespace Teleportal.Client.Contract.Properties.Channels
             get
             {
                 byte* result = generated.__Internal.TpClientContractPropertiesChannelsKeyframeU8Value(this.ptr?.p ?? IntPtr.Zero);
-                return ToManaged(OwnershipSemantics.SharedRef, result);
+                return ToManaged.f(OwnershipSemantics.SharedRef, result);
             }
-        }
-
-        private unsafe Keyframe_U8 ToManaged(OwnershipSemantics ownershipSemantics, Keyframe_U8_Ptr ptr)
-        {
-            return new Keyframe_U8(ptr, ownershipSemantics);
-        }
-
-        private unsafe byte ToManaged(OwnershipSemantics ownershipSemantics, byte* ptr)
-        {
-            return *ptr;
-        }
-
-        private unsafe double ToManaged(OwnershipSemantics ownershipSemantics, double* ptr)
-        {
-            return *ptr;
         }
 
         public double time
@@ -79,8 +85,7 @@ namespace Teleportal.Client.Contract.Properties.Channels
         }
 
         public unsafe Keyframe_U8(byte value, double time)
-            // TODO: Create a rust box of `value` otherwise this is nonsensical
-            : this(new Keyframe_U8_Ptr(generated.__Internal.TpClientContractPropertiesChannelsKeyframeU8New(&value, time)), OwnershipSemantics.Owned)
+            : this(new Keyframe_U8_Ptr(generated.__Internal.TpClientContractPropertiesChannelsKeyframeU8New(RSharp.RBox_U8.new_(value), time)), OwnershipSemantics.Owned)
         { }
 
         internal unsafe Keyframe_U8(Keyframe_U8_Ptr ptr, OwnershipSemantics ownershipSemantics)
