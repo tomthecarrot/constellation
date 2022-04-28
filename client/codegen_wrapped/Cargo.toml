@@ -1,9 +1,7 @@
 [package]
 name = "cs_codegen"
 version = "0.0.0"
-
 description = "Generates C# code for wrapping cppsharp low level code"
-
 edition = "2021"
 # Prevent accidental `cargo publish`
 publish = false
@@ -12,4 +10,7 @@ publish = false
 
 [dependencies]
 clap = { version = "3", features = ["derive"] }
-syn = { version = "1", features = ["derive"] }
+syn = { version = "1", features = ["full"] }
+handlebars = "4"
+miette = { version = "4", features = ["fancy"] }
+serde = { version = "1", features = ["derive"] }

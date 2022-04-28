@@ -4,12 +4,12 @@ resolver = "2" # As of Nov 2021, rust doesn't seem to use new resolver if you do
 members = [
     "circle_game",
     "client/rust",
+    "client/codegen_wrapped",
     "contract_macro",
     "crates/datastructures/arena",
     "crates/better_borrow",
     "crates/rsharp/rust",
     "crates/rsharp/rust/macro",
-    "crates/cs_codegen",
 ]
 
 [profile.release]
