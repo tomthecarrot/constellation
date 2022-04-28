@@ -33,7 +33,7 @@ namespace Codegen
             DirectoryInfo output_dir;
             if (arg0 == null)
             {
-                output_dir = new DirectoryInfo(Path.Join(project_dir.FullName, "client", "cs", "src", "generated"));
+                output_dir = new DirectoryInfo(Path.Join(project_dir.FullName, "client", "cs", "src", "generated", "cpp_sharp"));
             }
             else
             {
@@ -90,7 +90,7 @@ namespace Codegen
             var assembly_file = new DirectoryInfo(Rflct.Assembly.GetExecutingAssembly().Location);
 
             DirectoryInfo project_dir = assembly_file;
-            const uint n_steps_up = 7;
+            const uint n_steps_up = 6;
             for (var i = 0; i < n_steps_up; i++)
             {
                 project_dir = project_dir.Parent ?? project_dir.Root;
