@@ -1,13 +1,11 @@
 use handlebars::Handlebars;
+use lazy_static::lazy_static;
 use miette::{miette, IntoDiagnostic, Result, WrapErr};
 use serde::Serialize;
 use std::{
     fs::File,
     path::{Path, PathBuf},
 };
-
-#[macro_use]
-extern crate lazy_static;
 
 const TPL_NAME: &'static str = "tpl";
 
@@ -18,6 +16,10 @@ pub struct ClassData {
     pub new_expr: String,
     pub drop_ident: String,
     pub additional_methods: Option<String>,
+}
+
+pub trait ClassDataTemplate {
+    fn template() -> ClassData;
 }
 
 lazy_static! {
@@ -77,7 +79,7 @@ impl Codegen {
         })
     }
 
-    pub fn render(&self, data: &ClassData) -> Result<()> {
+    pub fn substitute_and_write_class_data(&self, data: &ClassData) -> Result<()> {
         let class_ident = &data.class_ident;
         let output_path = self.output_dir.join(format!("{class_ident}.cs"));
         let output_file = File::create(&output_path)
@@ -92,53 +94,7 @@ impl Codegen {
             .wrap_err("Failed to render to file")
     }
 
-    pub fn render_vec(&self, data_vec: Vec<ClassData>) -> Result<()> {
-        for data in data_vec.iter() {
-            let res = self.render(data);
-            if let Err(report) = res {
-                return Err(report);
-            }
-        }
-
-        Ok(())
-    }
-
-    pub fn render_class_data(&self) -> Result<()> {
-        self.render_vec(self.generate_class_data())
-    }
-
-    fn generate_templates(&self) -> Vec<ClassData> {
-        let mut templates: Vec<ClassData> = Vec::new();
-
-        let template_keyframe = ClassData {
-            class_ident: "Keyframe_<type_platform>".to_string(),
-            new_args: "<type_cs> value, double time".to_string(),
-            new_expr: "generated.__Internal.TpClientContractPropertiesChannelsKeyframe<type_platform>New(RSharp.RBox_<type_platform>.new_(value), time)".to_string(),
-            drop_ident: "generated.__Internal.TpClientContractPropertiesChannelsKeyframe<type_platform>Drop".to_string(),
-            additional_methods: Some(r#"
-                public unsafe <type_cs> Value
-                {
-                    get
-                    {
-                        <type_cs_ptr> result = generated.__Internal.TpClientContractPropertiesChannelsKeyframe<type_platform>Value(this.Ptr?.p ?? IntPtr.Zero);
-                        return ToManaged.f(OwnershipSemantics.SharedRef, result);
-                    }
-                }
-
-                public double Time
-                {
-                    get => generated.__Internal.TpClientContractPropertiesChannelsKeyframe<type_platform>Time(this.Ptr?.p ?? IntPtr.Zero);
-                }
-            "#.to_string()),
-        };
-        templates.push(template_keyframe);
-
-        templates
-    }
-
-    pub fn generate_class_data(&self) -> Vec<ClassData> {
-        let templates = self.generate_templates();
-
+    pub fn monomorphize_templated_class_data(&self, templates: Vec<ClassData>) -> Vec<ClassData> {
         let mut output: Vec<ClassData> = Vec::new();
         for type_ in TYPES.iter() {
             for template in templates.iter() {
