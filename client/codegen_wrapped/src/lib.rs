@@ -1,3 +1,6 @@
+mod class_data_templates;
+
+pub use class_data_templates::KeyframeTemplate;
 use handlebars::Handlebars;
 use miette::{miette, IntoDiagnostic, Result, WrapErr};
 use serde::Serialize;
