@@ -21,11 +21,13 @@ namespace Teleportal.Client.Contract.Properties.Channels
     {
         public {{class_ident}}(Ptr<{{class_ident}}> ptr, OwnershipSemantics ownershipSemantics) : base(ptr, ownershipSemantics) { }
 
+        {{#if new_expr}}
         public unsafe {{class_ident}}({{new_args}}) : base(
             new Ptr<{{class_ident}}>({{new_expr}}),
             OwnershipSemantics.Owned
         )
         { }
+        {{/if}}
 
         override protected void NativeDrop(Ptr<{{class_ident}}> ptr)
         {

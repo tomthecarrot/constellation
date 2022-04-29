@@ -15,7 +15,7 @@ const TPL_NAME: &'static str = "tpl";
 pub struct ClassData {
     pub class_ident: String,
     pub new_args: String,
-    pub new_expr: String,
+    pub new_expr: Option<String>,
     pub drop_ident: String,
     pub additional_methods: Option<String>,
 }

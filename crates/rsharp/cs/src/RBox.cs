@@ -201,13 +201,6 @@ namespace RSharp
     public struct RBox_ContractDataHandle
     {
         [DllImport(Metadata.LIBRARY_NAME)]
-        private static extern unsafe IntPtr rsharp__Box_ContractDataHandle__new(IntPtr value);
-        public static unsafe IntPtr new_(IntPtr value)
-        {
-            return rsharp__Box_ContractDataHandle__new(value);
-        }
-
-        [DllImport(Metadata.LIBRARY_NAME)]
         private static extern unsafe void rsharp__Box_ContractDataHandle__drop(IntPtr value);
         public static unsafe void drop(IntPtr value)
         {
@@ -217,13 +210,6 @@ namespace RSharp
 
     public struct RBox_ObjectHandle
     {
-        [DllImport(Metadata.LIBRARY_NAME)]
-        private static extern unsafe IntPtr rsharp__Box_ObjectHandle__new(IntPtr value);
-        public static unsafe IntPtr new_(IntPtr value)
-        {
-            return rsharp__Box_ObjectHandle__new(value);
-        }
-
         [DllImport(Metadata.LIBRARY_NAME)]
         private static extern unsafe void rsharp__Box_ObjectHandle__drop(IntPtr value);
         public static unsafe void drop(IntPtr value)
