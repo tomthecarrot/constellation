@@ -21,6 +21,7 @@ pub struct ClassData {
 }
 
 lazy_static! {
+    // Platform Type | C# Type | C# Pointer Type
     static ref TYPES: Vec<(&'static str, &'static str, &'static str)> = Vec::from([
         ("U8", "byte", "byte*"),
         ("U16", "ushort", "ushort*"),
