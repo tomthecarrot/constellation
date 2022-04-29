@@ -14,3 +14,4 @@ syn = { version = "1", features = ["full"] }
 handlebars = "4"
 miette = { version = "4", features = ["fancy"] }
 serde = { version = "1", features = ["derive"] }
+lazy_static = "1"
