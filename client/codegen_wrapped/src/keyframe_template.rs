@@ -1,4 +1,5 @@
 use crate::ClassData;
+
 use indoc::indoc;
 use lazy_static::lazy_static;
 

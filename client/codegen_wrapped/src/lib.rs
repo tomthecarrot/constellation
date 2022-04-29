@@ -1,6 +1,7 @@
-mod class_data_templates;
+mod keyframe_template;
 
-pub use class_data_templates::KeyframeTemplate;
+pub use keyframe_template::KeyframeTemplate;
+
 use handlebars::Handlebars;
 use miette::{miette, IntoDiagnostic, Result, WrapErr};
 use serde::Serialize;
@@ -22,7 +23,6 @@ pub struct ClassData {
 
 pub struct Codegen {
     reg: Handlebars<'static>,
-    tpl_path: PathBuf,
     output_dir: PathBuf,
 }
 impl Codegen {
@@ -43,19 +43,21 @@ impl Codegen {
             .wrap_err_with(|| format!("Failed to create `output_dir`={output_dir:?}"))?;
 
         let mut reg = handlebars::Handlebars::new();
+        // Once handlebars-rs properly handles multi-line partials, we will remove this line
+        reg.set_prevent_indent(true);
+
         // https://docs.rs/handlebars/latest/handlebars/#strict-mode
-        reg.set_strict_mode(true);
+        reg.set_strict_mode(false);
         // Don't escape characters
         reg.register_escape_fn(|s| s.to_string());
 
         reg.register_template_file(TPL_NAME, &tpl_path)
             .into_diagnostic()?;
 
-        Ok(Self {
-            reg,
-            tpl_path,
-            output_dir,
-        })
+        reg.register_partial("additional_methods", "{{additional_methods}}")
+            .into_diagnostic()?;
+
+        Ok(Self { reg, output_dir })
     }
 
     pub fn render_to_file(&self, data: &ClassData) -> Result<()> {
