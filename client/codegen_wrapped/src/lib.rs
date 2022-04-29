@@ -22,6 +22,7 @@ pub struct ClassData {
 
 lazy_static! {
     static ref TYPES: Vec<(&'static str, &'static str, &'static str)> = Vec::from([
+        ("U8", "byte", "byte*"),
         ("U16", "ushort", "ushort*"),
         ("U32", "uint", "uint*"),
         ("U64", "ulong", "ulong*"),
@@ -49,6 +50,7 @@ impl Codegen {
             .parent()
             .unwrap()
             .join("cs/src/generated/wrapped");
+
         if output_dir.exists() && output_dir.read_dir().into_diagnostic()?.next().is_some() {
             return Err(miette!(format!(
                 "`output_dir` is not empty! Please delete it. (output_dir={output_dir:?})"
