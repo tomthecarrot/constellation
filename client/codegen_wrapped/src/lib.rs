@@ -1,5 +1,4 @@
 use handlebars::Handlebars;
-use lazy_static::lazy_static;
 use miette::{miette, IntoDiagnostic, Result, WrapErr};
 use serde::Serialize;
 use std::{
@@ -16,29 +15,6 @@ pub struct ClassData {
     pub new_expr: String,
     pub drop_ident: String,
     pub additional_methods: Option<String>,
-}
-
-pub trait ClassDataTemplate {
-    fn template() -> ClassData;
-}
-
-lazy_static! {
-    // Platform Type | C# Type | C# Pointer Type
-    static ref TYPES: Vec<(&'static str, &'static str, &'static str)> = Vec::from([
-        ("U8", "byte", "byte*"),
-        ("U16", "ushort", "ushort*"),
-        ("U32", "uint", "uint*"),
-        ("U64", "ulong", "ulong*"),
-        ("I8", "sbyte", "sbyte*"),
-        ("I16", "short", "short*"),
-        ("I32", "int", "int*"),
-        ("I64", "long", "long*"),
-        ("Bool", "bool", "bool*"),
-        ("F32", "float", "float*"),
-        ("F64", "double", "double*"),
-        ("ObjectHandle", "IntPtr", "IntPtr"),
-        ("ContractDataHandle", "IntPtr", "IntPtr"),
-    ]);
 }
 
 pub struct Codegen {
@@ -79,7 +55,7 @@ impl Codegen {
         })
     }
 
-    pub fn substitute_and_write_class_data(&self, data: &ClassData) -> Result<()> {
+    pub fn render_to_file(&self, data: &ClassData) -> Result<()> {
         let class_ident = &data.class_ident;
         let output_path = self.output_dir.join(format!("{class_ident}.cs"));
         let output_file = File::create(&output_path)
@@ -92,47 +68,5 @@ impl Codegen {
             .render_to_write(TPL_NAME, data, output_file)
             .into_diagnostic()
             .wrap_err("Failed to render to file")
-    }
-
-    pub fn monomorphize_templated_class_data(&self, templates: Vec<ClassData>) -> Vec<ClassData> {
-        let mut output: Vec<ClassData> = Vec::new();
-        for type_ in TYPES.iter() {
-            for template in templates.iter() {
-                let mut data = template.clone();
-                data.class_ident = data
-                    .class_ident
-                    .replace("<type_platform>", type_.0)
-                    .replace("<type_cs>", type_.1)
-                    .replace("<type_cs_ptr>", type_.2);
-                data.new_args = data
-                    .new_args
-                    .replace("<type_platform>", type_.0)
-                    .replace("<type_cs>", type_.1)
-                    .replace("<type_cs_ptr>", type_.2);
-                data.new_expr = data
-                    .new_expr
-                    .replace("<type_platform>", type_.0)
-                    .replace("<type_cs>", type_.1)
-                    .replace("<type_cs_ptr>", type_.2);
-                data.drop_ident = data
-                    .drop_ident
-                    .replace("<type_platform>", type_.0)
-                    .replace("<type_cs>", type_.1)
-                    .replace("<type_cs_ptr>", type_.2);
-
-                if let Some(additional_methods) = data.additional_methods {
-                    data.additional_methods = Some(
-                        additional_methods
-                            .replace("<type_platform>", type_.0)
-                            .replace("<type_cs>", type_.1)
-                            .replace("<type_cs_ptr>", type_.2),
-                    );
-                }
-
-                output.push(data);
-            }
-        }
-
-        output
     }
 }
