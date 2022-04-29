@@ -4,7 +4,7 @@ use std::collections::HashMap;
 fn main() {
     let data_vec = generate_class_data();
     let serialized = serde_json::to_string(&data_vec).unwrap();
-    println!("serialized: {0}", serialized);
+    println!("{}", serialized);
 }
 
 fn generate_class_data() -> Vec<ClassData> {
@@ -29,7 +29,21 @@ fn generate_class_data() -> Vec<ClassData> {
         new_args: "<type_cs> value, double time".to_string(),
         new_expr: "generated.__Internal.TpClientContractPropertiesChannelsKeyframe<type_platform>New(RSharp.RBox_<type_platform>.new_(value), time)".to_string(),
         drop_ident: "generated.__Internal.TpClientContractPropertiesChannelsKeyframe<type_platform>Drop".to_string(),
-        additional_methods: None,
+        additional_methods: Some(r#"
+            public unsafe byte Value
+            {
+                get
+                {
+                    byte* result = generated.__Internal.TpClientContractPropertiesChannelsKeyframe<type_platform>Value(this.Ptr?.p ?? IntPtr.Zero);
+                    return ToManaged.f(OwnershipSemantics.SharedRef, result);
+                }
+            }
+
+            public double Time
+            {
+                get => generated.__Internal.TpClientContractPropertiesChannelsKeyframe<type_platform>Time(this.Ptr?.p ?? IntPtr.Zero);
+            }
+        "#.to_string()),
     };
     templates.push(template_keyframe);
 
