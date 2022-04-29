@@ -5,7 +5,6 @@ members = [
     "circle_game",
     "client/rust",
     "client/codegen_wrapped",
-    "client/codegen_test",
     "contract_macro",
     "crates/datastructures/arena",
     "crates/better_borrow",
