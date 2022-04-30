@@ -2,9 +2,9 @@ use crate::{generate_class_data_generic, ClassData, ClassDataTemplate};
 
 use indoc::indoc;
 
-pub struct KeyframeTemplate {}
+pub struct ChannelTemplate {}
 
-impl ClassDataTemplate for KeyframeTemplate {
+impl ClassDataTemplate for ChannelTemplate {
     fn namespace_super() -> String {
         "Contract.Properties".to_string()
     }
@@ -14,7 +14,7 @@ impl ClassDataTemplate for KeyframeTemplate {
     }
 
     fn class_ident() -> String {
-        "Keyframe_<type_platform>".to_string()
+        "Channel_<type_platform>".to_string()
     }
 
     fn new_args() -> String {
@@ -22,11 +22,11 @@ impl ClassDataTemplate for KeyframeTemplate {
     }
 
     fn new_expr() -> Option<String> {
-        Some("generated.__Internal.TpClientContractPropertiesChannelsKeyframe<type_platform>New(RSharp.RBox_<type_platform>.new_(value), time)".to_string())
+        None
     }
 
     fn drop_ident() -> String {
-        "generated.__Internal.TpClientContractPropertiesChannelsKeyframe<type_platform>Drop"
+        "generated.__Internal.TpClientContractPropertiesChannelsChannel<type_platform>Drop"
             .to_string()
     }
 
@@ -36,14 +36,9 @@ impl ClassDataTemplate for KeyframeTemplate {
             {
                 get
                 {
-                    var result = generated.__Internal.TpClientContractPropertiesChannelsKeyframe<type_platform>Value(this.Ptr?.p ?? IntPtr.Zero);
+                    var result = generated.__Internal.TpClientContractPropertiesChannelsChannel<type_platform>Value(this.Ptr?.p ?? IntPtr.Zero);
                     return ToManaged.f(OwnershipSemantics.SharedRef, result);
                 }
-            }
-
-            public double Time
-            {
-                get => generated.__Internal.TpClientContractPropertiesChannelsKeyframe<type_platform>Time(this.Ptr?.p ?? IntPtr.Zero);
             }
         "#}.to_string())
     }

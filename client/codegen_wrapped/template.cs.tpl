@@ -4,18 +4,18 @@ using IntPtr = System.IntPtr;
 using generated = Teleportal.Client.Generated.generated;
 
 
-namespace Teleportal.Client.Contract.Properties
+namespace Teleportal.Client.{{namespace_super}}
 {
     partial class ToManaged
     {
-        public static unsafe Channels.{{class_ident}} f(OwnershipSemantics ownershipSemantics, Ptr<Channels.{{class_ident}}> ptr)
+        public static unsafe {{namespace_sub}}.{{class_ident}} f(OwnershipSemantics ownershipSemantics, Ptr<{{namespace_sub}}.{{class_ident}}> ptr)
         {
-            return new Channels.{{class_ident}}(ptr, ownershipSemantics);
+            return new {{namespace_sub}}.{{class_ident}}(ptr, ownershipSemantics);
         }
     }
 }
 
-namespace Teleportal.Client.Contract.Properties.Channels
+namespace Teleportal.Client.{{namespace_super}}.{{namespace_sub}}
 {
     public sealed class {{class_ident}} : Wrapper<{{class_ident}}>
     {

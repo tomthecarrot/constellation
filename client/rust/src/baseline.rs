@@ -16,6 +16,9 @@ use crate::contract::{Contract, ContractData, ContractDataHandle};
 use crate::object::{Object, ObjectHandle};
 use crate::time::TimeWarp;
 
+#[cfg(feature = "safer-ffi")]
+use ::safer_ffi::prelude::*;
+
 use arena::Arena;
 use eyre::{eyre, Result};
 use itertools::EitherOrBoth;
@@ -303,7 +306,7 @@ impl Baseline {
             .entry::<StateArenaHandle<T>>()
             .or_insert_with(|| Arena::new());
 
-        arena.insert(State(value))
+        arena.insert(State::new(value))
     }
 
     fn channel_create<T: ITpPropertyStatic>(&mut self, channel: Channel<T>) -> ChannelHandle<T> {
@@ -381,5 +384,64 @@ impl<T: ITpPropertyStatic> core::ops::Index<ChannelHandle<T>> for Baseline {
 impl<T: ITpPropertyStatic> core::ops::IndexMut<ChannelHandle<T>> for Baseline {
     fn index_mut(&mut self, index: ChannelHandle<T>) -> &mut Self::Output {
         self.channel_mut(index).expect("Invalid handle")
+    }
+}
+
+#[cfg(feature = "c_api")]
+#[rsharp::substitute("tp_client::baseline")]
+pub mod c_api {
+    #![allow(non_camel_case_types, non_snake_case, dead_code)]
+
+    use super::*;
+    use crate::contract::properties::c_api::simple_primitives;
+    use crate::contract::ContractDataHandle;
+    use crate::object::ObjectHandle;
+    use derive_more::From;
+    use rsharp::remangle;
+
+    // Module is simply to prevent name collisions on the rust side. It does
+    // nothing for C
+    mod _Baseline {
+        use super::*;
+
+        #[remangle("tp_client::baseline")]
+        #[derive_ReprC]
+        #[ReprC::opaque]
+        #[derive(From)]
+        pub struct Baseline {
+            pub inner: super::Baseline,
+        }
+
+        #[remangle("tp_client::baseline")]
+        #[ffi_export]
+        pub fn object<'a>(baseline: &'a Baseline, handle: &'a ObjectHandle) -> &'a Object {
+            baseline.inner.object(handle)
+        }
+
+        #[remangle("tp_client::baseline")]
+        #[ffi_export]
+        pub fn object_mut<'a>(baseline: &'a Baseline, handle: &'a ObjectHandle) -> &'a mut Object {
+            baseline.inner.object_mut(handle)
+        }
+
+        macro_rules! monomorphize {
+            // Base case
+            ($path:literal, $t:ty $(,)?) => {
+                paste::paste! {
+
+                    pub fn [<Baseline _ $t:camel __object_mut>]<'a>(baseline: &'a Baseline) -> &'a mut Vec<Keyframe<$t>> {
+                        baseline.inner.keyframes_mut()
+                    }
+                }
+            };
+            // recursive case
+            ($path:literal, $first_t:ty, $($tail_t:ty),+ $(,)?) => {
+                monomorphize!($path, $first_t);
+                monomorphize!($path, $($tail_t),+);
+            };
+        }
+
+        // This is like doing `monomorphize!("whatever", Keyframe, u8, u16, ...)
+        simple_primitives!(; types, monomorphize, "tp_client::baseline");
     }
 }

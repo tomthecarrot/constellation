@@ -36,6 +36,14 @@ impl<T: ITpProperty> Channel<T> {
         });
         Self(keyframes)
     }
+
+    pub fn keyframes(&self) -> &Vec<Keyframe<T>> {
+        &self.0
+    }
+
+    pub fn keyframes_mut(&mut self) -> &mut Vec<Keyframe<T>> {
+        &mut self.0
+    }
 }
 
 #[cfg(feature = "c_api")]
@@ -47,7 +55,6 @@ pub mod c_api {
     use crate::contract::properties::c_api::simple_primitives;
     use crate::contract::ContractDataHandle;
     use crate::object::ObjectHandle;
-    // use crate::contract::properties::primitives;
     use derive_more::From;
     use rsharp::remangle;
 
@@ -90,8 +97,32 @@ pub mod c_api {
 
                     #[remangle($path)]
                     #[ffi_export]
-                    pub extern "C" fn [<Keyframe _ $t:camel __time>](kf: &Monomorphized) -> f64 {
+                    pub fn [<Keyframe _ $t:camel __time>](kf: &Monomorphized) -> f64 {
                         kf.inner.time()
+                    }
+                }
+
+                mod [<_Channel _ $t:camel>] {
+                    use super::*;
+
+                    #[remangle($path)]
+                    #[derive_ReprC]
+                    #[ReprC::opaque]
+                    #[derive(From)]
+                    pub struct [<Channel _ $t:camel>]{
+                        pub inner: Channel<$t>
+                    }
+
+                    use [<Channel _ $t:camel>] as Monomorphized;
+
+                    #[remangle($path)]
+                    #[ffi_export]
+                    pub fn [<Channel _ $t:camel __keyframes>]<'a>(chan: &'a Monomorphized) -> &'a Vec<Keyframe<$t>> {
+                        chan.inner.keyframes()
+                    }
+
+                    pub fn [<Channel _ $t:camel __keyframes_mut>]<'a>(chan: &'a Monomorphized) -> &'a mut Vec<Keyframe<$t>> {
+                        chan.inner.keyframes_mut()
                     }
                 }
             }

@@ -133,8 +133,8 @@ fn random_walk(
 
         let base = engine.realm_mut().baseline_mut(kind.0);
 
-        base[pos.x].0 += (rand::random::<f32>() - 0.5) * 2.;
-        base[pos.y].0 += (rand::random::<f32>() - 0.5) * 2.;
+        base[pos.x].value += (rand::random::<f32>() - 0.5) * 2.;
+        base[pos.y].value += (rand::random::<f32>() - 0.5) * 2.;
     }
     Ok(())
 }
@@ -146,7 +146,7 @@ fn sync_transforms(
     for (kind, pos, mut transform) in query.iter_mut() {
         let base = engine.realm().baseline(kind.0);
 
-        transform.translation.x = base[pos.x].0;
-        transform.translation.y = base[pos.y].0;
+        transform.translation.x = base[pos.x].value;
+        transform.translation.y = base[pos.y].value;
     }
 }

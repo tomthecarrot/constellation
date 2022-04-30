@@ -1,8 +1,11 @@
 mod keyframe_template;
+mod state_template;
 
 pub use keyframe_template::KeyframeTemplate;
+pub use state_template::StateTemplate;
 
 use handlebars::Handlebars;
+use lazy_static::lazy_static;
 use miette::{miette, IntoDiagnostic, Result, WrapErr};
 use serde::Serialize;
 use std::{
@@ -12,13 +15,114 @@ use std::{
 
 const TPL_NAME: &'static str = "tpl";
 
+lazy_static! {
+    // Platform Type | C# Type
+    pub static ref TYPES_INFO: Vec<TypeInfo> = Vec::from([
+        TypeInfo::new("U8", "byte", true),
+        TypeInfo::new("U16", "ushort", true),
+        TypeInfo::new("U32", "uint", true),
+        TypeInfo::new("U64", "ulong", true),
+        TypeInfo::new("I8", "sbyte", true),
+        TypeInfo::new("I16", "short", true),
+        TypeInfo::new("I32", "int", true),
+        TypeInfo::new("I64", "long", true),
+        TypeInfo::new("Bool", "bool", true),
+        TypeInfo::new("F32", "float", true),
+        TypeInfo::new("F64", "double", true),
+        TypeInfo::new("ObjectHandle", "IntPtr", false),
+        TypeInfo::new("ContractDataHandle", "IntPtr", false),
+    ]);
+}
+
+pub struct TypeInfo {
+    type_platform: &'static str,
+    type_cs: &'static str,
+    has_new: bool,
+}
+
+impl TypeInfo {
+    pub fn new(type_platform: &'static str, type_cs: &'static str, has_new: bool) -> Self {
+        Self {
+            type_platform,
+            type_cs,
+            has_new,
+        }
+    }
+}
+
 #[derive(Clone, Serialize)]
 pub struct ClassData {
+    pub namespace_super: String,
+    pub namespace_sub: String,
     pub class_ident: String,
     pub new_args: String,
     pub new_expr: Option<String>,
     pub drop_ident: String,
     pub additional_methods: Option<String>,
+}
+
+pub trait ClassDataTemplate {
+    fn namespace_super() -> String;
+    fn namespace_sub() -> String;
+    fn class_ident() -> String;
+    fn new_args() -> String;
+    fn new_expr() -> Option<String>;
+    fn drop_ident() -> String;
+    fn additional_methods() -> Option<String>;
+    fn generate_class_data() -> Vec<ClassData>;
+}
+
+pub fn generate_class_data_generic<T: ClassDataTemplate>() -> Vec<ClassData> {
+    let mut output: Vec<ClassData> = Vec::new();
+
+    for type_info in TYPES_INFO.iter() {
+        let namespace_super = T::namespace_super();
+
+        let namespace_sub = T::namespace_sub();
+
+        let class_ident = T::class_ident()
+            .replace("<type_platform>", type_info.type_platform)
+            .replace("<type_cs>", type_info.type_cs);
+
+        let new_args = T::new_args()
+            .replace("<type_platform>", type_info.type_platform)
+            .replace("<type_cs>", type_info.type_cs);
+
+        let new_expr = if type_info.has_new {
+            if let Some(expr) = T::new_expr() {
+                Some(
+                    expr.replace("<type_platform>", type_info.type_platform)
+                        .replace("<type_cs>", type_info.type_cs),
+                )
+            } else {
+                None
+            }
+        } else {
+            None
+        };
+
+        let drop_ident = T::drop_ident()
+            .replace("<type_platform>", type_info.type_platform)
+            .replace("<type_cs>", type_info.type_cs);
+
+        let additional_methods = T::additional_methods().as_ref().map(|value| {
+            value
+                .replace("<type_platform>", type_info.type_platform)
+                .replace("<type_cs>", type_info.type_cs)
+        });
+
+        output.push(ClassData {
+            namespace_super,
+            namespace_sub,
+            class_ident,
+            new_args,
+            new_expr,
+            drop_ident,
+            additional_methods,
+        });
+    }
+
+    output
 }
 
 pub struct Codegen {
