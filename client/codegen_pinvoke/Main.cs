@@ -68,7 +68,7 @@ namespace Codegen
             options.GeneratorKind = Gen.GeneratorKind.CSharp;
             options.OutputDir = this.output_dir.FullName;
 
-            var module = options.AddModule("Client");
+            var module = options.AddModule("Teleportal.Client.Generated");
             module.IncludeDirs.Add(Path.Join(project_dir.FullName, "client", "rust"));
             module.Headers.Add("generated.h");
             module.LibraryDirs.Add(cargo_artifact_dir);
