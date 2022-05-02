@@ -21,6 +21,9 @@ impl<T: ITpProperty> StateId<T> {
         self.idx
     }
 
+    /// This is only exposed so that contract macros can call it. It isn't intended
+    /// for direct use by API clients
+    #[doc(hidden)]
     pub fn new(idx: usize, contract: ContractDataHandle) -> Self {
         Self {
             idx,
