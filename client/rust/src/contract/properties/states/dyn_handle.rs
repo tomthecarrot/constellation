@@ -20,7 +20,7 @@ impl IStateHandle for DynStateHandle {
         // Matches on the type and then calls the appropriate generic function in baseline
         apply_to_state_handle!(*self, |h: StateHandle<_>| {
             let state = h.get(baseline)?;
-            let prop_ref: DynTpPropertyRef<'a> = DynTpPropertyRef::from(&state.0);
+            let prop_ref: DynTpPropertyRef<'a> = DynTpPropertyRef::from(&state.value);
             Ok(prop_ref.into())
         })
     }
@@ -38,7 +38,7 @@ impl IStateHandle for DynStateHandle {
             &'a mut T: Into<DynTpPropertyMut<'a>>,
         {
             let state = h.get_mut(baseline)?;
-            let prop_mut: DynTpPropertyMut<'a> = (&mut state.0).into();
+            let prop_mut: DynTpPropertyMut<'a> = (&mut state.value).into();
             Ok(prop_mut.into())
         }
 

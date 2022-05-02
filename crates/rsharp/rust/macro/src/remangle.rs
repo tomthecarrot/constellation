@@ -36,7 +36,7 @@ pub fn remangle(path: syn::LitStr, mut item: syn::Item) -> Result<TokenStream> {
     let output = quote_spanned! {item.span() =>
         #item
         #[allow(unused)]
-        use #mangled_ident as #original_ident;
+        pub use #mangled_ident as #original_ident;
     };
 
     Ok(output)

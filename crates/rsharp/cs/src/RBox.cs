@@ -195,27 +195,4 @@ namespace RSharp
             rsharp__Box_F64__drop(value);
         }
     }
-
-    // ---- Opaque ----
-
-    public struct RBox_ContractDataHandle
-    {
-        [DllImport(Metadata.LIBRARY_NAME)]
-        private static extern unsafe void rsharp__Box_ContractDataHandle__drop(IntPtr value);
-        public static unsafe void drop(IntPtr value)
-        {
-            rsharp__Box_ContractDataHandle__drop(value);
-        }
-    }
-
-    public struct RBox_ObjectHandle
-    {
-        [DllImport(Metadata.LIBRARY_NAME)]
-        private static extern unsafe void rsharp__Box_ObjectHandle__drop(IntPtr value);
-        public static unsafe void drop(IntPtr value)
-        {
-            rsharp__Box_ObjectHandle__drop(value);
-        }
-    }
-
 }

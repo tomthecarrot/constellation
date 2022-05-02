@@ -1,7 +1,7 @@
 use crate::contract::properties::traits::ITpProperty;
 
 #[cfg(feature = "safer-ffi")]
-use ::safer_ffi::prelude::*;
+use ::safer_ffi::derive_ReprC;
 
 #[derive(Debug, PartialEq)]
 #[cfg_attr(feature = "safer-ffi", derive_ReprC, ReprC::opaque)]
@@ -36,10 +36,17 @@ impl<T: ITpProperty> Channel<T> {
         });
         Self(keyframes)
     }
+
+    pub fn keyframes(&self) -> &Vec<Keyframe<T>> {
+        &self.0
+    }
+
+    pub fn keyframes_mut(&mut self) -> &mut Vec<Keyframe<T>> {
+        &mut self.0
+    }
 }
 
 #[cfg(feature = "c_api")]
-#[rsharp::substitute("tp_client::contract::properties::channels")]
 pub mod c_api {
     #![allow(non_camel_case_types, non_snake_case, dead_code)]
 
@@ -47,9 +54,10 @@ pub mod c_api {
     use crate::contract::properties::c_api::simple_primitives;
     use crate::contract::ContractDataHandle;
     use crate::object::ObjectHandle;
-    // use crate::contract::properties::primitives;
+
     use derive_more::From;
     use rsharp::remangle;
+    use safer_ffi::prelude::*;
 
     macro_rules! monomorphize {
         // Base case
@@ -90,8 +98,32 @@ pub mod c_api {
 
                     #[remangle($path)]
                     #[ffi_export]
-                    pub extern "C" fn [<Keyframe _ $t:camel __time>](kf: &Monomorphized) -> f64 {
+                    pub fn [<Keyframe _ $t:camel __time>](kf: &Monomorphized) -> f64 {
                         kf.inner.time()
+                    }
+                }
+
+                mod [<_Channel _ $t:camel>] {
+                    use super::*;
+
+                    #[remangle($path)]
+                    #[derive_ReprC]
+                    #[ReprC::opaque]
+                    #[derive(From)]
+                    pub struct [<Channel _ $t:camel>]{
+                        pub inner: Channel<$t>
+                    }
+
+                    use [<Channel _ $t:camel>] as Monomorphized;
+
+                    #[remangle($path)]
+                    #[ffi_export]
+                    pub fn [<Channel _ $t:camel __keyframes>]<'a>(chan: &'a Monomorphized) -> c_slice::Ref<'a, Keyframe<$t>> {
+                        chan.inner.keyframes().as_slice().into()
+                    }
+
+                    pub fn [<Channel _ $t:camel __keyframes_mut>]<'a>(chan: &'a mut Monomorphized) -> c_slice::Mut<'a, Keyframe<$t>> {
+                        chan.inner.keyframes_mut().as_mut_slice().into()
                     }
                 }
             }
