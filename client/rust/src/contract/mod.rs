@@ -75,3 +75,23 @@ impl ContractData {
         &self.objects
     }
 }
+
+#[cfg(feature = "c_api")]
+mod c_api {
+    #![allow(non_camel_case_types, non_snake_case, dead_code)]
+
+    use derive_more::From;
+    use safer_ffi::prelude::*;
+
+    #[derive_ReprC]
+    #[ReprC::opaque]
+    #[derive(Clone, Copy, Eq, PartialEq, From)]
+    pub struct ContractDataHandle {
+        pub inner: super::ContractDataHandle,
+    }
+
+    #[ffi_export]
+    pub fn ContractDataHandle__drop(c: repr_c::Box<ContractDataHandle>) {
+        drop(c)
+    }
+}

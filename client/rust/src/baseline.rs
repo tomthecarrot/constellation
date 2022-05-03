@@ -303,7 +303,7 @@ impl Baseline {
             .entry::<StateArenaHandle<T>>()
             .or_insert_with(|| Arena::new());
 
-        arena.insert(State(value))
+        arena.insert(State::new(value))
     }
 
     fn channel_create<T: ITpPropertyStatic>(&mut self, channel: Channel<T>) -> ChannelHandle<T> {
@@ -382,4 +382,50 @@ impl<T: ITpPropertyStatic> core::ops::IndexMut<ChannelHandle<T>> for Baseline {
     fn index_mut(&mut self, index: ChannelHandle<T>) -> &mut Self::Output {
         self.channel_mut(index).expect("Invalid handle")
     }
+}
+
+#[cfg(feature = "c_api")]
+#[rsharp::substitute("tp_client::baseline")]
+pub mod c_api {
+    #![allow(non_camel_case_types, non_snake_case, dead_code)]
+
+    use super::*;
+    use crate::contract::properties::c_api::simple_primitives;
+    use crate::object::c_api::ObjectHandle as CObjectHandle;
+
+    use rsharp::remangle;
+    use safer_ffi::prelude::*;
+
+    #[remangle(substitute!())]
+    #[ffi_export]
+    pub fn Baseline__object<'a>(baseline: &'a Baseline, handle: &CObjectHandle) -> &'a Object {
+        baseline.object(handle.inner).unwrap()
+    }
+
+    #[remangle(substitute!())]
+    #[ffi_export]
+    pub fn Baseline__object_mut<'a>(
+        baseline: &'a mut Baseline,
+        handle: &CObjectHandle,
+    ) -> &'a mut Object {
+        baseline.object_mut(handle.inner).unwrap()
+    }
+
+    macro_rules! monomorphize {
+            // Base case
+            ($path:literal, $t:ty $(,)?) => {
+                paste::paste! {
+
+                    // TODO(SER-341)
+                }
+            };
+            // recursive case
+            ($path:literal, $first_t:ty, $($tail_t:ty),+ $(,)?) => {
+                monomorphize!($path, $first_t);
+                monomorphize!($path, $($tail_t),+);
+            };
+        }
+
+    // This is like doing `monomorphize!("whatever", Keyframe, u8, u16, ...)
+    simple_primitives!(; types, monomorphize, "tp_client::baseline");
 }
