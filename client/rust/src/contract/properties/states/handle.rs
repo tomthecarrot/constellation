@@ -49,3 +49,43 @@ impl<T: ITpPropertyStatic> IStateHandle for StateHandle<T> {
         T::PROPERTY_TYPE
     }
 }
+
+#[cfg(feature = "c_api")]
+mod c_api {
+    #![allow(non_camel_case_types, non_snake_case, dead_code)]
+    use super::*;
+
+    use crate::contract::properties::c_api::simple_primitives;
+    use crate::contract::ContractDataHandle;
+    use crate::object::ObjectHandle;
+
+    use derive_more::From;
+    use rsharp::remangle;
+    use safer_ffi::prelude::*;
+
+    macro_rules! monomorphize {
+        // Base case
+        ($path:literal, $t:ty $(,)?) => {
+            paste::paste! {
+                mod [<_StateHandle _ $t:camel>] {
+                    use super::*;
+
+                    #[remangle($path)]
+                    #[derive_ReprC]
+                    #[ReprC::opaque]
+                    #[derive(From)]
+                    pub struct [<StateHandle _ $t:camel>] {
+                        pub inner: StateHandle<$t>,
+                    }
+                }
+            }
+        };
+        // recursive case
+        ($path:literal, $first_t:ty, $($tail_t:ty),+ $(,)?) => {
+            monomorphize!($path, $first_t);
+            monomorphize!($path, $($tail_t),+);
+        };
+    }
+    // This is like doing `monomorphize!("whatever", Keyframe, u8, u16, ...)
+    simple_primitives!(; types, monomorphize, "tp_client::contract::properties::states");
+}
