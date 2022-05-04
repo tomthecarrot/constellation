@@ -28,6 +28,7 @@ keyframe = "1"
 better_borrow = { path = "../../crates/better_borrow" }
 rsharp = { path = "../../crates/rsharp/rust", optional = true }
 safer-ffi = { version = "0.0.7", features = ["proc_macros"], optional = true }
+ref-cast = "1"
 
 [features]
 default = ["c_api"]

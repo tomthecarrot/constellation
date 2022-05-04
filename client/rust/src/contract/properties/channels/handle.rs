@@ -50,3 +50,42 @@ impl<T: ITpPropertyStatic> IChannelHandle for ChannelHandle<T> {
         T::PROPERTY_TYPE
     }
 }
+
+#[cfg(feature = "c_api")]
+pub mod c_api {
+    #![allow(non_camel_case_types, non_snake_case, dead_code)]
+
+    use crate::contract::properties::c_api::simple_primitives;
+    use crate::contract::ContractDataHandle;
+    use crate::object::ObjectHandle;
+
+    use derive_more::From;
+    use ref_cast::RefCast;
+    use rsharp::remangle;
+    use safer_ffi::prelude::*;
+
+    macro_rules! monomorphize {
+        // Base case
+        ($path:literal, $t:ty $(,)?) => {
+            paste::paste! {
+
+                #[remangle($path)]
+                #[derive_ReprC]
+                #[ReprC::opaque]
+                #[derive(From, RefCast, Debug, Copy, Clone, Eq, PartialEq)]
+                #[repr(C)]
+                pub struct [<ChannelHandle _ $t>] {
+                    pub inner: super::ChannelHandle<$t>,
+                }
+            }
+        };
+        // recursive case
+        ($path:literal, $first_t:ty, $($tail_t:ty),+ $(,)?) => {
+            monomorphize!($path, $first_t);
+            monomorphize!($path, $($tail_t),+);
+        };
+    }
+
+    // This is like doing `monomorphize!("whatever", Keyframe, u8, u16, ...)
+    simple_primitives!(; types, monomorphize, "tp_client::contract::properties::channels");
+}
