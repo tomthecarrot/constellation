@@ -56,6 +56,7 @@ pub mod c_api {
     use crate::object::ObjectHandle;
 
     use derive_more::From;
+    use ref_cast::RefCast;
     use rsharp::remangle;
     use safer_ffi::prelude::*;
 
@@ -71,7 +72,8 @@ pub mod c_api {
                     #[remangle($path)]
                     #[derive_ReprC]
                     #[ReprC::opaque]
-                    #[derive(From)]
+                    #[derive(From, RefCast)]
+                    #[repr(C)]
                     pub struct [<Keyframe _ $t:camel>]{
                         pub inner: Keyframe<$t>
                     }
@@ -109,7 +111,8 @@ pub mod c_api {
                     #[remangle($path)]
                     #[derive_ReprC]
                     #[ReprC::opaque]
-                    #[derive(From)]
+                    #[derive(From, RefCast)]
+                    #[repr(C)]
                     pub struct [<Channel _ $t:camel>]{
                         pub inner: Channel<$t>
                     }

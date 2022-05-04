@@ -60,6 +60,7 @@ mod c_api {
     use crate::object::ObjectHandle;
 
     use derive_more::From;
+    use ref_cast::RefCast;
     use rsharp::remangle;
     use safer_ffi::prelude::*;
 
@@ -73,7 +74,8 @@ mod c_api {
                     #[remangle($path)]
                     #[derive_ReprC]
                     #[ReprC::opaque]
-                    #[derive(From)]
+                    #[derive(From, RefCast, Copy, Clone, Eq, PartialEq)]
+                    #[repr(C)]
                     pub struct [<StateHandle _ $t:camel>] {
                         pub inner: StateHandle<$t>,
                     }

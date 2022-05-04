@@ -51,6 +51,7 @@ mod c_api {
 
     use derive_more::From;
     use paste::paste;
+    use ref_cast::RefCast;
     use rsharp::remangle;
     use safer_ffi::prelude::*;
 
@@ -64,7 +65,8 @@ mod c_api {
                     #[remangle($path)]
                     #[derive_ReprC]
                     #[ReprC::opaque]
-                    #[derive(From)]
+                    #[derive(From, RefCast, Copy, Clone)]
+                    #[repr(C)]
                     pub struct [<StateId _ $t:camel>] {
                         pub inner: StateId<$t>,
                     }

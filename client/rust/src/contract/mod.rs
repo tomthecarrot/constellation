@@ -81,11 +81,13 @@ mod c_api {
     #![allow(non_camel_case_types, non_snake_case, dead_code)]
 
     use derive_more::From;
+    use ref_cast::RefCast;
     use safer_ffi::prelude::*;
 
     #[derive_ReprC]
     #[ReprC::opaque]
-    #[derive(Clone, Copy, Eq, PartialEq, From)]
+    #[derive(Clone, Copy, Eq, PartialEq, From, RefCast)]
+    #[repr(C)]
     pub struct ContractDataHandle {
         pub inner: super::ContractDataHandle,
     }

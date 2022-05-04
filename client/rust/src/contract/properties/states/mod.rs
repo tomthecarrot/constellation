@@ -17,12 +17,8 @@ use crate::contract::properties::traits::ITpPropertyStatic;
 use std::marker::PhantomData;
 use typemap::ShareMap;
 
-#[cfg(feature = "safer-ffi")]
-use ::safer_ffi::derive_ReprC;
-
 /// Holds all information related to a state with a statically-known type `T`.
 #[derive(Debug, PartialEq)]
-#[cfg_attr(feature = "safer-ffi", derive_ReprC, ReprC::opaque)]
 pub struct State<T: ITpPropertyStatic> {
     pub value: T,
 }
@@ -64,6 +60,7 @@ pub mod c_api {
     use crate::object::ObjectHandle;
 
     use derive_more::From;
+    use ref_cast::RefCast;
     use rsharp::remangle;
     use safer_ffi::prelude::*;
 
@@ -78,7 +75,8 @@ pub mod c_api {
                     #[remangle($path)]
                     #[derive_ReprC]
                     #[ReprC::opaque]
-                    #[derive(From)]
+                    #[derive(From, RefCast)]
+                    #[repr(C)]
                     pub struct [<State _ $t:camel>] {
                         pub inner: State<$t>
                     }
