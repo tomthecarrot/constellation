@@ -9,6 +9,7 @@ use eyre::{eyre, Result};
 
 // TODO: Can we handle mapping from StateID -> StateHandle more sanely?
 
+#[cfg_attr(feature = "c_api", safer_ffi::derive_ReprC, ReprC::opaque)]
 pub struct Object {
     // we have to store type erased index here to get around unsized types
     states: Vec<ga::Index>,   // map from StateID -> StateHandle
@@ -119,26 +120,20 @@ pub type ObjectHandle = arena::Index<Object>;
 pub mod c_api {
     #![allow(non_camel_case_types, non_snake_case, dead_code)]
 
-    use derive_more::From;
+    use crate::contract::properties::c_api::impl_from_refcast;
+
+    use derive_more::{From, Into};
     use ref_cast::RefCast;
     use rsharp::remangle;
     use safer_ffi::prelude::*;
 
     #[remangle(substitute!())]
-    #[derive(From, Copy, Clone, RefCast)]
+    #[derive(From, Into, Copy, Clone, RefCast)]
     #[derive_ReprC]
     #[ReprC::opaque]
     #[repr(C)]
     pub struct ObjectHandle {
         pub inner: super::ObjectHandle,
     }
-
-    #[remangle(substitute!())]
-    #[derive_ReprC]
-    #[ReprC::opaque]
-    #[derive(From, RefCast)]
-    #[repr(C)]
-    pub struct Object {
-        pub inner: super::Object,
-    }
+    impl_from_refcast!(super::ObjectHandle, ObjectHandle);
 }

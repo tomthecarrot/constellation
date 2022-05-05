@@ -11,4 +11,3 @@ publish = false
 
 [dependencies]
 generational-arena = "0.2"
-safer-ffi = { version = "0.0.7", optional = true }

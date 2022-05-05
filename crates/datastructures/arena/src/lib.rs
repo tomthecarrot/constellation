@@ -4,9 +4,6 @@ use generational_arena as ga;
 use core::marker::PhantomData;
 use std::iter::FusedIterator;
 
-#[cfg(feature = "safer-ffi")]
-use safer_ffi::derive_ReprC;
-
 /// A generational arena allocator. Built as a wrapper around
 /// [`generational_arena::Arena`], but with a type-safe index.
 #[derive(Debug, Clone)]
@@ -103,7 +100,6 @@ impl<T> FromIterator<T> for Arena<T> {
 }
 
 /// A type-safe index for [`Arena`]
-#[cfg_attr(feature = "safer-ffi", derive_ReprC, ReprC::opaque)]
 pub struct Index<T> {
     inner: ga::Index,
     _phantom: PhantomData<T>,
