@@ -1,7 +1,9 @@
 # Automates build process for Platform codegen on Apple Silicon Macs.
 # This script should be run from the `client` directory.
 
-CLIENT_DIR=$(pwd)
+set -ex
+
+CLIENT_DIR=$0
 PLATFORM_DIR=$CLIENT_DIR/..
 
 rm -rf $CLIENT_DIR/cs/src/generated
