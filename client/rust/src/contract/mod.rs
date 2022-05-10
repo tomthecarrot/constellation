@@ -77,7 +77,7 @@ impl ContractData {
 }
 
 #[cfg(feature = "c_api")]
-mod c_api {
+pub mod c_api {
     #![allow(non_camel_case_types, non_snake_case, dead_code)]
 
     use crate::contract::properties::c_api::impl_from_refcast;

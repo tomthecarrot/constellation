@@ -390,11 +390,37 @@ pub mod c_api {
     #![allow(non_camel_case_types, non_snake_case, dead_code)]
 
     use super::*;
+    use crate::contract::c_api::ContractDataHandle as CContractDataHandle;
     use crate::contract::properties::c_api::simple_primitives;
     use crate::object::c_api::ObjectHandle as CObjectHandle;
 
     use rsharp::remangle;
     use safer_ffi::prelude::*;
+
+    #[remangle(substitute!())]
+    #[ffi_export]
+    pub fn Baseline__new(kind: BaselineKind) -> repr_c::Box<Baseline> {
+        Box::new(Baseline::new(kind)).into()
+    }
+
+    #[remangle(substitute!())]
+    #[ffi_export]
+    pub fn Baseline__kind(b: &Baseline) -> BaselineKind {
+        b.kind()
+    }
+
+    // TODO: register/unregister_contract
+
+    #[remangle(substitute!())]
+    #[ffi_export]
+    pub fn Baseline__contract_data<'a>(
+        b: &'a Baseline,
+        contract: &CContractDataHandle,
+    ) -> &'a ContractData {
+        b.contract_data(contract.inner).unwrap()
+    }
+
+    // TODO: iter_objects
 
     #[remangle(substitute!())]
     #[ffi_export]
@@ -411,12 +437,86 @@ pub mod c_api {
         baseline.object_mut(handle.inner).unwrap()
     }
 
+    // TODO: object_create/remove
+
     macro_rules! monomorphize {
         // Base case
         ($path:literal, $t:ty $(,)?) => {
             paste::paste! {
+                mod [<_Baseline_ $t:camel>] {
+                    use super::*;
 
-                // TODO(SER-341)
+                    use crate::contract::properties::states::c_api::[<StateHandle_ $t:camel>] as Monomorphized_StateHandle;
+                    use crate::contract::properties::states::c_api::[<State_ $t:camel>] as Monomorphized_State;
+
+                    use crate::contract::properties::channels::c_api::[<ChannelHandle_ $t:camel>] as Monomorphized_ChannelHandle;
+                    use crate::contract::properties::channels::c_api::[<Channel_ $t:camel>] as Monomorphized_Channel;
+
+                    use crate::contract::properties::states::c_api::[<StateId_ $t:camel>] as Monomorphized_StateId;
+                    use crate::contract::properties::channels::c_api::[<ChannelId_ $t:camel>] as Monomorphized_ChannelId;
+
+                    #[remangle($path)]
+                    #[ffi_export]
+                    pub fn [<Baseline_ $t:camel __state>]<'a>(
+                        b: &'a Baseline,
+                        state: &Monomorphized_StateHandle
+                    ) -> &'a Monomorphized_State {
+                        let s: &'a State<$t> = b.state(state.inner).unwrap();
+                        s.into()
+                    }
+
+                    #[remangle($path)]
+                    #[ffi_export]
+                    pub fn [<Baseline_ $t:camel __state_mut>]<'a>(
+                        b: &'a mut Baseline,
+                        state: &Monomorphized_StateHandle
+                    ) -> &'a mut Monomorphized_State {
+                        let s: &'a mut State<$t> = b.state_mut(state.inner).unwrap();
+                        s.into()
+                    }
+
+                    #[remangle($path)]
+                    #[ffi_export]
+                    pub fn [<Baseline_ $t:camel __channel>]<'a>(
+                        b: &'a Baseline,
+                        chan: &Monomorphized_ChannelHandle
+                    ) -> &'a Monomorphized_Channel {
+                        let c: &'a Channel<$t> = b.channel(chan.inner).unwrap();
+                        c.into()
+                    }
+
+                    #[remangle($path)]
+                    #[ffi_export]
+                    pub fn [<Baseline_ $t:camel __channel_mut>]<'a>(
+                        b: &'a mut Baseline,
+                        chan: &Monomorphized_ChannelHandle
+                    ) -> &'a mut Monomorphized_Channel {
+                        let c: &'a mut Channel<$t> = b.channel_mut(chan.inner).unwrap();
+                        c.into()
+                    }
+
+                    #[remangle($path)]
+                    #[ffi_export]
+                    pub fn [<Baseline_ $t:camel __bind_state>](
+                        b: &Baseline,
+                        id: &Monomorphized_StateId,
+                        obj: &CObjectHandle,
+                    ) -> repr_c::Box<Monomorphized_StateHandle> {
+                        let h: StateHandle<$t> = b.bind_state(id.inner, obj.inner).unwrap();
+                        Box::new(Monomorphized_StateHandle::from(h)).into()
+                    }
+
+                    #[remangle($path)]
+                    #[ffi_export]
+                    pub fn [<Baseline_ $t:camel __bind_channel>](
+                        b: &Baseline,
+                        id: &Monomorphized_ChannelId,
+                        obj: &CObjectHandle,
+                    ) -> repr_c::Box<Monomorphized_ChannelHandle> {
+                        let h: ChannelHandle<$t> = b.bind_channel(id.inner, obj.inner).unwrap();
+                        Box::new(Monomorphized_ChannelHandle::from(h)).into()
+                    }
+                }
             }
         };
         // recursive case

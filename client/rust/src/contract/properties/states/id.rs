@@ -40,7 +40,7 @@ impl<T: ITpProperty> StateId<T> {
 DynTpPropId!(DynStateId, StateId);
 
 #[cfg(feature = "c_api")]
-mod c_api {
+pub mod c_api {
     #![allow(non_camel_case_types, non_snake_case, dead_code)]
 
     use crate::contract::c_api::ContractDataHandle as CContractDataHandle;
@@ -59,7 +59,7 @@ mod c_api {
         // Base case
         ($path:literal, $t:ty $(,)?) => {
             paste! {
-                mod [<_StateId _ $t:camel>] {
+                mod [<_StateId_ $t:camel>] {
                     use super::*;
 
                     #[remangle($path)]
@@ -67,16 +67,17 @@ mod c_api {
                     #[ReprC::opaque]
                     #[derive(From, Into, RefCast, Copy, Clone)]
                     #[repr(C)]
-                    pub struct [<StateId _ $t:camel>] {
+                    pub struct [<StateId_ $t:camel>] {
                         pub inner: StateId<$t>,
                     }
-                    use [<StateId _ $t:camel>] as Monomorphized;
+                    pub use [<StateId_ $t:camel>] as Monomorphized;
 
                     #[ffi_export]
-                    pub fn [<StateId _ $t:camel __contract>]<'a>(id: &'a Monomorphized) -> repr_c::Box<CContractDataHandle> {
+                    pub fn [<StateId_ $t:camel __contract>]<'a>(id: &'a Monomorphized) -> repr_c::Box<CContractDataHandle> {
                         repr_c::Box::new(CContractDataHandle::from(id.inner.contract()))
                     }
                 }
+                pub use [<_StateId_ $t:camel>]::Monomorphized as [<StateId_ $t:camel>];
             }
         };
         // recursive case

@@ -63,7 +63,7 @@ pub mod c_api {
             paste::paste! {
                 // Module is simply to prevent name collisions on the rust side. It does
                 // nothing for C
-                mod [<_Keyframe _ $t:camel>] {
+                mod [<_Keyframe_ $t:camel>] {
                     use super::*;
 
                     #[remangle($path)]
@@ -71,59 +71,59 @@ pub mod c_api {
                     #[ReprC::opaque]
                     #[derive(From, Into, RefCast)]
                     #[repr(C)]
-                    pub struct [<Keyframe _ $t:camel>]{
+                    pub struct [<Keyframe_ $t:camel>]{
                         pub inner: Keyframe<$t>
                     }
-                    pub use [<Keyframe _ $t:camel>] as Monomorphized;
+                    pub use [<Keyframe_ $t:camel>] as Monomorphized;
                     impl_from_refcast!(Keyframe<$t>, Monomorphized);
 
                     #[remangle($path)]
                     #[ffi_export]
-                    pub fn [<Keyframe _ $t:camel __new>](value: repr_c::Box<c_types::$t>, time: f64) -> repr_c::Box<Monomorphized> {
+                    pub fn [<Keyframe_ $t:camel __new>](value: repr_c::Box<c_types::$t>, time: f64) -> repr_c::Box<Monomorphized> {
                         let value = $t::from(*value);
                         repr_c::Box::new(Keyframe::new(value, time).into())
                     }
 
                     #[remangle($path)]
                     #[ffi_export]
-                    pub fn [<Keyframe _ $t:camel __drop>](kf: repr_c::Box<Monomorphized>) {
+                    pub fn [<Keyframe_ $t:camel __drop>](kf: repr_c::Box<Monomorphized>) {
                         drop(kf)
                     }
 
                     #[remangle($path)]
                     #[ffi_export]
-                    pub fn [<Keyframe _ $t:camel __value>]<'a>(kf: &'a Monomorphized) -> &'a c_types::$t {
+                    pub fn [<Keyframe_ $t:camel __value>]<'a>(kf: &'a Monomorphized) -> &'a c_types::$t {
                         kf.inner.value().into()
                     }
 
                     #[remangle($path)]
                     #[ffi_export]
-                    pub fn [<Keyframe _ $t:camel __time>](kf: &Monomorphized) -> f64 {
+                    pub fn [<Keyframe_ $t:camel __time>](kf: &Monomorphized) -> f64 {
                         kf.inner.time()
                     }
                 }
 
-                mod [<_Channel _ $t:camel>] {
+                mod [<_Channel_ $t:camel>] {
                     use super::*;
 
                     // TODO(SER-362)
-                    use [<_Keyframe _ $t:camel>]::Monomorphized as Keyframe_Monomorphized;
+                    use [<_Keyframe_ $t:camel>]::Monomorphized as Keyframe_Monomorphized;
 
                     #[remangle($path)]
                     #[derive_ReprC]
                     #[ReprC::opaque]
                     #[derive(From, Into, RefCast)]
                     #[repr(C)]
-                    pub struct [<Channel _ $t:camel>]{
+                    pub struct [<Channel_ $t:camel>]{
                         pub inner: Channel<$t>
                     }
-                    use [<Channel _ $t:camel>] as Monomorphized;
+                    pub use [<Channel_ $t:camel>] as Monomorphized;
                     impl_from_refcast!(Channel<$t>, Monomorphized);
 
 
                     #[remangle($path)]
                     #[ffi_export]
-                    pub fn [<Channel _ $t:camel __keyframes>]<'a>(chan: &'a Monomorphized) -> repr_c::Vec<&'a Keyframe_Monomorphized> {
+                    pub fn [<Channel_ $t:camel __keyframes>]<'a>(chan: &'a Monomorphized) -> repr_c::Vec<&'a Keyframe_Monomorphized> {
                         // TODO(SER-365): Avoid allocation
                         let v: Vec<&'a Keyframe_Monomorphized> = chan.inner.keyframes().iter().map(|k| k.into()).collect();
                         v.into()
@@ -131,11 +131,14 @@ pub mod c_api {
 
                     #[remangle($path)]
                     #[ffi_export]
-                    pub fn [<Channel _ $t:camel __keyframes_mut>]<'a>(chan: &'a mut Monomorphized) -> repr_c::Vec<&'a mut Keyframe_Monomorphized> {
+                    pub fn [<Channel_ $t:camel __keyframes_mut>]<'a>(chan: &'a mut Monomorphized) -> repr_c::Vec<&'a mut Keyframe_Monomorphized> {
                         let v: Vec<&'a mut Keyframe_Monomorphized> = chan.inner.keyframes_mut().iter_mut().map(|k| k.into()).collect();
                         v.into()
                     }
                 }
+
+                pub use [<_Keyframe_ $t:camel>]::Monomorphized as [<Keyframe_ $t:camel>];
+                pub use [<_Channel_ $t:camel>]::Monomorphized as [<Channel_ $t:camel>];
             }
         };
         // recursive case
