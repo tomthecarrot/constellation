@@ -412,19 +412,19 @@ pub mod c_api {
     }
 
     macro_rules! monomorphize {
-            // Base case
-            ($path:literal, $t:ty $(,)?) => {
-                paste::paste! {
+        // Base case
+        ($path:literal, $t:ty $(,)?) => {
+            paste::paste! {
 
-                    // TODO(SER-341)
-                }
-            };
-            // recursive case
-            ($path:literal, $first_t:ty, $($tail_t:ty),+ $(,)?) => {
-                monomorphize!($path, $first_t);
-                monomorphize!($path, $($tail_t),+);
-            };
-        }
+                // TODO(SER-341)
+            }
+        };
+        // recursive case
+        ($path:literal, $first_t:ty, $($tail_t:ty),+ $(,)?) => {
+            monomorphize!($path, $first_t);
+            monomorphize!($path, $($tail_t),+);
+        };
+    }
 
     // This is like doing `monomorphize!("whatever", Keyframe, u8, u16, ...)
     simple_primitives!(; types, monomorphize, "tp_client::baseline");

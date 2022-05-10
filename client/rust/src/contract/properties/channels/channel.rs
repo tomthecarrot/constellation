@@ -107,7 +107,7 @@ pub mod c_api {
                     use super::*;
 
                     // TODO(SER-362)
-                    // use [<_Keyframe _ $t:camel>]::Monomorphized as Keyframe_Monomorphized;
+                    use [<_Keyframe _ $t:camel>]::Monomorphized as Keyframe_Monomorphized;
 
                     #[remangle($path)]
                     #[derive_ReprC]
@@ -123,12 +123,17 @@ pub mod c_api {
 
                     #[remangle($path)]
                     #[ffi_export]
-                    pub fn [<Channel _ $t:camel __keyframes>]<'a>(chan: &'a Monomorphized) -> c_slice::Ref<'a, Keyframe<$t>> {
-                        chan.inner.keyframes().as_slice().into()
+                    pub fn [<Channel _ $t:camel __keyframes>]<'a>(chan: &'a Monomorphized) -> repr_c::Vec<&'a Keyframe_Monomorphized> {
+                        // TODO(SER-365): Avoid allocation
+                        let v: Vec<&'a Keyframe_Monomorphized> = chan.inner.keyframes().iter().map(|k| k.into()).collect();
+                        v.into()
                     }
 
-                    pub fn [<Channel _ $t:camel __keyframes_mut>]<'a>(chan: &'a mut Monomorphized) -> c_slice::Mut<'a, Keyframe<$t>> {
-                        chan.inner.keyframes_mut().as_mut_slice().into()
+                    #[remangle($path)]
+                    #[ffi_export]
+                    pub fn [<Channel _ $t:camel __keyframes_mut>]<'a>(chan: &'a mut Monomorphized) -> repr_c::Vec<&'a mut Keyframe_Monomorphized> {
+                        let v: Vec<&'a mut Keyframe_Monomorphized> = chan.inner.keyframes_mut().iter_mut().map(|k| k.into()).collect();
+                        v.into()
                     }
                 }
             }
