@@ -80,17 +80,20 @@ impl ContractData {
 mod c_api {
     #![allow(non_camel_case_types, non_snake_case, dead_code)]
 
-    use derive_more::From;
+    use crate::contract::properties::c_api::impl_from_refcast;
+
+    use derive_more::{From, Into};
     use ref_cast::RefCast;
     use safer_ffi::prelude::*;
 
     #[derive_ReprC]
     #[ReprC::opaque]
-    #[derive(Clone, Copy, Eq, PartialEq, From, RefCast)]
+    #[derive(Clone, Copy, Eq, PartialEq, From, Into, RefCast)]
     #[repr(C)]
     pub struct ContractDataHandle {
         pub inner: super::ContractDataHandle,
     }
+    impl_from_refcast!(super::ContractDataHandle, ContractDataHandle);
 
     #[ffi_export]
     pub fn ContractDataHandle__drop(c: repr_c::Box<ContractDataHandle>) {

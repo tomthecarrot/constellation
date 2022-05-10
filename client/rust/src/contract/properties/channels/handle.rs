@@ -59,7 +59,7 @@ pub mod c_api {
     use crate::contract::ContractDataHandle;
     use crate::object::ObjectHandle;
 
-    use derive_more::From;
+    use derive_more::{From, Into};
     use ref_cast::RefCast;
     use rsharp::remangle;
     use safer_ffi::prelude::*;
@@ -72,7 +72,7 @@ pub mod c_api {
                 #[remangle($path)]
                 #[derive_ReprC]
                 #[ReprC::opaque]
-                #[derive(From, RefCast, Debug, Copy, Clone, Eq, PartialEq)]
+                #[derive(From, Into, RefCast, Debug, Copy, Clone, Eq, PartialEq)]
                 #[repr(C)]
                 pub struct [<ChannelHandle _ $t>] {
                     pub inner: super::ChannelHandle<$t>,

@@ -32,4 +32,4 @@ ref-cast = "1"
 
 [features]
 default = ["c_api"]
-c_api = ["rsharp", "safer-ffi/headers", "arena/safer-ffi"]
+c_api = ["rsharp", "safer-ffi/headers"]

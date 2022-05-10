@@ -391,16 +391,15 @@ pub mod c_api {
 
     use super::*;
     use crate::contract::properties::c_api::simple_primitives;
-    use crate::object::c_api::{Object as CObject, ObjectHandle as CObjectHandle};
+    use crate::object::c_api::ObjectHandle as CObjectHandle;
 
-    use ref_cast::RefCast;
     use rsharp::remangle;
     use safer_ffi::prelude::*;
 
     #[remangle(substitute!())]
     #[ffi_export]
-    pub fn Baseline__object<'a>(baseline: &'a Baseline, handle: &CObjectHandle) -> &'a CObject {
-        CObject::ref_cast(baseline.object(handle.inner).unwrap())
+    pub fn Baseline__object<'a>(baseline: &'a Baseline, handle: &CObjectHandle) -> &'a Object {
+        baseline.object(handle.inner).unwrap()
     }
 
     #[remangle(substitute!())]
@@ -408,8 +407,8 @@ pub mod c_api {
     pub fn Baseline__object_mut<'a>(
         baseline: &'a mut Baseline,
         handle: &CObjectHandle,
-    ) -> &'a mut CObject {
-        CObject::ref_cast_mut(baseline.object_mut(handle.inner).unwrap())
+    ) -> &'a mut Object {
+        baseline.object_mut(handle.inner).unwrap()
     }
 
     macro_rules! monomorphize {

@@ -1,10 +1,7 @@
 use crate::contract::properties::traits::ITpProperty;
 
-#[cfg(feature = "safer-ffi")]
-use ::safer_ffi::derive_ReprC;
-
+#[cfg_attr(feature = "c_api", safer_ffi::derive_ReprC, ReprC::opaque)]
 #[derive(Debug, PartialEq)]
-#[cfg_attr(feature = "safer-ffi", derive_ReprC, ReprC::opaque)]
 pub struct Keyframe<T: ITpProperty> {
     value: T,
     time: f64,
@@ -51,11 +48,11 @@ pub mod c_api {
     #![allow(non_camel_case_types, non_snake_case, dead_code)]
 
     use super::*;
-    use crate::contract::properties::c_api::simple_primitives;
+    use crate::contract::properties::c_api::{c_types, impl_from_refcast, simple_primitives};
     use crate::contract::ContractDataHandle;
     use crate::object::ObjectHandle;
 
-    use derive_more::From;
+    use derive_more::{From, Into};
     use ref_cast::RefCast;
     use rsharp::remangle;
     use safer_ffi::prelude::*;
@@ -72,17 +69,18 @@ pub mod c_api {
                     #[remangle($path)]
                     #[derive_ReprC]
                     #[ReprC::opaque]
-                    #[derive(From, RefCast)]
+                    #[derive(From, Into, RefCast)]
                     #[repr(C)]
                     pub struct [<Keyframe _ $t:camel>]{
                         pub inner: Keyframe<$t>
                     }
-                    use [<Keyframe _ $t:camel>] as Monomorphized;
+                    pub use [<Keyframe _ $t:camel>] as Monomorphized;
+                    impl_from_refcast!(Keyframe<$t>, Monomorphized);
 
                     #[remangle($path)]
                     #[ffi_export]
-                    pub fn [<Keyframe _ $t:camel __new>](value: repr_c::Box<$t>, time: f64) -> repr_c::Box<Monomorphized> {
-                        let value = *(value.into());
+                    pub fn [<Keyframe _ $t:camel __new>](value: repr_c::Box<c_types::$t>, time: f64) -> repr_c::Box<Monomorphized> {
+                        let value = $t::from(*value);
                         repr_c::Box::new(Keyframe::new(value, time).into())
                     }
 
@@ -94,8 +92,8 @@ pub mod c_api {
 
                     #[remangle($path)]
                     #[ffi_export]
-                    pub fn [<Keyframe _ $t:camel __value>]<'a>(kf: &'a Monomorphized) -> &'a $t {
-                        kf.inner.value()
+                    pub fn [<Keyframe _ $t:camel __value>]<'a>(kf: &'a Monomorphized) -> &'a c_types::$t {
+                        kf.inner.value().into()
                     }
 
                     #[remangle($path)]
@@ -108,16 +106,20 @@ pub mod c_api {
                 mod [<_Channel _ $t:camel>] {
                     use super::*;
 
+                    // TODO(SER-362)
+                    // use [<_Keyframe _ $t:camel>]::Monomorphized as Keyframe_Monomorphized;
+
                     #[remangle($path)]
                     #[derive_ReprC]
                     #[ReprC::opaque]
-                    #[derive(From, RefCast)]
+                    #[derive(From, Into, RefCast)]
                     #[repr(C)]
                     pub struct [<Channel _ $t:camel>]{
                         pub inner: Channel<$t>
                     }
-
                     use [<Channel _ $t:camel>] as Monomorphized;
+                    impl_from_refcast!(Channel<$t>, Monomorphized);
+
 
                     #[remangle($path)]
                     #[ffi_export]

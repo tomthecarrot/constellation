@@ -282,4 +282,38 @@ pub mod c_api {
         };
     }
     pub(crate) use simple_primitives;
+
+    /// Implements From traits to convert references of wrapper types using `ref-cast`
+    macro_rules! impl_from_refcast {
+        ($from_t:ty, $for_t:ty) => {
+            impl<'a> From<&'a $from_t> for &'a $for_t {
+                fn from(other: &'a $from_t) -> &'a $for_t {
+                    <$for_t>::ref_cast(other)
+                }
+            }
+            impl<'a> From<&'a mut $from_t> for &'a mut $for_t {
+                fn from(other: &'a mut $from_t) -> &'a mut $for_t {
+                    <$for_t>::ref_cast_mut(other)
+                }
+            }
+        };
+    }
+    pub(crate) use impl_from_refcast;
+
+    pub mod c_types {
+        pub use crate::contract::c_api::ContractDataHandle;
+        pub use crate::object::c_api::ObjectHandle;
+
+        pub use bool;
+        pub use f32;
+        pub use f64;
+        pub use i16;
+        pub use i32;
+        pub use i64;
+        pub use i8;
+        pub use u16;
+        pub use u32;
+        pub use u64;
+        pub use u8;
+    }
 }

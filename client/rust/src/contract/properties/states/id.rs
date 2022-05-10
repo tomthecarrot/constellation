@@ -49,7 +49,7 @@ mod c_api {
     use crate::contract::ContractDataHandle;
     use crate::object::ObjectHandle;
 
-    use derive_more::From;
+    use derive_more::{From, Into};
     use paste::paste;
     use ref_cast::RefCast;
     use rsharp::remangle;
@@ -65,7 +65,7 @@ mod c_api {
                     #[remangle($path)]
                     #[derive_ReprC]
                     #[ReprC::opaque]
-                    #[derive(From, RefCast, Copy, Clone)]
+                    #[derive(From, Into, RefCast, Copy, Clone)]
                     #[repr(C)]
                     pub struct [<StateId _ $t:camel>] {
                         pub inner: StateId<$t>,
