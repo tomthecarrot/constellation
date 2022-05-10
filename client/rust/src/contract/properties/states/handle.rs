@@ -51,7 +51,7 @@ impl<T: ITpPropertyStatic> IStateHandle for StateHandle<T> {
 }
 
 #[cfg(feature = "c_api")]
-mod c_api {
+pub mod c_api {
     #![allow(non_camel_case_types, non_snake_case, dead_code)]
     use super::*;
 
@@ -68,7 +68,7 @@ mod c_api {
         // Base case
         ($path:literal, $t:ty $(,)?) => {
             paste::paste! {
-                mod [<_StateHandle _ $t:camel>] {
+                mod [<_StateHandle_ $t:camel>] {
                     use super::*;
 
                     #[remangle($path)]
@@ -76,10 +76,11 @@ mod c_api {
                     #[ReprC::opaque]
                     #[derive(From, Into, RefCast, Copy, Clone, Eq, PartialEq)]
                     #[repr(C)]
-                    pub struct [<StateHandle _ $t:camel>] {
+                    pub struct [<StateHandle_ $t:camel>] {
                         pub inner: StateHandle<$t>,
                     }
                 }
+                pub use [<_StateHandle_ $t:camel>]::[<StateHandle_ $t:camel>];
             }
         };
         // recursive case

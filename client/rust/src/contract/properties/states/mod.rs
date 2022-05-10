@@ -1,7 +1,7 @@
 pub mod dyn_handle;
 pub mod dyn_state;
-pub mod handle;
-pub mod id;
+mod handle;
+pub(crate) mod id;
 
 mod iter;
 
@@ -54,6 +54,9 @@ impl StateArenaMap {
 pub mod c_api {
     #![allow(non_camel_case_types, non_snake_case, dead_code)]
 
+    pub use super::handle::c_api::*;
+    pub use super::id::c_api::*;
+
     use super::*;
     use crate::contract::properties::c_api::{c_types, impl_from_refcast, simple_primitives};
     use crate::contract::ContractDataHandle;
@@ -69,7 +72,7 @@ pub mod c_api {
             paste::paste! {
                 // Module is simply to prevent name collisions on the rust side. It does
                 // nothing for C
-                mod [<_State _ $t:camel>] {
+                mod [<_State_ $t:camel>] {
                     use super::*;
 
                     #[remangle($path)]
@@ -77,26 +80,27 @@ pub mod c_api {
                     #[ReprC::opaque]
                     #[derive(From, Into, RefCast)]
                     #[repr(C)]
-                    pub struct [<State _ $t:camel>] {
+                    pub struct [<State_ $t:camel>] {
                         pub inner: State<$t>
                     }
 
-                    use [<State _ $t:camel>] as Monomorphized;
+                    pub use [<State_ $t:camel>] as Monomorphized;
                     impl_from_refcast!(State<$t>, Monomorphized);
 
 
                     #[remangle($path)]
                     #[ffi_export]
-                    pub fn [<State _ $t:camel __value>]<'a>(state: &'a Monomorphized) -> &'a c_types::$t {
+                    pub fn [<State_ $t:camel __value>]<'a>(state: &'a Monomorphized) -> &'a c_types::$t {
                         (&state.inner.value).into()
                     }
 
                     #[remangle($path)]
                     #[ffi_export]
-                    pub fn [<State _ $t:camel __value_mut>]<'a>(state: &'a mut Monomorphized) -> &'a mut c_types::$t {
+                    pub fn [<State_ $t:camel __value_mut>]<'a>(state: &'a mut Monomorphized) -> &'a mut c_types::$t {
                         (&mut state.inner.value).into()
                     }
                 }
+                pub use [<_State_ $t:camel>]::Monomorphized as [<State_ $t:camel>];
             }
         };
         // recursive case

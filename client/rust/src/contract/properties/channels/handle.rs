@@ -74,7 +74,7 @@ pub mod c_api {
                 #[ReprC::opaque]
                 #[derive(From, Into, RefCast, Debug, Copy, Clone, Eq, PartialEq)]
                 #[repr(C)]
-                pub struct [<ChannelHandle _ $t>] {
+                pub struct [<ChannelHandle _ $t:camel>] {
                     pub inner: super::ChannelHandle<$t>,
                 }
             }

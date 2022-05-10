@@ -91,9 +91,12 @@ DynTpPropId!(DynChannelId, ChannelId);
 super::prop_iter!(ChannelsIter, IChannels, DynChannelId);
 
 #[cfg(feature = "c_api")]
-mod c_api {
+pub mod c_api {
     #![allow(non_camel_case_types, non_snake_case, dead_code)]
     use super::*;
+
+    pub use super::channel::c_api::*;
+    pub use super::handle::c_api::*;
 
     use crate::contract::c_api::ContractDataHandle as CContractDataHandle;
     use crate::contract::properties::c_api::simple_primitives;
@@ -109,7 +112,7 @@ mod c_api {
         // Base case
         ($path:literal, $t:ty $(,)?) => {
             paste::paste! {
-                mod [<_StateId _ $t:camel>] {
+                mod [<_ChannelId_ $t:camel>] {
                     use super::*;
 
                     #[remangle($path)]
@@ -117,16 +120,17 @@ mod c_api {
                     #[ReprC::opaque]
                     #[derive(From, Into, RefCast, Copy, Clone)]
                     #[repr(C)]
-                    pub struct [<ChannelId _ $t:camel>] {
+                    pub struct [<ChannelId_ $t:camel>] {
                         pub inner: ChannelId<$t>,
                     }
-                    use [<ChannelId _ $t:camel>] as Monomorphized;
+                    pub use [<ChannelId_ $t:camel>] as Monomorphized;
 
                     #[ffi_export]
-                    pub fn [<ChannelId _ $t:camel __contract>]<'a>(id: &'a Monomorphized) -> repr_c::Box<CContractDataHandle> {
+                    pub fn [<ChannelId_ $t:camel __contract>]<'a>(id: &'a Monomorphized) -> repr_c::Box<CContractDataHandle> {
                         repr_c::Box::new(CContractDataHandle::from(id.inner.contract()))
                     }
                 }
+                pub use [<_ChannelId_ $t:camel>]::Monomorphized as [<ChannelId_ $t:camel>];
             }
         };
         // recursive case
