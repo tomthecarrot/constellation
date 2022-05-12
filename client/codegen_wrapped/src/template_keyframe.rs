@@ -3,11 +3,11 @@ use crate::{ClassData, TypeInfo, TYPES_INFO};
 use serde::Serialize;
 
 #[derive(Serialize)]
-pub struct Kf {
+pub struct CDKeyframe {
     type_cs: String,
     type_platform: String,
 }
-impl ClassData<Kf> {
+impl ClassData<CDKeyframe> {
     fn new(type_info: &TypeInfo) -> Self {
         ClassData {
             class_ident: format!("Keyframe_{}", type_info.type_platform),
@@ -21,7 +21,7 @@ impl ClassData<Kf> {
                 "generated.__Internal.TpClientContractPropertiesChannelsKeyframe{}Drop",
                 type_info.type_platform
             ),
-            additional_methods: Some(Kf {
+            additional_methods: Some(CDKeyframe {
                 type_cs: type_info.type_cs.to_string(),
                 type_platform: type_info.type_platform.to_string(),
             }),
@@ -29,6 +29,6 @@ impl ClassData<Kf> {
     }
 
     pub fn generate_class_data() -> Vec<Self> {
-        TYPES_INFO.iter().map(ClassData::<Kf>::new).collect()
+        TYPES_INFO.iter().map(ClassData::<CDKeyframe>::new).collect()
     }
 }
