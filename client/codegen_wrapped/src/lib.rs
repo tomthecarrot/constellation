@@ -2,6 +2,7 @@ mod keyframe_template;
 
 pub use self::keyframe_template::Kf;
 
+use lazy_static::lazy_static;
 use handlebars::Handlebars;
 use miette::{miette, IntoDiagnostic, Result, WrapErr};
 use serde::Serialize;
@@ -80,5 +81,38 @@ impl Codegen {
             .render_to_write(TPL_NAME, data, output_file)
             .into_diagnostic()
             .wrap_err("Failed to render to file")
+    }
+}
+
+lazy_static! {
+    // Platform Type | C# Type
+    static ref TYPES_INFO: Vec<TypeInfo> = Vec::from([
+        TypeInfo::new("U8", "byte", true),
+        TypeInfo::new("U16", "ushort", true),
+        TypeInfo::new("U32", "uint", true),
+        TypeInfo::new("U64", "ulong", true),
+        TypeInfo::new("I8", "sbyte", true),
+        TypeInfo::new("I16", "short", true),
+        TypeInfo::new("I32", "int", true),
+        TypeInfo::new("I64", "long", true),
+        TypeInfo::new("Bool", "bool", true),
+        TypeInfo::new("F32", "float", true),
+        TypeInfo::new("F64", "double", true),
+        TypeInfo::new("ObjectHandle", "IntPtr", false),
+        TypeInfo::new("ContractDataHandle", "IntPtr", false),
+    ]);
+}
+pub struct TypeInfo {
+    type_platform: &'static str,
+    type_cs: &'static str,
+    has_new: bool,
+}
+impl TypeInfo {
+    pub fn new(type_platform: &'static str, type_cs: &'static str, has_new: bool) -> Self {
+        Self {
+            type_platform,
+            type_cs,
+            has_new,
+        }
     }
 }
