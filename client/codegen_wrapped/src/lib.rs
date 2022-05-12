@@ -1,6 +1,6 @@
 mod keyframe_template;
 
-pub use keyframe_template::KeyframeTemplate;
+pub use self::keyframe_template::Kf;
 
 use handlebars::Handlebars;
 use miette::{miette, IntoDiagnostic, Result, WrapErr};
@@ -12,13 +12,15 @@ use std::{
 
 const TPL_NAME: &'static str = "tpl";
 
+/// `M` Is the additional data to populate `additional_methods` partial template
 #[derive(Clone, Serialize)]
-pub struct ClassData {
+pub struct ClassData<M: Serialize = ()> {
     pub class_ident: String,
     pub new_args: String,
     pub new_expr: Option<String>,
     pub drop_ident: String,
-    pub additional_methods: Option<String>,
+    #[serde(flatten)]
+    pub additional_methods: Option<M>,
 }
 
 pub struct Codegen {
@@ -26,8 +28,9 @@ pub struct Codegen {
     output_dir: PathBuf,
 }
 impl Codegen {
-    pub fn new() -> Result<Self> {
+    pub fn new(partial_tpl_filename: &str) -> Result<Self> {
         let tpl_path = Path::new(env!("CARGO_MANIFEST_DIR")).join("template.cs.tpl");
+        let partial_path = Path::new(env!("CARGO_MANIFEST_DIR")).join(partial_tpl_filename);
         let output_dir = Path::new(env!("CARGO_MANIFEST_DIR"))
             .parent()
             .unwrap()
@@ -46,21 +49,25 @@ impl Codegen {
         // Once handlebars-rs properly handles multi-line partials, we will remove this line
         reg.set_prevent_indent(true);
 
-        // https://docs.rs/handlebars/latest/handlebars/#strict-mode
-        reg.set_strict_mode(false);
+        // Error when missing a value
+        reg.set_strict_mode(true);
+
         // Don't escape characters
         reg.register_escape_fn(|s| s.to_string());
 
         reg.register_template_file(TPL_NAME, &tpl_path)
             .into_diagnostic()?;
 
-        reg.register_partial("additional_methods", "{{additional_methods}}")
+        let partial = std::fs::read_to_string(&partial_path)
+            .into_diagnostic()
+            .wrap_err("Faild to read partial template file")?;
+        reg.register_partial("additional_methods", &partial)
             .into_diagnostic()?;
 
         Ok(Self { reg, output_dir })
     }
 
-    pub fn render_to_file(&self, data: &ClassData) -> Result<()> {
+    pub fn render_to_file<M: Serialize>(&self, data: &ClassData<M>) -> Result<()> {
         let class_ident = &data.class_ident;
         let output_path = self.output_dir.join(format!("{class_ident}.cs"));
         let output_file = File::create(&output_path)
