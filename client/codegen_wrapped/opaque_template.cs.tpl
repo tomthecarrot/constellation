@@ -2,24 +2,25 @@
 
 using IntPtr = System.IntPtr;
 using generated = Teleportal.Client.Generated.generated;
+using RSharp;
 
 
 namespace Teleportal.Client.Contract.Properties
 {
     partial class ToManaged
     {
-        public static unsafe Channels.{{class_ident}} f(OwnershipSemantics ownershipSemantics, Ptr<Channels.{{class_ident}}> ptr)
+        public static unsafe Channels.{{class_ident}} f(OwnershipSemantics ownershipSemantics, Ptr<Channels.{{class_ident}}> inner)
         {
-            return new Channels.{{class_ident}}(ptr, ownershipSemantics);
+            return new Channels.{{class_ident}}(inner, ownershipSemantics);
         }
     }
 }
 
 namespace Teleportal.Client.Contract.Properties.Channels
 {
-    public sealed class {{class_ident}} : Wrapper<{{class_ident}}>
+    public sealed class {{class_ident}} : OpaqueWrapper<{{class_ident}}>
     {
-        public {{class_ident}}(Ptr<{{class_ident}}> ptr, OwnershipSemantics ownershipSemantics) : base(ptr, ownershipSemantics) { }
+        public {{class_ident}}(Ptr<{{class_ident}}> inner, OwnershipSemantics ownershipSemantics) : base(inner, ownershipSemantics) { }
 
         {{#if new_expr}}
         public unsafe {{class_ident}}({{new_args}}) : base(
@@ -29,9 +30,9 @@ namespace Teleportal.Client.Contract.Properties.Channels
         { }
         {{/if}}
 
-        override protected void NativeDrop(Ptr<{{class_ident}}> ptr)
+        override protected void NativeDrop(Ptr<{{class_ident}}> inner)
         {
-            {{drop_ident}}(ptr.p);
+            {{drop_ident}}(inner.p);
         }
 
         {{> additional_methods}}

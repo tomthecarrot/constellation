@@ -29,7 +29,7 @@ pub struct Codegen {
 }
 impl Codegen {
     pub fn new(partial_tpl_filename: &str) -> Result<Self> {
-        let tpl_path = Path::new(env!("CARGO_MANIFEST_DIR")).join("template.cs.tpl");
+        let tpl_path = Path::new(env!("CARGO_MANIFEST_DIR")).join("opaque_template.cs.tpl");
         let partial_path = Path::new(env!("CARGO_MANIFEST_DIR")).join(partial_tpl_filename);
         let output_dir = Path::new(env!("CARGO_MANIFEST_DIR"))
             .parent()
