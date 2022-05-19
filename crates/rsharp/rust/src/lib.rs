@@ -1,7 +1,6 @@
 mod primitives;
 mod rbox;
-mod string;
-mod vec;
+mod rvec;
 
 pub use rsharp_macro::{remangle, substitute};
 
