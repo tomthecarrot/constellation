@@ -13,4 +13,4 @@ crate-type = ["rlib", "cdylib"]
 [dependencies]
 rsharp_macro = { path = "macro" }
 paste = "1"
-safer-ffi = { version = "0.0.7", features = ["proc_macros", "headers"] }
+safer-ffi = { version = "0.0.10", features = ["proc_macros", "headers"] }
