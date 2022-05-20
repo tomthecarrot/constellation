@@ -102,7 +102,7 @@ pub mod c_api {
                         kf.inner.time()
                     }
 
-                    rvec_fns!($path, Monomorphized);
+                    rvec_fns!($path, [<Keyframe_ $t:camel>]);
                 }
 
                 mod [<_Channel_ $t:camel>] {
@@ -124,9 +124,7 @@ pub mod c_api {
 
                     #[remangle($path)]
                     #[ffi_export]
-                    pub fn [<Channel_ $t:camel __new>](v: repr_c::Vec<Keyframe_Monomorphized>) -> repr_c::Box<Monomorphized> {
-                        // See https://github.com/getditto/safer_ffi/issues/110
-                        let mut v = v;
+                    pub fn [<Channel_ $t:camel __new>](mut v: repr_c::Vec<Keyframe_Monomorphized>) -> repr_c::Box<Monomorphized> {
                         let v = v.with_rust_mut(|v| {
                             let mut tmp = std::vec::Vec::new();
                             std::mem::swap(v, &mut tmp);
