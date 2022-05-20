@@ -54,7 +54,7 @@ pub mod c_api {
 
     use derive_more::{From, Into};
     use ref_cast::RefCast;
-    use rsharp::remangle;
+    use rsharp::{remangle, rvec_fns};
     use safer_ffi::prelude::*;
 
     macro_rules! monomorphize {
@@ -101,6 +101,8 @@ pub mod c_api {
                     pub fn [<Keyframe_ $t:camel __time>](kf: &Monomorphized) -> f64 {
                         kf.inner.time()
                     }
+
+                    rvec_fns!($path, Monomorphized);
                 }
 
                 mod [<_Channel_ $t:camel>] {
@@ -120,6 +122,25 @@ pub mod c_api {
                     pub use [<Channel_ $t:camel>] as Monomorphized;
                     impl_from_refcast!(Channel<$t>, Monomorphized);
 
+                    #[remangle($path)]
+                    #[ffi_export]
+                    pub fn [<Channel_ $t:camel __new>](v: repr_c::Vec<Keyframe_Monomorphized>) -> repr_c::Box<Monomorphized> {
+                        // See https://github.com/getditto/safer_ffi/issues/110
+                        let mut v = v;
+                        let v = v.with_rust_mut(|v| {
+                            let mut tmp = std::vec::Vec::new();
+                            std::mem::swap(v, &mut tmp);
+                            tmp
+                        });
+                        let c = Channel::new(v.into_iter().map(|item| item.inner));
+                        Box::new(Monomorphized::from(c)).into()
+                    }
+
+                    #[remangle($path)]
+                    #[ffi_export]
+                    pub fn [<Channel_ $t:camel __drop>](c:repr_c::Box<Monomorphized>) {
+                        drop(c)
+                    }
 
                     #[remangle($path)]
                     #[ffi_export]
