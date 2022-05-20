@@ -5,18 +5,18 @@ using generated = tp_client.generated;
 using RSharp;
 
 
-namespace Teleportal.Client.Contract.Properties
+namespace Teleportal.Client.{{namespace_super}}
 {
     partial class ToManaged
     {
-        public static unsafe Channels.{{class_ident}} f(OwnershipSemantics ownershipSemantics, Ptr<Channels.{{class_ident}}> inner)
+        public static unsafe {{namespace_sub}}.{{class_ident}} f(OwnershipSemantics ownershipSemantics, Ptr<{{namespace_sub}}.{{class_ident}}> inner)
         {
-            return new Channels.{{class_ident}}(inner, ownershipSemantics);
+            return new {{namespace_sub}}.{{class_ident}}(inner, ownershipSemantics);
         }
     }
 }
 
-namespace Teleportal.Client.Contract.Properties.Channels
+namespace Teleportal.Client.{{namespace_super}}.{{namespace_sub}}
 {
     public sealed class {{class_ident}} : OpaqueWrapper<{{class_ident}}>
     {

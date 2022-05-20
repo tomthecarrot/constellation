@@ -10,6 +10,8 @@ pub struct CDKeyframe {
 impl ClassData<CDKeyframe> {
     fn new(type_info: &TypeInfo) -> Self {
         ClassData {
+            namespace_super: "Contract.Properties".to_string(),
+            namespace_sub: "Channels".to_string(),
             class_ident: format!("Keyframe_{}", type_info.type_platform),
             new_args: format!("{} value, double time", type_info.type_cs),
             new_expr: if type_info.has_new {
@@ -29,6 +31,9 @@ impl ClassData<CDKeyframe> {
     }
 
     pub fn generate_class_data() -> Vec<Self> {
-        TYPES_INFO.iter().map(ClassData::<CDKeyframe>::new).collect()
+        TYPES_INFO
+            .iter()
+            .map(ClassData::<CDKeyframe>::new)
+            .collect()
     }
 }

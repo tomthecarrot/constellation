@@ -16,6 +16,8 @@ const TPL_NAME: &'static str = "tpl";
 /// `M` Is the additional data to populate `additional_methods` partial template
 #[derive(Clone, Serialize)]
 pub struct ClassData<M: Serialize = ()> {
+    pub namespace_super: String,
+    pub namespace_sub: String,
     pub class_ident: String,
     pub new_args: String,
     pub new_expr: Option<String>,
