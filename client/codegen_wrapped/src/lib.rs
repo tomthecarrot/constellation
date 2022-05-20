@@ -1,9 +1,11 @@
-mod keyframe_template;
+mod template_keyframe;
+mod template_state;
 
-pub use self::keyframe_template::Kf;
+pub use self::template_keyframe::CDKeyframe;
+pub use self::template_state::CDState;
 
-use lazy_static::lazy_static;
 use handlebars::Handlebars;
+use lazy_static::lazy_static;
 use miette::{miette, IntoDiagnostic, Result, WrapErr};
 use serde::Serialize;
 use std::{
