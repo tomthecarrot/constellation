@@ -23,6 +23,9 @@ fi
 mv $PLATFORM_DIR/target/x86_64-apple-darwin/debug/libtp_client.dylib $PLATFORM_DIR/target/x86_64-apple-darwin/debug/libtp_client
 mv $PLATFORM_DIR/target/x86_64-apple-darwin/debug/librsharp.dylib $PLATFORM_DIR/target/x86_64-apple-darwin/debug/librsharp
 
+cd $CLIENT_DIR/rust/
+cargo test
+
 cd $CLIENT_DIR/codegen_pinvoke
 dotnet run -a x64
 
