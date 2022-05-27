@@ -19,10 +19,10 @@ impl ClassData<CDKeyframe> {
             } else {
                 None
             },
-            drop_ident: format!(
+            drop_ident: Some(format!(
                 "generated.__Internal.TpClientContractPropertiesChannelsKeyframe{}Drop",
                 type_info.type_platform
-            ),
+            )),
             additional_methods: Some(CDKeyframe {
                 type_cs: type_info.type_cs.to_string(),
                 type_platform: type_info.type_platform.to_string(),

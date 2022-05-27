@@ -14,15 +14,8 @@ impl ClassData<CDState> {
             namespace_sub: "States".to_string(),
             class_ident: format!("State_{}", type_info.type_platform),
             new_args: format!("{} value", type_info.type_cs),
-            new_expr: if type_info.has_new {
-                Some(format!("generated.__Internal.TpClientContractPropertiesStatesState{0}New(RSharp.RBox_{0}.new_(value))", type_info.type_platform))
-            } else {
-                None
-            },
-            drop_ident: format!(
-                "generated.__Internal.TpClientContractPropertiesStatesState{}Drop",
-                type_info.type_platform
-            ),
+            new_expr: None,
+            drop_ident: None,
             additional_methods: Some(CDState {
                 type_cs: type_info.type_cs.to_string(),
                 type_platform: type_info.type_platform.to_string(),

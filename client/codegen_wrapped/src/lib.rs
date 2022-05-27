@@ -23,7 +23,7 @@ pub struct ClassData<M: Serialize = ()> {
     pub class_ident: String,
     pub new_args: String,
     pub new_expr: Option<String>,
-    pub drop_ident: String,
+    pub drop_ident: Option<String>,
     #[serde(flatten)]
     pub additional_methods: Option<M>,
 }
