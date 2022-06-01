@@ -87,6 +87,18 @@ pub mod c_api {
                     pub use [<State_ $t:camel>] as Monomorphized;
                     impl_from_refcast!(State<$t>, Monomorphized);
 
+                    #[remangle($path)]
+                    #[ffi_export]
+                    pub fn [<State_ $t:camel __new>](value: repr_c::Box<c_types::$t>) -> repr_c::Box<Monomorphized> {
+                        let value = $t::from(*value);
+                        repr_c::Box::new(State::new(value).into())
+                    }
+
+                    #[remangle($path)]
+                    #[ffi_export]
+                    pub fn [<State_ $t:camel __drop>](s: repr_c::Box<Monomorphized>) {
+                        drop(s)
+                    }
 
                     #[remangle($path)]
                     #[ffi_export]
