@@ -7,9 +7,6 @@ public unsafe {{type_cs}} Value
     }
     set
     {
-        var result = generated.__Internal.TpClientContractPropertiesStatesState{{type_platform}}ValueMut(this.Ptr?.p ?? IntPtr.Zero);
-        var ptr = ToManaged.f(OwnershipSemantics.MutRef, result);
-        *ptr = value;
-        generated.__Internal.TpClientContractPropertiesStatesState{{type_platform}}Drop(ptr);
+        generated.__Internal.TpClientContractPropertiesStatesState{{type_platform}}ValueSet(this.Ptr?.p ?? IntPtr.Zero, value);
     }
 }
