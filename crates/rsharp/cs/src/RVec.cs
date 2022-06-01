@@ -1,5 +1,4 @@
 using System;
-using System.Runtime.InteropServices;
 
 namespace RSharp
 {
@@ -8,11 +7,23 @@ namespace RSharp
     /// shared struct of the monomorphized RVec
     public abstract class RVec<T, V> : SharedWrapper<V>
         where T : class
-        where V : struct
+        where V : unmanaged
     {
 
         public RVec(V shared) : base(shared, OwnershipSemantics.Owned)
         { }
+
+        /// Provided as a convient helper that can be invoked in a `base()` call
+        protected static V NewHelper(Action<IntPtr> nativeNew)
+        {
+            V inner = default;
+            unsafe
+            {
+                IntPtr intPtr = new IntPtr(&inner);
+                nativeNew(intPtr);
+            }
+            return inner;
+        }
 
         abstract public void push(T e);
 
