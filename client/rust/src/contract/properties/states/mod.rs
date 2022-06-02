@@ -108,12 +108,6 @@ pub mod c_api {
 
                     #[remangle($path)]
                     #[ffi_export]
-                    pub fn [<State_ $t:camel __value_mut>]<'a>(state: &'a mut Monomorphized) -> &'a mut c_types::$t {
-                        (&mut state.inner.value).into()
-                    }
-
-                    #[remangle($path)]
-                    #[ffi_export]
                     pub fn [<State_ $t:camel __value_set>]<'a>(state: &'a mut Monomorphized, new_value: ::safer_ffi::boxed::Box<c_types::$t>) {
                         state.inner.value = (*new_value).into();
                     }

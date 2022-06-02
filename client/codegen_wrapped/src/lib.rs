@@ -18,13 +18,30 @@ const TPL_NAME: &'static str = "tpl";
 /// `M` Is the additional data to populate `additional_methods` partial template
 #[derive(Clone, Serialize)]
 pub struct ClassData<M: Serialize = ()> {
+    /// The first parts of the namespace (e.g. `Contract.Properties`).
     pub namespace_super: String,
+
+    /// The last part of the namespace, which should contain no periods (e.g. `Channels`).
     pub namespace_sub: String,
+
+    /// C name for the type in this class.
     pub class_ident: String,
+
+    /// Constructor arguments for this class.
     pub new_args: String,
+
+    /// C symbol name for the `new` function for this type.
     pub new_expr: Option<String>,
-    pub drop_ident: Option<String>,
+
+    /// C symbol name for the `drop` function for this type.
+    pub drop_ident: String,
+
+    /// Indicates whether the platform type in this class will be represented in C# as `IntPtr`.
+    /// Setting this value does not change the C# representation of the type, but it provides
+    /// necessary context when generating the wrapper code using text substitution.
     pub is_ptr_type: bool,
+
+    /// Injects functionality beyond the scope of `ClassData<M>`.
     #[serde(flatten)]
     pub additional_methods: Option<M>,
 }
@@ -111,10 +128,12 @@ pub struct TypeInfo {
     type_platform: &'static str,
     type_cs: &'static str,
     supports_new: bool,
+
+    /// See [ClassData.is_ptr_type].
     is_ptr_type: bool,
 }
 impl TypeInfo {
-    pub fn new(
+    fn new(
         type_platform: &'static str,
         type_cs: &'static str,
         supports_new: bool,

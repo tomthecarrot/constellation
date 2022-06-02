@@ -33,9 +33,7 @@ namespace Teleportal.Client.{{namespace_super}}.{{namespace_sub}}
 
         override protected void NativeDrop(Ptr<{{class_ident}}> inner)
         {
-            {{#if drop_ident}}
             {{drop_ident}}(inner.p);
-            {{/if}}
         }
 
         {{> additional_methods}}
