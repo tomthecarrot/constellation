@@ -11,7 +11,6 @@ fn main() -> Result<()> {
         .iter()
         .map(|d| codegen_keyframe.render_to_file(d))
         .collect();
-    // result_keyframe
 
     let cd_state = ClassData::<CDState>::generate_class_data();
     let result_state: Result<()> = cd_state
@@ -19,7 +18,7 @@ fn main() -> Result<()> {
         .map(|d| codegen_state.render_to_file(d))
         .collect();
 
-    // result_state
+    let results = Vec::from([result_keyframe, result_state]);
 
-    Ok(())
+    results.into_iter().collect()
 }
