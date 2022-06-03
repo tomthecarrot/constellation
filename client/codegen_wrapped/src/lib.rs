@@ -36,11 +36,6 @@ pub struct ClassData<M: Serialize = ()> {
     /// C symbol name for the `drop` function for this type.
     pub drop_ident: String,
 
-    /// Indicates whether the platform type in this class will be represented in C# as `IntPtr`.
-    /// Setting this value does not change the C# representation of the type, but it provides
-    /// necessary context when generating the wrapper code using text substitution.
-    pub is_ptr_type: bool,
-
     /// Injects functionality beyond the scope of `ClassData<M>`.
     #[serde(flatten)]
     pub additional_methods: Option<M>,
@@ -109,41 +104,32 @@ impl Codegen {
 lazy_static! {
     // Platform Type | C# Type
     static ref TYPES_INFO: Vec<TypeInfo> = Vec::from([
-        TypeInfo::new("U8", "byte", true, false),
-        TypeInfo::new("U16", "ushort", true, false),
-        TypeInfo::new("U32", "uint", true, false),
-        TypeInfo::new("U64", "ulong", true, false),
-        TypeInfo::new("I8", "sbyte", true, false),
-        TypeInfo::new("I16", "short", true, false),
-        TypeInfo::new("I32", "int", true, false),
-        TypeInfo::new("I64", "long", true, false),
-        TypeInfo::new("Bool", "bool", true, false),
-        TypeInfo::new("F32", "float", true, false),
-        TypeInfo::new("F64", "double", true, false),
-        TypeInfo::new("ObjectHandle", "IntPtr", false, true),
-        TypeInfo::new("ContractDataHandle", "IntPtr", false, true),
+        TypeInfo::new("U8", "byte", true),
+        TypeInfo::new("U16", "ushort", true),
+        TypeInfo::new("U32", "uint", true),
+        TypeInfo::new("U64", "ulong", true),
+        TypeInfo::new("I8", "sbyte", true),
+        TypeInfo::new("I16", "short", true),
+        TypeInfo::new("I32", "int", true),
+        TypeInfo::new("I64", "long", true),
+        TypeInfo::new("Bool", "bool", true),
+        TypeInfo::new("F32", "float", true),
+        TypeInfo::new("F64", "double", true),
+        TypeInfo::new("ObjectHandle", "IntPtr", false),
+        TypeInfo::new("ContractDataHandle", "IntPtr", false),
     ]);
 }
 pub struct TypeInfo {
     type_platform: &'static str,
     type_cs: &'static str,
     supports_new: bool,
-
-    /// See [ClassData.is_ptr_type].
-    is_ptr_type: bool,
 }
 impl TypeInfo {
-    fn new(
-        type_platform: &'static str,
-        type_cs: &'static str,
-        supports_new: bool,
-        is_ptr_type: bool,
-    ) -> Self {
+    fn new(type_platform: &'static str, type_cs: &'static str, supports_new: bool) -> Self {
         Self {
             type_platform,
             type_cs,
             supports_new,
-            is_ptr_type,
         }
     }
 }

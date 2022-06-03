@@ -23,7 +23,6 @@ impl ClassData<CDState> {
                 "generated.__Internal.TpClientContractPropertiesStatesState{}Drop",
                 type_info.type_platform
             ),
-            is_ptr_type: type_info.is_ptr_type,
             additional_methods: Some(CDState {
                 type_cs: type_info.type_cs.to_string(),
                 type_platform: type_info.type_platform.to_string(),

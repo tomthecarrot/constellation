@@ -7,6 +7,7 @@ public unsafe {{type_cs}} Value
     }
     set
     {
-        generated.__Internal.TpClientContractPropertiesStatesState{{type_platform}}ValueSet(this.Inner.Value.p, {{#unless is_ptr_type}}&{{/unless}}value);
+        var boxed_value = RBox_{{type_platform}}.new_(value);
+        generated.__Internal.TpClientContractPropertiesStatesState{{type_platform}}ValueSet(this.Inner.Value.p, boxed_value);
     }
 }
