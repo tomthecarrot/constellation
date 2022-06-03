@@ -136,4 +136,10 @@ pub mod c_api {
         pub inner: super::ObjectHandle,
     }
     impl_from_refcast!(super::ObjectHandle, ObjectHandle);
+
+    #[remangle(substitute!())]
+    #[ffi_export]
+    pub fn ObjectHandle__drop(c: repr_c::Box<ObjectHandle>) {
+        drop(c)
+    }
 }
