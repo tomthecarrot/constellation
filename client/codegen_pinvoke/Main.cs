@@ -68,11 +68,12 @@ namespace Codegen
             options.GeneratorKind = Gen.GeneratorKind.CSharp;
             options.OutputDir = this.output_dir.FullName;
 
-            var module = options.AddModule("Teleportal.Client.Generated");
+            var module = options.AddModule("tp_client");
             module.IncludeDirs.Add(Path.Join(project_dir.FullName, "client", "rust"));
             module.Headers.Add("generated.h");
             module.LibraryDirs.Add(cargo_artifact_dir);
             module.Libraries.Add("libtp_client.so");
+            // module.Undefines.Add("__cplusplus");
         }
 
         /// Setup your passes here.
