@@ -139,5 +139,28 @@ pub mod c_api {
         cid.name.into()
     }
 
-    // TODO: expose ContractId version info
+    #[remangle(substitute!())]
+    #[derive_ReprC]
+    #[repr(C)]
+    #[derive(Clone, Copy, Eq, PartialEq)]
+    pub struct ContractId_Version {
+        pub major: u16,
+        pub minor: u16,
+        pub patch: u16,
+    }
+    impl From<(u16, u16, u16)> for ContractId_Version {
+        fn from(o: (u16, u16, u16)) -> Self {
+            Self {
+                major: o.0,
+                minor: o.1,
+                patch: o.2,
+            }
+        }
+    }
+
+    #[remangle(substitute!())]
+    #[ffi_export]
+    pub fn ContractId__version<'a>(cid: &'a ContractId) -> ContractId_Version {
+        cid.version.into()
+    }
 }

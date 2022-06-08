@@ -457,7 +457,7 @@ pub mod c_api {
 
                     #[remangle($path)]
                     #[ffi_export]
-                    pub fn [<Baseline_ $t:camel __state>]<'a>(
+                    pub fn [<Baseline__state_ $t:camel>]<'a>(
                         b: &'a Baseline,
                         state: &Monomorphized_StateHandle
                     ) -> &'a Monomorphized_State {
@@ -467,7 +467,7 @@ pub mod c_api {
 
                     #[remangle($path)]
                     #[ffi_export]
-                    pub fn [<Baseline_ $t:camel __state_mut>]<'a>(
+                    pub fn [<Baseline__state_mut_ $t:camel>]<'a>(
                         b: &'a mut Baseline,
                         state: &Monomorphized_StateHandle
                     ) -> &'a mut Monomorphized_State {
@@ -477,7 +477,7 @@ pub mod c_api {
 
                     #[remangle($path)]
                     #[ffi_export]
-                    pub fn [<Baseline_ $t:camel __channel>]<'a>(
+                    pub fn [<Baseline__channel_ $t:camel>]<'a>(
                         b: &'a Baseline,
                         chan: &Monomorphized_ChannelHandle
                     ) -> &'a Monomorphized_Channel {
@@ -487,7 +487,7 @@ pub mod c_api {
 
                     #[remangle($path)]
                     #[ffi_export]
-                    pub fn [<Baseline_ $t:camel __channel_mut>]<'a>(
+                    pub fn [<Baseline__channel_mut_ $t:camel>]<'a>(
                         b: &'a mut Baseline,
                         chan: &Monomorphized_ChannelHandle
                     ) -> &'a mut Monomorphized_Channel {
@@ -497,7 +497,7 @@ pub mod c_api {
 
                     #[remangle($path)]
                     #[ffi_export]
-                    pub fn [<Baseline_ $t:camel __bind_state>](
+                    pub fn [<Baseline__bind_state_ $t:camel>](
                         b: &Baseline,
                         id: &Monomorphized_StateId,
                         obj: &CObjectHandle,
@@ -508,7 +508,7 @@ pub mod c_api {
 
                     #[remangle($path)]
                     #[ffi_export]
-                    pub fn [<Baseline_ $t:camel __bind_channel>](
+                    pub fn [<Baseline__bind_channel_ $t:camel>](
                         b: &Baseline,
                         id: &Monomorphized_ChannelId,
                         obj: &CObjectHandle,
