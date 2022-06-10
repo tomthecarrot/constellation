@@ -34,13 +34,22 @@ public class TestKeyframe
         var kf2 = new Channels.Keyframe_U8(2, 1.0);
         var kf3 = new Channels.Keyframe_U8(3, 1.5);
 
-        //TODO[SER-376]: safer-ffi appears to not update the c struct's len/capactity.
-        // need to fix that in order for the test to actually work.
+        v.push(kf0);
+        v.push(kf1);
+        v.push(kf2);
+        v.push(kf3);
 
-        // v.push(kf0);
-        // v.push(kf1);
-        // v.push(kf2);
-        // v.push(kf3);
-        // Assert.Equal(0, v[0].Value);
+        Assert.Equal(0, v[0].Value);
+        Assert.Equal(0.0, v[0].Time);
+
+        Assert.Equal(1, v[1].Value);
+        Assert.Equal(0.5, v[1].Time);
+
+        Assert.Equal(2, v[2].Value);
+        Assert.Equal(1.0, v[2].Time);
+
+        Assert.Equal(3, v[3].Value);
+        Assert.Equal(1.5, v[3].Time);
+
     }
 }

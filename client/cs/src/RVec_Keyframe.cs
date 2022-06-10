@@ -36,6 +36,7 @@ namespace Teleportal.Client.Contract.Properties.Channels
             var shared = this.Inner.Value;
             generated.__Internal.TpClientContractPropertiesChannelsRVecKeyframeU8Push((IntPtr)(&shared), e.Inner.Value.p);
             e.Inner = null;  // move from `e`
+            this.Inner = shared;
         }
 
         public unsafe override Keyframe_U8 this[int index]
