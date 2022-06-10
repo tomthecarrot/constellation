@@ -1,6 +1,7 @@
 using Channels = Teleportal.Client.Contract.Properties.Channels;
 using Sys = System;
 using Xunit;
+using InvalidOperationException = System.InvalidOperationException;
 
 public class TestKeyframe
 {
@@ -21,7 +22,7 @@ public class TestKeyframe
         Assert.Equal(1.0, kf.Time);
 
         kf.Dispose();
-        // Sys.Console.WriteLine(kf.time); // aborts
+        Assert.Throws<InvalidOperationException>(() => kf.Value);
     }
 
     [Fact]
@@ -51,5 +52,7 @@ public class TestKeyframe
         Assert.Equal(3, v[3].Value);
         Assert.Equal(1.5, v[3].Time);
 
+        v.Dispose();
+        Assert.Throws<InvalidOperationException>(() => v[0]);
     }
 }

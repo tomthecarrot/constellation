@@ -28,7 +28,7 @@ use safer_ffi::derive_ReprC;
 #[repr(u8)]
 #[derive(Copy, Clone, PartialEq, Eq, Debug, Hash)]
 pub enum BaselineKind {
-    Main,
+    Main = 0,
     Fork,
 }
 
@@ -401,6 +401,12 @@ pub mod c_api {
     #[ffi_export]
     pub fn Baseline__new(kind: BaselineKind) -> repr_c::Box<Baseline> {
         Box::new(Baseline::new(kind)).into()
+    }
+
+    #[remangle(substitute!())]
+    #[ffi_export]
+    pub fn Baseline__drop(baseline: repr_c::Box<Baseline>) {
+        drop(baseline)
     }
 
     #[remangle(substitute!())]
