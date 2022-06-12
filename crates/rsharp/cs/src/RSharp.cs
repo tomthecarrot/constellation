@@ -130,4 +130,7 @@ namespace RSharp
         /// Implemented by subclasses to provide the exact native destructor to call
         abstract protected void NativeDrop(Ptr<T> inner);
     }
+
+    public class InvalidDropException : Exception
+    { }
 }

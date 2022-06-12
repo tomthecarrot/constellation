@@ -30,11 +30,15 @@ pub struct ClassData<M: Serialize = ()> {
     /// Constructor arguments for this class.
     pub new_args: String,
 
-    /// C symbol name for the `new` function for this type.
+    /// C expression passed as an argument to the `new` function for this type.
     pub new_expr: Option<String>,
 
     /// C symbol name for the `drop` function for this type.
-    pub drop_ident: String,
+    pub drop_ident: Option<String>,
+
+    /// An optional pointer literal "*" which is defined if the C# type (`type_cs`) is not `IntPtr`.
+    /// It is later concatenated with the C# type, e.g. `sbyte*`.
+    pub ptr_literal: Option<String>,
 
     /// Injects functionality beyond the scope of `ClassData<M>`.
     #[serde(flatten)]
@@ -130,6 +134,13 @@ impl TypeInfo {
             type_platform,
             type_cs,
             supports_new,
+        }
+    }
+    fn ptr_literal(&self) -> Option<String> {
+        if !self.type_cs.eq("IntPtr") {
+            Some("*".to_string())
+        } else {
+            None
         }
     }
 }

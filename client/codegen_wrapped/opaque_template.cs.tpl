@@ -22,18 +22,21 @@ namespace Teleportal.Client.{{namespace_super}}.{{namespace_sub}}
     {
         public {{class_ident}}(Ptr<{{class_ident}}> inner, OwnershipSemantics ownershipSemantics) : base(inner, ownershipSemantics) { }
 
-        {{#if new_expr}}
+{{#if new_expr}}
         public unsafe {{class_ident}}({{new_args}}) : base(
             new Ptr<{{class_ident}}>({{new_expr}}),
             OwnershipSemantics.Owned
         )
         { }
-        {{/if}}
-
+{{/if}}
 
         override protected void NativeDrop(Ptr<{{class_ident}}> inner)
         {
+{{#if drop_ident}}
             {{drop_ident}}(inner.p);
+{{else}}
+            throw new InvalidDropException();
+{{/if}}
         }
 
         {{> additional_methods}}
