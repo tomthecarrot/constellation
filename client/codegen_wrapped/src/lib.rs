@@ -30,7 +30,7 @@ pub struct ClassData<M: Serialize = ()> {
     /// Constructor arguments for this class.
     pub new_args: String,
 
-    /// C expression passed as an argument to the `new` function for this type.
+    /// The expression passed as an argument to the `new` function for this type.
     pub new_expr: Option<String>,
 
     /// C symbol name for the `drop` function for this type.
