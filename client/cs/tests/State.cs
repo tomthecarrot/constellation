@@ -13,7 +13,7 @@ public class TestState
     }
 
     [Fact]
-    public unsafe void TestI8()
+    public void TestI8()
     {
         var st = new States.State_I8(-20);
         Sys.Console.WriteLine(st.ToString());
@@ -25,7 +25,7 @@ public class TestState
     }
 
     [Fact]
-    public unsafe void TestF64()
+    public void TestF64()
     {
         var st = new States.State_F64(20181.530152399);
 
