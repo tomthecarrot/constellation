@@ -5,89 +5,26 @@ namespace RSharp
 {
     // ---- Unsigned ----
 
-    public struct RBox_Bool
+    public class RBox_Bool : OpaqueWrapper<bool>
     {
+        public unsafe RBox_Bool(bool value) : base(new Ptr<bool>((IntPtr)rsharp__Box_Bool__new(value)), OwnershipSemantics.Owned)
+        { }
+
+        public unsafe RBox_Bool(Ptr<bool> inner, OwnershipSemantics ownershipSemantics) : base(inner, ownershipSemantics)
+        { }
+
+        protected override unsafe void NativeDrop(Ptr<bool> inner)
+        {
+            rsharp__Box_Bool__drop((bool*)inner.p);
+        }
+
+        // -- C interop
+
         [DllImport(Metadata.LIBRARY_NAME)]
         private static extern unsafe bool* rsharp__Box_Bool__new(bool value);
-        public static unsafe bool* new_(bool value)
-        {
-            return rsharp__Box_Bool__new(value);
-        }
 
         [DllImport(Metadata.LIBRARY_NAME)]
         private static extern unsafe void rsharp__Box_Bool__drop(bool* value);
-        public static unsafe void drop(bool* value)
-        {
-            rsharp__Box_Bool__drop(value);
-        }
-    }
-
-    public struct RBox_U8
-    {
-        [DllImport(Metadata.LIBRARY_NAME)]
-        private static extern unsafe byte* rsharp__Box_U8__new(byte value);
-        public static unsafe byte* new_(byte value)
-        {
-            return rsharp__Box_U8__new(value);
-        }
-
-        [DllImport(Metadata.LIBRARY_NAME)]
-        private static extern unsafe void rsharp__Box_U8__drop(byte* value);
-        public static unsafe void drop(byte* value)
-        {
-            rsharp__Box_U8__drop(value);
-        }
-    }
-
-    public struct RBox_U16
-    {
-        [DllImport(Metadata.LIBRARY_NAME)]
-        private static extern unsafe ushort* rsharp__Box_U16__new(ushort value);
-        public static unsafe ushort* new_(ushort value)
-        {
-            return rsharp__Box_U16__new(value);
-        }
-
-        [DllImport(Metadata.LIBRARY_NAME)]
-        private static extern unsafe void rsharp__Box_U16__drop(ushort* value);
-        public static unsafe void drop(ushort* value)
-        {
-            rsharp__Box_U16__drop(value);
-        }
-    }
-
-    public struct RBox_U32
-    {
-        [DllImport(Metadata.LIBRARY_NAME)]
-        private static extern unsafe uint* rsharp__Box_U32__new(uint value);
-        public static unsafe uint* new_(uint value)
-        {
-            return rsharp__Box_U32__new(value);
-        }
-
-        [DllImport(Metadata.LIBRARY_NAME)]
-        private static extern unsafe void rsharp__Box_U32__drop(uint* value);
-        public static unsafe void drop(uint* value)
-        {
-            rsharp__Box_U32__drop(value);
-        }
-    }
-
-    public struct RBox_U64
-    {
-        [DllImport(Metadata.LIBRARY_NAME)]
-        private static extern unsafe ulong* rsharp__Box_U64__new(ulong value);
-        public static unsafe ulong* new_(ulong value)
-        {
-            return rsharp__Box_U64__new(value);
-        }
-
-        [DllImport(Metadata.LIBRARY_NAME)]
-        private static extern unsafe void rsharp__Box_U64__drop(ulong* value);
-        public static unsafe void drop(ulong* value)
-        {
-            rsharp__Box_U64__drop(value);
-        }
     }
 
     // ---- Signed ----

@@ -43,7 +43,7 @@ namespace RSharp
         }
     }
 
-    public abstract class SharedWrapper<T> : IDisposable where T : struct
+    public abstract class PrimitiveWrapper<T> : IDisposable where T : struct
     {
         private T? inner;
 
@@ -63,7 +63,7 @@ namespace RSharp
 
         // ---- Lifetime management ----
 
-        public unsafe SharedWrapper(T inner, OwnershipSemantics ownershipSemantics)
+        public unsafe PrimitiveWrapper(T inner, OwnershipSemantics ownershipSemantics)
         {
             this.inner = inner;
             this.ownershipSemantics = ownershipSemantics;
@@ -78,7 +78,7 @@ namespace RSharp
             this.inner = null;
         }
 
-        ~SharedWrapper()
+        ~PrimitiveWrapper()
         {
             this.Dispose();
         }
@@ -87,7 +87,7 @@ namespace RSharp
         abstract protected void NativeDrop(T inner);
     }
 
-    public abstract class OpaqueWrapper<T> : IDisposable where T : class
+    public abstract class OpaqueWrapper<T> : IDisposable
     {
         private Ptr<T>? inner;
 

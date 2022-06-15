@@ -15,7 +15,15 @@ impl ClassData<CDState> {
             class_ident: format!("State_{}", type_info.type_platform),
             new_args: format!("{} value", type_info.type_cs),
             new_expr: if type_info.supports_new {
-                Some(format!("generated.__Internal.TpClientContractPropertiesStatesState{0}New(RSharp.RBox_{0}.new_(value))", type_info.type_platform))
+                Some(format!(
+                    "generated.
+                    __Internal.TpClientContractPropertiesStatesState{0}New(
+                    ({1}{2})(new RSharp.RBox_{0}(value)).Inner.Value.p
+                    )",
+                    type_info.type_platform,
+                    type_info.type_cs,
+                    type_info.ptr_literal().unwrap_or("".to_string()),
+                ))
             } else {
                 None
             },

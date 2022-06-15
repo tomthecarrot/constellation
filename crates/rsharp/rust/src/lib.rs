@@ -1,3 +1,4 @@
+pub mod codegen;
 mod primitives;
 mod rbox;
 mod rvec;

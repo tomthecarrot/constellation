@@ -1,28 +1,19 @@
-public {{type_cs}}{{ptr_literal}} ValueBoxed
+public RBox_{{type_platform}} Value
 {
     get
     {
         unsafe
         {
-            return generated.__Internal.TpClientContractPropertiesStatesState{{type_platform}}Value(this.Inner.Value.p);
+            {{type_cs}}{{ptr_literal}} p = generated.__Internal.TpClientContractPropertiesStatesState{{type_platform}}Value(this.Inner.Value.p);
+            Ptr<{{type_cs}}> ptr = new Ptr<{{type_cs}}>((IntPtr)p);
+            return new RBox_{{type_platform}}(ptr, OwnershipSemantics.SharedRef);
         }
     }
     set
     {
         unsafe
         {
-            generated.__Internal.TpClientContractPropertiesStatesState{{type_platform}}ValueSet(this.Inner.Value.p, value);
-        }
-    }
-}
-
-public {{type_cs}} Value
-{
-    get
-    {
-        unsafe
-        {
-            return ToManaged.f(OwnershipSemantics.SharedRef, this.ValueBoxed);
+            generated.__Internal.TpClientContractPropertiesStatesState{{type_platform}}ValueSet(this.Inner.Value.p, value.Inner.Value.p);
         }
     }
 }

@@ -5,7 +5,7 @@ namespace RSharp
 
     /// T is the c# wrapped data type stored *inside* the RVec, V is the C#
     /// shared struct of the monomorphized RVec
-    public abstract class RVec<T, V> : SharedWrapper<V>
+    public abstract class RVec<T, V> : PrimitiveWrapper<V>
         where T : class
         where V : unmanaged
     {
