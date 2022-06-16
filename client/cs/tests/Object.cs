@@ -3,6 +3,7 @@ using Baseline = Teleportal.Client.Baseline;
 using InvalidOperationException = System.InvalidOperationException;
 using Xunit;
 using RSharp;
+using ExampleContract = Teleportal.Client.Contract.ExampleContract;
 
 public class TestObject
 {
@@ -17,7 +18,7 @@ public class TestObject
     public void TestObjectCreate()
     {
         var baseline = new Baseline(true);
-        var contract = baseline.registerContractExample();
+        var contract = ExampleContract.register(baseline);
         var s = contract.States;
         var obj = contract.ObjectCreate(baseline, 0, 1, -1, -2, 0.0f, 1.0f);
 
@@ -44,21 +45,5 @@ public class TestObject
 
         obj.Dispose();
         Assert.Throws<InvalidOperationException>(() => { var _ = baseline.BindStateU8(s.U8_0, obj); });
-    }
-
-    [Fact]
-    public void TestF64()
-    {
-        var b = new RBox_F64(20181.530152399);
-        var st = new States.State_F64(b);
-        // `b` should be moved from!
-        Assert.Null(b.Inner);
-        Assert.Equal(20181.530152399, st.Value.Value);
-
-        st.Value = new RBox_F64(-56817.5919827);
-        Assert.Equal(-56817.5919827, st.Value.Value);
-
-        st.Dispose();
-        Assert.Throws<InvalidOperationException>(() => { var val = st.Value; });
     }
 }
