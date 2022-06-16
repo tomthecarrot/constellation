@@ -4,6 +4,7 @@ use miette::{miette, ErrReport, IntoDiagnostic, Result, WrapErr};
 use serde::Serialize;
 use std::{
     fs::File,
+    io::Write,
     path::{Path, PathBuf},
 };
 
@@ -11,17 +12,17 @@ const TPL_NAME: &'static str = "tpl";
 
 pub struct Codegen {
     reg: Handlebars<'static>,
-    output_path: PathBuf,
+    output_dir: PathBuf,
 }
 
 impl Codegen {
-    pub fn new() -> Result<Self> {
-        let tpl_path = Path::new(env!("CARGO_MANIFEST_DIR")).join("rbox.cs.tpl");
+    pub fn new(partial_tpl_filename: &str) -> Result<Self> {
+        let tpl_path = Path::new(env!("CARGO_MANIFEST_DIR")).join(partial_tpl_filename);
+        let partial_path = Path::new(env!("CARGO_MANIFEST_DIR")).join(partial_tpl_filename);
         let output_dir = Path::new(env!("CARGO_MANIFEST_DIR"))
             .parent()
             .unwrap()
-            .join("cs/src/generated/wrapped");
-        let output_path = output_dir.join("RBox.cs");
+            .join("cs/src/generated");
 
         if output_dir.exists() && output_dir.read_dir().into_diagnostic()?.next().is_some() {
             return Err(miette!(format!(
@@ -45,29 +46,31 @@ impl Codegen {
         reg.register_template_file(TPL_NAME, &tpl_path)
             .into_diagnostic()?;
 
-        Ok(Self { reg, output_path })
+        let partial = std::fs::read_to_string(&partial_path)
+            .into_diagnostic()
+            .wrap_err("Failed to read partial template file")?;
+
+        Ok(Self { reg, output_dir })
     }
 
-    pub fn render(&self) -> Result<()> {
-        let output_file = File::create(&self.output_path)
+    pub fn render_to_file(&self, type_info: &TypeInfo) -> Result<()> {
+        let output_path = self
+            .output_dir
+            .join(format!("RBox_{}.cs", type_info.type_platform));
+        let output_file = File::create(&output_path)
             .into_diagnostic()
             .wrap_err_with(|| format!("Failed to create output file for RBox."))?;
 
-        let mut output_str = String::new();
+        self.reg
+            .render_to_write(TPL_NAME, type_info, output_file)
+            .into_diagnostic()
+            .wrap_err("Failed to render to file")
+    }
 
-        TYPES_INFO.iter().for_each(|item| {
-            let result = self
-                .reg
-                .render(TPL_NAME, item)
-                .into_diagnostic()
-                .wrap_err("Failed to render to file");
-
-            output_str.push_str(&result.unwrap());
+    pub fn render_all(&self) -> Result<()> {
+        TYPES_INFO.iter().for_each(|type_info| {
+            self.render_to_file(type_info);
         });
-
-        println!("OUTPUT STR: {}", output_str);
-        println!("OUTPUT PATH: {}", self.output_path.display());
-
         Ok(())
     }
 }
