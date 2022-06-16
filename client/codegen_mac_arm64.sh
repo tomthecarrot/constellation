@@ -13,15 +13,15 @@ cargo build
 cargo build --target x86_64-apple-darwin
 
 if [ ! -f $CLIENT_DIR/cs/tests/bin/Debug/net6.0/libtp_client.dylib ]; then
-    ln -s $PLATFORM_DIR/target/debug/libtp_client.dylib $CLIENT_DIR/cs/tests/bin/Debug/net6.0/libtp_client.dylib
+    ln -s $PLATFORM_DIR/target/debug/deps/libtp_client.dylib $CLIENT_DIR/cs/tests/bin/Debug/net6.0/libtp_client.dylib
 fi
 
 if [ ! -f $CLIENT_DIR/cs/tests/bin/Debug/net6.0/librsharp.dylib ]; then
-    ln -s $PLATFORM_DIR/target/debug/librsharp.dylib $CLIENT_DIR/cs/tests/bin/Debug/net6.0/librsharp.dylib
+    ln -s $PLATFORM_DIR/target/debug/deps/librsharp.dylib $CLIENT_DIR/cs/tests/bin/Debug/net6.0/librsharp.dylib
 fi
 
-mv $PLATFORM_DIR/target/x86_64-apple-darwin/debug/libtp_client.dylib $PLATFORM_DIR/target/x86_64-apple-darwin/debug/libtp_client
-mv $PLATFORM_DIR/target/x86_64-apple-darwin/debug/librsharp.dylib $PLATFORM_DIR/target/x86_64-apple-darwin/debug/librsharp
+mv $PLATFORM_DIR/target/x86_64-apple-darwin/debug/deps/libtp_client.dylib $PLATFORM_DIR/target/x86_64-apple-darwin/debug/deps/libtp_client
+mv $PLATFORM_DIR/target/x86_64-apple-darwin/debug/deps/librsharp.dylib $PLATFORM_DIR/target/x86_64-apple-darwin/debug/deps/librsharp
 
 cd $CLIENT_DIR/rust/
 cargo test
