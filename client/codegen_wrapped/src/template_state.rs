@@ -18,11 +18,9 @@ impl ClassData<CDState> {
                 Some(format!(
                     "generated.
                     __Internal.TpClientContractPropertiesStatesState{0}New(
-                    ({1}{2})(new RSharp.RBox_{0}(value)).Inner.Value.p
+                    new RSharp.RBox_{0}(value).NativePtr
                     )",
                     type_info.type_platform,
-                    type_info.type_cs,
-                    type_info.ptr_literal().unwrap_or("".to_string()),
                 ))
             } else {
                 None

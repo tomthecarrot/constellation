@@ -5,8 +5,10 @@ set -e
 
 CLIENT_DIR=$(realpath $(dirname $0))
 PLATFORM_DIR=$(realpath $CLIENT_DIR/..)
+RSHARP_DIR="$PLATFORM_DIR/crates/rsharp"
 
 rm -rf $CLIENT_DIR/cs/src/generated
+rm -rf $RSHARP_DIR/cs/src/generated
 
 cd $PLATFORM_DIR
 cargo build
@@ -24,6 +26,9 @@ mv $PLATFORM_DIR/target/x86_64-apple-darwin/debug/deps/libtp_client.dylib $PLATF
 mv $PLATFORM_DIR/target/x86_64-apple-darwin/debug/deps/librsharp.dylib $PLATFORM_DIR/target/x86_64-apple-darwin/debug/deps/librsharp
 
 cd $CLIENT_DIR/rust/
+cargo test
+
+cd $RSHARP_DIR/rust
 cargo test
 
 cd $CLIENT_DIR/codegen_pinvoke

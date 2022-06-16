@@ -13,7 +13,7 @@ public RBox_{{type_platform}} Value
     {
         unsafe
         {
-            generated.__Internal.TpClientContractPropertiesStatesState{{type_platform}}ValueSet(this.Inner.Value.p, value.Inner.Value.p);
+            generated.__Internal.TpClientContractPropertiesStatesState{{type_platform}}ValueSet(this.Inner.Value.p, value.NativePtr);
         }
     }
 }

@@ -15,7 +15,13 @@ impl ClassData<CDKeyframe> {
             class_ident: format!("Keyframe_{}", type_info.type_platform),
             new_args: format!("{} value, double time", type_info.type_cs),
             new_expr: if type_info.supports_new {
-                Some(format!("generated.__Internal.TpClientContractPropertiesChannelsKeyframe{0}New(RSharp.RBox_{0}.new_(value), time)", type_info.type_platform))
+                Some(format!(
+                    "generated.
+                    __Internal.TpClientContractPropertiesChannelsKeyframe{0}New(
+                    new RSharp.RBox_{0}(value).NativePtr, time
+                    )",
+                    type_info.type_platform
+                ))
             } else {
                 None
             },
