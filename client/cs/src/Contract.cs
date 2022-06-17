@@ -71,4 +71,105 @@ namespace Teleportal.Client.Contract
             }
         }
     }
+
+    public class ExampleContract : OpaqueWrapper<ExampleContract>
+    {
+        public ExampleContract(Ptr<ExampleContract> inner, OwnershipSemantics ownershipSemantics)
+        : base(inner, ownershipSemantics)
+        { }
+
+        override protected void NativeDrop(Ptr<ExampleContract> inner)
+        {
+            generated.__Internal.TpClientContractExampleContractDrop(inner.p);
+        }
+
+        public ContractDataHandle Handle
+        {
+            get
+            {
+                var p = new Ptr<ContractDataHandle>(
+                    generated.__Internal.TpClientContractExampleContractHandle(
+                        this.Inner.Value.p
+                    )
+                );
+                return new ContractDataHandle(p);
+            }
+        }
+
+        public ExampleStates States
+        {
+            get
+            {
+                var p = new Ptr<ExampleStates>(
+                    generated.__Internal.TpClientContractExampleContractStates(
+                        this.Inner.Value.p
+                    )
+                );
+                return new ExampleStates(p);
+            }
+        }
+    }
+
+    public class ExampleStates : OpaqueWrapper<ExampleStates>
+    {
+        public ExampleStates(Ptr<ExampleStates> p)
+        : base(p, OwnershipSemantics.SharedRef)
+        { }
+
+        override protected void NativeDrop(Ptr<ExampleStates> inner)
+        {
+            throw new System.InvalidOperationException("Unreachable code reached");
+        }
+
+        public StateId<byte> U8_0
+        {
+            get
+            {
+                throw new System.NotImplementedException("TODO: SER-392");
+            }
+        }
+
+        public StateId<byte> U8_1
+        {
+            get
+            {
+                throw new System.NotImplementedException("TODO: SER-392");
+            }
+        }
+
+        public StateId<sbyte> I8_0
+        {
+            get
+            {
+                throw new System.NotImplementedException("TODO: SER-392");
+            }
+        }
+
+        public StateId<sbyte> I8_1
+        {
+            get
+            {
+                throw new System.NotImplementedException("TODO: SER-392");
+            }
+        }
+
+        public StateId<float> F32_0
+        {
+            get
+            {
+                throw new System.NotImplementedException("TODO: SER-392");
+            }
+        }
+
+        public StateId<float> F32_1
+        {
+            get
+            {
+                throw new System.NotImplementedException("TODO: SER-392");
+            }
+        }
+    }
+
+    // TODO: SER-392
+    public class StateId<T> { }
 }

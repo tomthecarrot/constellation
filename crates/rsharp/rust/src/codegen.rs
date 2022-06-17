@@ -1,10 +1,9 @@
 use handlebars::Handlebars;
 use lazy_static::lazy_static;
-use miette::{miette, ErrReport, IntoDiagnostic, Result, WrapErr};
+use miette::{miette, IntoDiagnostic, Result, WrapErr};
 use serde::Serialize;
 use std::{
     fs::File,
-    io::Write,
     path::{Path, PathBuf},
 };
 
@@ -46,7 +45,7 @@ impl Codegen {
         reg.register_template_file(TPL_NAME, &tpl_path)
             .into_diagnostic()?;
 
-        let partial = std::fs::read_to_string(&partial_path)
+        std::fs::read_to_string(&partial_path)
             .into_diagnostic()
             .wrap_err("Failed to read partial template file")?;
 
@@ -69,7 +68,8 @@ impl Codegen {
 
     pub fn render_all(&self) -> Result<()> {
         TYPES_INFO.iter().for_each(|type_info| {
-            self.render_to_file(type_info);
+            self.render_to_file(type_info)
+                .expect("Failed to render to file");
         });
         Ok(())
     }

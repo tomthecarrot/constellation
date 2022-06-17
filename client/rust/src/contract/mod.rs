@@ -89,7 +89,7 @@ impl ContractData {
 #[cfg(feature = "c_api")]
 pub mod c_api {
     #![allow(non_camel_case_types, non_snake_case, dead_code)]
-    use super::{ContractData, ContractId};
+    use super::{states, Contract, ContractData, ContractId};
     use crate::contract::properties::c_api::c_types;
     use crate::contract::properties::c_api::impl_from_refcast;
 
@@ -162,5 +162,74 @@ pub mod c_api {
     #[ffi_export]
     pub fn ContractId__version<'a>(cid: &'a ContractId) -> ContractId_Version {
         cid.version.into()
+    }
+
+    #[states]
+    #[derive_ReprC]
+    #[ReprC::opaque]
+    #[derive(Clone)]
+    pub struct ExampleStates {
+        u8_0: u8,
+        u8_1: u8,
+        i8_0: i8,
+        i8_1: i8,
+        f32_0: f32,
+        f32_1: f32,
+    }
+
+    #[derive_ReprC]
+    #[ReprC::opaque]
+    pub struct ExampleContract {
+        handle: super::ContractDataHandle,
+        states: ExampleStates,
+        channels: (),
+    }
+    impl Contract for ExampleContract {
+        type States = ExampleStates;
+
+        type Channels = ();
+
+        const ID: ContractId = ContractId {
+            name: "teleportal.example-ffi-contract",
+            version: (1, 2, 3),
+        };
+
+        fn new(handle: super::ContractDataHandle) -> Self {
+            Self {
+                handle,
+                states: ExampleStates::new(handle),
+                channels: (),
+            }
+        }
+
+        fn states(&self) -> &Self::States {
+            &self.states
+        }
+
+        fn channels(&self) -> &Self::Channels {
+            &self.channels
+        }
+
+        fn handle(&self) -> super::ContractDataHandle {
+            self.handle
+        }
+    }
+
+    #[remangle(substitute!())]
+    #[ffi_export]
+    pub fn ExampleContract__drop(c: repr_c::Box<ExampleContract>) {
+        drop(c)
+    }
+
+    #[remangle(substitute!())]
+    #[ffi_export]
+    pub fn ExampleContract__handle(c: &ExampleContract) -> repr_c::Box<ContractDataHandle> {
+        Box::new(ContractDataHandle::from(c.handle())).into()
+    }
+
+    #[remangle(substitute!())]
+    #[ffi_export]
+    pub fn ExampleContract__states(c: &ExampleContract) -> repr_c::Box<ExampleStates> {
+        Box::new(c.states().clone()).into()
     }
 }

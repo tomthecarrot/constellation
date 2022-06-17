@@ -391,6 +391,7 @@ pub mod c_api {
 
     use super::*;
     use crate::contract::c_api::ContractDataHandle as CContractDataHandle;
+    use crate::contract::c_api::ExampleContract;
     use crate::contract::properties::c_api::simple_primitives;
     use crate::object::c_api::ObjectHandle as CObjectHandle;
 
@@ -414,8 +415,6 @@ pub mod c_api {
     pub fn Baseline__kind(b: &Baseline) -> BaselineKind {
         b.kind()
     }
-
-    // TODO: register/unregister_contract
 
     #[remangle(substitute!())]
     #[ffi_export]
@@ -534,4 +533,17 @@ pub mod c_api {
 
     // This is like doing `monomorphize!("whatever", Keyframe, u8, u16, ...)
     simple_primitives!(; types, monomorphize, "tp_client::baseline");
+
+    // ---- Example contract for tests ---- //
+
+    #[remangle(substitute!())]
+    #[ffi_export]
+    pub fn Baseline__register_contract___example<'a>(
+        baseline: &'a mut Baseline,
+    ) -> repr_c::Box<ExampleContract> {
+        let c: ExampleContract = baseline
+            .register_contract()
+            .expect("Failed to register contract");
+        Box::new(c).into()
+    }
 }

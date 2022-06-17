@@ -3,8 +3,6 @@ mod primitives;
 mod rbox;
 mod rvec;
 
-use crate::codegen::Codegen;
-use miette::{Result, WrapErr};
 pub use rsharp_macro::{remangle, substitute};
 
 /// Provides additional helper functions on `Option<T>`.
@@ -44,11 +42,4 @@ fn generate_headers() -> ::std::io::Result<()> {
     } else {
         builder.to_file(&"generated.h".to_string())?.generate()
     }
-}
-
-#[safer_ffi::cfg_headers]
-#[test]
-fn generate_rbox() -> Result<()> {
-    let codegen = Codegen::new("rbox.cs.tpl").wrap_err("Failed to create `Codegen`")?;
-    codegen.render_all()
 }
