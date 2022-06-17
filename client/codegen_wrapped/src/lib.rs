@@ -1,9 +1,11 @@
 mod template_keyframe;
 mod template_state;
+mod template_state_id;
 pub mod type_info;
 
 pub use self::template_keyframe::CDKeyframe;
 pub use self::template_state::CDState;
+pub use self::template_state_id::CDStateId;
 
 use handlebars::Handlebars;
 use miette::{miette, IntoDiagnostic, Result, WrapErr};

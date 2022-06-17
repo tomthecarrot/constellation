@@ -1,6 +1,6 @@
+use eyre::{eyre, Result, WrapErr};
 use handlebars::Handlebars;
 use lazy_static::lazy_static;
-use eyre::{eyre, Result, WrapErr};
 use serde::Serialize;
 use std::{
     fs::File,
@@ -43,8 +43,7 @@ impl Codegen {
 
         reg.register_template_file(TPL_NAME, &tpl_path)?;
 
-        std::fs::read_to_string(&partial_path)
-            .wrap_err("Failed to read partial template file")?;
+        std::fs::read_to_string(&partial_path).wrap_err("Failed to read partial template file")?;
 
         Ok(Self { reg, output_dir })
     }

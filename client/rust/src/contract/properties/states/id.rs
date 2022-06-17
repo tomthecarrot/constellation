@@ -72,10 +72,18 @@ pub mod c_api {
                     }
                     pub use [<StateId_ $t:camel>] as Monomorphized;
 
+                    #[remangle($path)]
                     #[ffi_export]
                     pub fn [<StateId_ $t:camel __contract>]<'a>(id: &'a Monomorphized) -> repr_c::Box<CContractDataHandle> {
                         repr_c::Box::new(CContractDataHandle::from(id.inner.contract()))
                     }
+
+                    #[remangle($path)]
+                    #[ffi_export]
+                    pub fn [<StateId_ $t:camel __drop>](id: repr_c::Box<Monomorphized>) {
+                        drop(id)
+                    }
+
                 }
                 pub use [<_StateId_ $t:camel>]::Monomorphized as [<StateId_ $t:camel>];
             }
