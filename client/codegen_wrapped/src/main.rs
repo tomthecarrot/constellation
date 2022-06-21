@@ -18,7 +18,7 @@ fn main() -> Result<()> {
         .map(|d| codegen_state.render_to_file(d))
         .collect();
 
-    let results = Vec::from([result_keyframe, result_state]);
+    let results = vec![result_keyframe, result_state];
 
     results.into_iter().collect()
 }
