@@ -23,8 +23,9 @@ public class TestState
         st.Value = new RBox_I8(10);
         Assert.Equal(10, st.Value.SharedValue);
 
+        Assert.Null(st.Value.Inner);
         st.Dispose();
-        Assert.Throws<Sys.InvalidOperationException>(delegate { var val = st.Value; });
+        Assert.Throws<Sys.InvalidOperationException>(() => { var val = st.Value; });
     }
 
     [Fact]
@@ -37,7 +38,8 @@ public class TestState
         st.Value = new RBox_F64(-56817.5919827);
         Assert.Equal(-56817.5919827, st.Value.SharedValue);
 
+        Assert.Null(st.Value.Inner);
         st.Dispose();
-        Assert.Throws<Sys.InvalidOperationException>(delegate { var val = st.Value; });
+        Assert.Throws<Sys.InvalidOperationException>(() => { var val = st.Value; });
     }
 }
