@@ -4,7 +4,9 @@ use serde::Serialize;
 
 #[derive(Serialize)]
 pub struct CDKeyframe {
+    /// The type of values stored in the Keyframe in C#
     type_cs: String,
+    /// The type of values stored in the Keyframe in C#
     type_platform: String,
 }
 impl ClassData<CDKeyframe> {
@@ -18,7 +20,7 @@ impl ClassData<CDKeyframe> {
                 Some(format!(
                     "generated.
                     __Internal.TpClientContractPropertiesChannelsKeyframe{0}New(
-                    new RSharp.RBox_{0}(value).NativePtr, time
+                    new RSharp.RBox_{0}(value).StealInner(), time
                     )",
                     type_info.type_platform
                 ))

@@ -20,7 +20,7 @@ namespace Teleportal.Client.{{namespace_super}}.{{namespace_sub}}
 {
     public sealed class {{class_ident}} : OpaqueWrapper<{{class_ident}}>
     {
-        public {{class_ident}}(Ptr<{{class_ident}}> inner, OwnershipSemantics ownershipSemantics) : base(inner, ownershipSemantics) { }
+        public unsafe {{class_ident}}(Ptr<{{class_ident}}> inner, OwnershipSemantics ownershipSemantics) : base(inner, ownershipSemantics) { }
 
 {{#if new_expr}}
         public unsafe {{class_ident}}({{new_args}}) : base(
@@ -34,8 +34,6 @@ namespace Teleportal.Client.{{namespace_super}}.{{namespace_sub}}
         {
 {{#if drop_ident}}
             {{drop_ident}}(inner.p);
-{{else}}
-            throw new InvalidDropException();
 {{/if}}
         }
 

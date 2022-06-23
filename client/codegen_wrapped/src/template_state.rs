@@ -4,7 +4,9 @@ use serde::Serialize;
 
 #[derive(Serialize)]
 pub struct CDState {
+    /// The type of values stored in the State in C#
     type_cs: String,
+    /// The type of values stored in the State in rust
     type_platform: String,
 }
 impl ClassData<CDState> {
@@ -18,7 +20,7 @@ impl ClassData<CDState> {
                 Some(format!(
                     "generated.
                     __Internal.TpClientContractPropertiesStatesState{0}New(
-                    new RSharp.RBox_{0}(value).NativePtr
+                    new RSharp.RBox_{0}(value).StealInner()
                     )",
                     type_info.type_platform,
                 ))

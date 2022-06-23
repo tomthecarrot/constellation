@@ -17,24 +17,6 @@ namespace RSharp
             rsharp__Box_{{type_platform}}__drop(({{type_cs}}{{ptr_literal}})inner.p);
         }
 
-        public unsafe {{type_cs}}{{ptr_literal}} NativePtr
-        {
-            get
-            {
-                return ({{type_cs}}{{ptr_literal}})(this.Inner.Value.p);
-            }
-        }
-
-        public {{type_cs}} SharedValue
-        {
-            get
-            {
-                unsafe
-                {
-                    return {{ptr_literal}}(({{type_cs}}{{ptr_literal}})(this.Inner.Value.p));
-                }
-            }
-        }
 
         // -- C interop
 
