@@ -7,7 +7,7 @@ public unsafe {{value_owned_ident}} Value
 {{#if has_second_arg}}
         return new {{value_owned_ident}}(ptr, OwnershipSemantics.SharedRef);
 {{else}}
-        // This violates rust's single ownership rule, and is unsound
+        // TODO[SER-389]: This violates rust's single ownership rule, and is unsound
         return new {{value_owned_ident}}(ptr);
 {{/if}}
     }
