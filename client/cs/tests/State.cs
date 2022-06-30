@@ -15,15 +15,14 @@ public class TestState
     [Fact]
     public void TestI8()
     {
-        var st = new States.State_I8(-20);
+        var st = new States.State_I8(new RBox_I8(-20));
         Sys.Console.WriteLine(st.ToString());
 
-        Assert.Equal(-20, st.Value.SharedValue);
+        Assert.Equal(-20, st.Value.Value);
 
         st.Value = new RBox_I8(10);
-        Assert.Equal(10, st.Value.SharedValue);
+        Assert.Equal(10, st.Value.Value);
 
-        Assert.Null(st.Value.Inner);
         st.Dispose();
         Assert.Throws<Sys.InvalidOperationException>(() => { var val = st.Value; });
     }
@@ -31,14 +30,15 @@ public class TestState
     [Fact]
     public void TestF64()
     {
-        var st = new States.State_F64(20181.530152399);
-
-        Assert.Equal(20181.530152399, st.Value.SharedValue);
+        var b = new RBox_F64(20181.530152399);
+        var st = new States.State_F64(b);
+        // `b` should be moved from!
+        Assert.Null(b.Inner);
+        Assert.Equal(20181.530152399, st.Value.Value);
 
         st.Value = new RBox_F64(-56817.5919827);
-        Assert.Equal(-56817.5919827, st.Value.SharedValue);
+        Assert.Equal(-56817.5919827, st.Value.Value);
 
-        Assert.Null(st.Value.Inner);
         st.Dispose();
         Assert.Throws<Sys.InvalidOperationException>(() => { var val = st.Value; });
     }

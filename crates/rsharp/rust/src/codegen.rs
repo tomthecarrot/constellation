@@ -89,8 +89,8 @@ lazy_static! {
         TypeInfo::new("Bool", "bool", "*"),
         TypeInfo::new("F32", "float", "*"),
         TypeInfo::new("F64", "double", "*"),
-        TypeInfo::new("ObjectHandle", "IntPtr", ""),
-        TypeInfo::new("ContractDataHandle", "IntPtr", ""),
+        // TypeInfo::new("ObjectHandle", "IntPtr", ""),
+        // TypeInfo::new("ContractDataHandle", "IntPtr", ""),
     ]);
 }
 

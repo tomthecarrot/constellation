@@ -17,6 +17,10 @@ namespace RSharp
             rsharp__Box_{{type_platform}}__drop(({{type_cs}}{{ptr_literal}})inner.p);
         }
 
+        public unsafe {{type_cs}} Value {
+            get => *({{type_cs}}{{ptr_literal}})this.Inner.Value.p;
+        }
+
 
         // -- C interop
 
