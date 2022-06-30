@@ -1,11 +1,11 @@
 mod template_keyframe;
 mod template_state;
+pub mod type_info;
 
 pub use self::template_keyframe::CDKeyframe;
 pub use self::template_state::CDState;
 
 use handlebars::Handlebars;
-use lazy_static::lazy_static;
 use miette::{miette, IntoDiagnostic, Result, WrapErr};
 use serde::Serialize;
 use std::{
@@ -24,7 +24,7 @@ pub struct ClassData<M: Serialize = ()> {
     /// The last part of the namespace, which should contain no periods (e.g. `Channels`).
     pub namespace_sub: String,
 
-    /// C name for the type in this class.
+    /// C# name for the type in this class.
     pub class_ident: String,
 
     /// Constructor arguments for this class.
@@ -35,10 +35,6 @@ pub struct ClassData<M: Serialize = ()> {
 
     /// C symbol name for the `drop` function for this type.
     pub drop_ident: Option<String>,
-
-    /// An optional pointer literal "*" which is defined if the C# type (`type_cs`) is not `IntPtr`.
-    /// It is later concatenated with the C# type, e.g. `sbyte*`.
-    pub ptr_literal: Option<String>,
 
     /// Injects functionality beyond the scope of `ClassData<M>`.
     #[serde(flatten)]
@@ -102,45 +98,5 @@ impl Codegen {
             .render_to_write(TPL_NAME, data, output_file)
             .into_diagnostic()
             .wrap_err("Failed to render to file")
-    }
-}
-
-lazy_static! {
-    // Platform Type | C# Type
-    static ref TYPES_INFO: Vec<TypeInfo> = Vec::from([
-        TypeInfo::new("U8", "byte", true),
-        TypeInfo::new("U16", "ushort", true),
-        TypeInfo::new("U32", "uint", true),
-        TypeInfo::new("U64", "ulong", true),
-        TypeInfo::new("I8", "sbyte", true),
-        TypeInfo::new("I16", "short", true),
-        TypeInfo::new("I32", "int", true),
-        TypeInfo::new("I64", "long", true),
-        TypeInfo::new("Bool", "bool", true),
-        TypeInfo::new("F32", "float", true),
-        TypeInfo::new("F64", "double", true),
-        TypeInfo::new("ObjectHandle", "IntPtr", false),
-        TypeInfo::new("ContractDataHandle", "IntPtr", false),
-    ]);
-}
-pub struct TypeInfo {
-    type_platform: &'static str,
-    type_cs: &'static str,
-    supports_new: bool,
-}
-impl TypeInfo {
-    fn new(type_platform: &'static str, type_cs: &'static str, supports_new: bool) -> Self {
-        Self {
-            type_platform,
-            type_cs,
-            supports_new,
-        }
-    }
-    fn ptr_literal(&self) -> Option<String> {
-        if !self.type_cs.eq("IntPtr") {
-            Some("*".to_string())
-        } else {
-            None
-        }
     }
 }

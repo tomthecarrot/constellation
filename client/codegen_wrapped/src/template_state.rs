@@ -1,4 +1,7 @@
-use crate::{ClassData, TypeInfo, TYPES_INFO};
+use crate::{
+    type_info::{PrimitiveType, TypeInfo},
+    ClassData,
+};
 
 use serde::Serialize;
 
@@ -10,12 +13,12 @@ pub struct CDState {
     type_platform: String,
 }
 impl ClassData<CDState> {
-    fn new(type_info: &TypeInfo) -> Self {
+    fn new(type_info: &PrimitiveType) -> Self {
         ClassData {
             namespace_super: "Contract.Properties".to_string(),
             namespace_sub: "States".to_string(),
-            class_ident: format!("State_{}", type_info.type_platform),
-            new_args: format!("{} value", type_info.type_cs),
+            class_ident: format!("State_{}", type_info.mangled_name()),
+            new_args: format!("{} value", type_info.owned_ident()),
             new_expr: if type_info.supports_new {
                 Some(format!(
                     "generated.
