@@ -1,4 +1,4 @@
-use cs_codegen::{CDKeyframe, /*CDState,*/ ClassData, Codegen};
+use cs_codegen::{CDKeyframe, CDState, ClassData, Codegen};
 use miette::{Result, WrapErr};
 
 fn main() -> Result<()> {
