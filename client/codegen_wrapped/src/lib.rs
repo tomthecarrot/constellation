@@ -1,6 +1,9 @@
-mod keyframe_template;
+mod template_keyframe;
+mod template_state;
+pub mod type_info;
 
-pub use self::keyframe_template::Kf;
+pub use self::template_keyframe::CDKeyframe;
+pub use self::template_state::CDState;
 
 use handlebars::Handlebars;
 use miette::{miette, IntoDiagnostic, Result, WrapErr};
@@ -15,10 +18,25 @@ const TPL_NAME: &'static str = "tpl";
 /// `M` Is the additional data to populate `additional_methods` partial template
 #[derive(Clone, Serialize)]
 pub struct ClassData<M: Serialize = ()> {
+    /// The first parts of the namespace (e.g. `Contract.Properties`).
+    pub namespace_super: String,
+
+    /// The last part of the namespace, which should contain no periods (e.g. `Channels`).
+    pub namespace_sub: String,
+
+    /// C# name for the type in this class.
     pub class_ident: String,
+
+    /// Constructor arguments for this class.
     pub new_args: String,
+
+    /// The expression passed as an argument to the `new` function for this type.
     pub new_expr: Option<String>,
-    pub drop_ident: String,
+
+    /// C symbol name for the `drop` function for this type.
+    pub drop_ident: Option<String>,
+
+    /// Injects functionality beyond the scope of `ClassData<M>`.
     #[serde(flatten)]
     pub additional_methods: Option<M>,
 }

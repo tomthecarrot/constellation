@@ -83,11 +83,23 @@ namespace RSharp
             this.Dispose();
         }
 
+        /// Transfers ownership of `Inner`, and returns it.
+        ///
+        /// This "steals" the inner data by returning it and setting `Inner` in this
+        /// instance to `null`. This is important to avoid double-free and
+        /// use-after-free bugs.
+        public T StealInner()
+        {
+            var result = this.inner.Value;
+            this.inner = null;
+            return result;
+        }
+
         /// Implemented by subclasses to provide the exact native destructor to call
         abstract protected void NativeDrop(T inner);
     }
 
-    public abstract class OpaqueWrapper<T> : IDisposable where T : class
+    public abstract class OpaqueWrapper<T> : IDisposable
     {
         private Ptr<T>? inner;
 
@@ -127,7 +139,19 @@ namespace RSharp
             this.Dispose();
         }
 
-        /// Implemented by subclasses to provide the exact native destructor to call
+        /// Transfers ownership of `Inner`, and returns it.
+        ///
+        /// This "steals" the inner data by returning it and setting `Inner` in this
+        /// instance to `null`. This is important to avoid double-free and
+        /// use-after-free bugs.
+        public Ptr<T> StealInner()
+        {
+            var result = this.inner.Value;
+            this.inner = null;
+            return result;
+        }
+
+        /// Implemented by subclasses to provide the exact native destructor to call.
         abstract protected void NativeDrop(Ptr<T> inner);
     }
 }
