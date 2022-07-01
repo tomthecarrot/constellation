@@ -29,7 +29,6 @@ public class TestKeyframe
     [Fact]
     public void TestVec()
     {
-        using
         var v = new Channels.RVec_Keyframe_U8();
 
         var kf0 = new Channels.Keyframe_U8(new RBox_U8(0), 0.0);
