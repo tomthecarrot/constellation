@@ -1,6 +1,6 @@
 <img src="logo.png" width="200"/>
 
-# Teleportal Platform v3
+# Teleportal Platform
 
 The teleportal platform is a time-sampled and realtime data model and spatial computing
 library. For more info, reach out to us as [hello@teleportal.app][hello email].
