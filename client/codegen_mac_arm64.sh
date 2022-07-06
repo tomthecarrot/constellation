@@ -29,7 +29,7 @@ mv $PLATFORM_DIR/target/x86_64-apple-darwin/debug/deps/libtp_client.dylib $PLATF
 mv $PLATFORM_DIR/target/x86_64-apple-darwin/debug/deps/librsharp.dylib $PLATFORM_DIR/target/x86_64-apple-darwin/debug/deps/librsharp
 
 cargo test -p tp_client
-cargo test -p rsharp
+cargo run -p rsharp
 
 cd $CLIENT_DIR/codegen_pinvoke
 dotnet run -a x64
