@@ -1,4 +1,4 @@
-use miette::{Result, WrapErr};
+use eyre::{Result, WrapErr};
 use rsharp::codegen::Codegen;
 
 fn main() -> Result<()> {

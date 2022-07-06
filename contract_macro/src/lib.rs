@@ -127,14 +127,14 @@ macro_rules! template_impl {
 
                 impl $trait_name for #s_name {
                     fn #type_ids_ident() -> &'static [::std::any::TypeId] {
-                        ::lazy_static::lazy_static! {
+                        ::tp_client::lazy_static::lazy_static! {
                             static ref TYPE_IDS: Vec<::std::any::TypeId> = vec![#(#typeids),*];
                         }
                         TYPE_IDS.as_slice()
                     }
 
                     fn #enumerate_types_ident() -> &'static [::tp_client::contract::properties::dynamic::TpPropertyType] {
-                        ::lazy_static::lazy_static! {
+                        ::tp_client::lazy_static::lazy_static! {
                             static ref PROP_TYPES: Vec<::tp_client::contract::properties::dynamic::TpPropertyType> = vec![#(#prop_types),*];
                         }
                         PROP_TYPES.as_slice()
