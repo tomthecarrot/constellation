@@ -1,6 +1,6 @@
 use handlebars::Handlebars;
 use lazy_static::lazy_static;
-use miette::{miette, IntoDiagnostic, Result, WrapErr};
+use eyre::{eyre, Result, WrapErr};
 use serde::Serialize;
 use std::{
     fs::File,
@@ -23,13 +23,12 @@ impl Codegen {
             .unwrap()
             .join("cs/src/generated");
 
-        if output_dir.exists() && output_dir.read_dir().into_diagnostic()?.next().is_some() {
-            return Err(miette!(format!(
+        if output_dir.exists() && output_dir.read_dir()?.next().is_some() {
+            return Err(eyre!(format!(
                 "`output_dir` is not empty! Please delete it. (output_dir={output_dir:?})"
             )));
         }
         std::fs::create_dir_all(&output_dir)
-            .into_diagnostic()
             .wrap_err_with(|| format!("Failed to create `output_dir`={output_dir:?}"))?;
 
         let mut reg = handlebars::Handlebars::new();
@@ -42,11 +41,9 @@ impl Codegen {
         // Don't escape characters
         reg.register_escape_fn(|s| s.to_string());
 
-        reg.register_template_file(TPL_NAME, &tpl_path)
-            .into_diagnostic()?;
+        reg.register_template_file(TPL_NAME, &tpl_path)?;
 
         std::fs::read_to_string(&partial_path)
-            .into_diagnostic()
             .wrap_err("Failed to read partial template file")?;
 
         Ok(Self { reg, output_dir })
@@ -57,12 +54,10 @@ impl Codegen {
             .output_dir
             .join(format!("RBox_{}.cs", type_info.type_platform));
         let output_file = File::create(&output_path)
-            .into_diagnostic()
             .wrap_err_with(|| format!("Failed to create output file for RBox."))?;
 
         self.reg
             .render_to_write(TPL_NAME, type_info, output_file)
-            .into_diagnostic()
             .wrap_err("Failed to render to file")
     }
 

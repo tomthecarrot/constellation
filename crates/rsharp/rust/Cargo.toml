@@ -15,6 +15,6 @@ rsharp_macro = { path = "macro" }
 paste = "1"
 safer-ffi = { version = "0.0.10", features = ["proc_macros", "headers"] }
 handlebars = "4.2"
-miette = { version = "5", features = ["fancy"] }
+eyre = "0.6"
 serde = { version = "1", features = ["derive"] }
 lazy_static = "1"
