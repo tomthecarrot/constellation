@@ -126,7 +126,7 @@ namespace Teleportal.Client.Contract
         {
             get
             {
-                throw new System.NotImplementedException("TODO: SER-392");
+                throw new System.NotImplementedException("TODO: SER-395");
             }
         }
 
@@ -134,7 +134,7 @@ namespace Teleportal.Client.Contract
         {
             get
             {
-                throw new System.NotImplementedException("TODO: SER-392");
+                throw new System.NotImplementedException("TODO: SER-395");
             }
         }
 
@@ -142,7 +142,7 @@ namespace Teleportal.Client.Contract
         {
             get
             {
-                throw new System.NotImplementedException("TODO: SER-392");
+                throw new System.NotImplementedException("TODO: SER-395");
             }
         }
 
@@ -150,7 +150,7 @@ namespace Teleportal.Client.Contract
         {
             get
             {
-                throw new System.NotImplementedException("TODO: SER-392");
+                throw new System.NotImplementedException("TODO: SER-395");
             }
         }
 
@@ -158,7 +158,7 @@ namespace Teleportal.Client.Contract
         {
             get
             {
-                throw new System.NotImplementedException("TODO: SER-392");
+                throw new System.NotImplementedException("TODO: SER-395");
             }
         }
 
@@ -166,7 +166,7 @@ namespace Teleportal.Client.Contract
         {
             get
             {
-                throw new System.NotImplementedException("TODO: SER-392");
+                throw new System.NotImplementedException("TODO: SER-395");
             }
         }
     }
