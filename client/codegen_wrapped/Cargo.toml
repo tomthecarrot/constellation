@@ -6,8 +6,6 @@ edition = "2021"
 # Prevent accidental `cargo publish`
 publish = false
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
 syn = { version = "1", features = ["full"] }
 handlebars = "4.2"
@@ -15,3 +13,4 @@ miette = { version = "4", features = ["fancy"] }
 serde = { version = "1", features = ["derive"] }
 lazy_static = "1"
 enum_dispatch = "0.3"
+clap = { version = "3", features = ["derive"] }

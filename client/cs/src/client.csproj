@@ -15,6 +15,8 @@
 
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Nullable>enable</Nullable>
+
+    <NoWarn>CS8629</NoWarn>
   </PropertyGroup>
 
 </Project>
