@@ -292,8 +292,8 @@ pub mod c_api {
 
         #[remangle(substitute!())]
         #[ffi_export]
-        pub fn ExampleContract__states(c: &ExampleContract) -> repr_c::Box<ExampleStates> {
-            Box::new(c.states().clone()).into()
+        pub fn ExampleContract__states<'a>(c: &'a ExampleContract) -> &'a ExampleStates {
+            c.states()
         }
     }
     pub use _ExampleContract::ExampleContract;
