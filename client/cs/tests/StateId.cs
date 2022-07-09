@@ -13,7 +13,6 @@ public class TestStateId
         this.output = output;
     }
 
-    [Fact(Skip = "TODO: SER-395")]
     public void TestContractDataHandle()
     {
         var baseline = new Baseline(true);
