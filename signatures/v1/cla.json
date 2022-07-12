@@ -1,3 +1,12 @@
 {
-   "signedContributors": []
+  "signedContributors": [
+    {
+      "name": "tomthecarrot",
+      "id": 5103968,
+      "comment_id": 1181187126,
+      "created_at": "2022-07-12T00:40:18Z",
+      "repoId": 411308999,
+      "pullRequestNo": 92
+    }
+  ]
 }
