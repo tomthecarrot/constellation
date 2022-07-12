@@ -1,6 +1,6 @@
 # Contributing
 
-Thank you for helping design the future of spatial computing! This document describes
+Thank you for helping build the future of spatial computing! This document describes
 what you need to know to contribute to this project.
 
 
