@@ -1,10 +1,12 @@
 mod template_keyframe;
 mod template_state;
+mod template_state_handle;
 mod template_state_id;
 pub mod type_info;
 
 pub use self::template_keyframe::CDKeyframe;
 pub use self::template_state::CDState;
+pub use self::template_state_handle::CDStateHandle;
 pub use self::template_state_id::CDStateId;
 
 use handlebars::Handlebars;
@@ -28,6 +30,9 @@ pub struct ClassData<M: Serialize = ()> {
 
     /// C# name for the type in this class.
     pub class_ident: String,
+
+    /// Whether the type can only be constructed with owned pointers
+    pub only_owned: bool,
 
     /// Constructor arguments for this class.
     pub new_args: String,
