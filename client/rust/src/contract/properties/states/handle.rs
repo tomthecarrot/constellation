@@ -79,9 +79,17 @@ pub mod c_api {
                     pub struct [<StateHandle_ $t:camel>] {
                         pub inner: StateHandle<$t>,
                     }
+                    pub use [<StateHandle_ $t:camel>] as Monomorphized;
+
+                    #[remangle($path)]
+                    #[ffi_export]
+                    pub fn [<StateHandle_ $t:camel __drop>](h: repr_c::Box<Monomorphized>) {
+                        drop(h)
+                    }
                 }
                 pub use [<_StateHandle_ $t:camel>]::[<StateHandle_ $t:camel>];
-            }
+
+             }
         };
         // recursive case
         ($path:literal, $first_t:ty, $($tail_t:ty),+ $(,)?) => {

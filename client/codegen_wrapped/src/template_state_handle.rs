@@ -6,33 +6,28 @@ use crate::{
 use serde::Serialize;
 
 #[derive(Serialize)]
-pub struct CDStateId {
-    /// The mangled name of the inner type (`F32`, `ObjectHandle`)
-    inner_mangled_name: String,
-}
-impl ClassData<CDStateId> {
+pub struct CDStateHandle;
+impl ClassData<CDStateHandle> {
     fn new(type_info: &PrimitiveType) -> Self {
         ClassData {
             namespace_super: "Contract.Properties".to_string(),
             namespace_sub: "States".to_string(),
-            class_ident: format!("StateId_{}", type_info.mangled_name()),
-            only_owned: false,
+            class_ident: format!("StateHandle_{}", type_info.mangled_name()),
+            only_owned: true,
             new_args: "".to_owned(),
             new_expr: None,
             drop_ident: Some(format!(
-                "generated.__Internal.TpClientContractPropertiesStatesStateId{}Drop",
+                "generated.__Internal.TpClientContractPropertiesStatesStateHandle{}Drop",
                 type_info.mangled_name()
             )),
-            additional_methods: Some(CDStateId {
-                inner_mangled_name: type_info.mangled_name().to_owned(),
-            }),
+            additional_methods: None,
         }
     }
 
     pub fn generate_class_data() -> Vec<Self> {
         PrimitiveType::types()
             .iter()
-            .map(ClassData::<CDStateId>::new)
+            .map(ClassData::<CDStateHandle>::new)
             .collect()
     }
 }

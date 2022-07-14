@@ -24,6 +24,7 @@ impl ClassData<CDState> {
             namespace_super: "Contract.Properties".to_string(),
             namespace_sub: "States".to_string(),
             class_ident: format!("State_{}", type_info.mangled_name()),
+            only_owned: false,
             new_args: format!("{} value", type_info.owned_ident()),
             new_expr: Some(format!(
                 "generated.__Internal.TpClientContractPropertiesStatesState{}New(
