@@ -8,7 +8,7 @@ using ExampleContract = Teleportal.Client.Contract.ExampleContract;
 
 namespace Teleportal.Client
 {
-    public sealed class Baseline : OpaqueWrapper<Baseline>
+    public sealed partial class Baseline : OpaqueWrapper<Baseline>
     {
 
         public Baseline(bool is_main) : base(new Ptr<Baseline>(
