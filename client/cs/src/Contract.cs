@@ -107,6 +107,25 @@ namespace Teleportal.Client.Contract
                 return new ExampleStates(p);
             }
         }
+
+        public ObjectHandle ObjectCreate(Baseline baseline, byte u8_0, byte u8_1, sbyte i8_0, sbyte i8_1, float f32_0, float f32_1)
+        {
+            if (baseline.OwnershipSemantics == OwnershipSemantics.SharedRef)
+            {
+                throw new OwnershipException("`baseline` must be mutable");
+            }
+            var p = new Ptr<ObjectHandle>(generated.__Internal.TpClientContractExampleContractObjectCreate(this.Inner.Value.p, baseline.Inner.Value.p, u8_0, u8_1, i8_0, i8_1, f32_0, f32_1));
+            return new ObjectHandle(p);
+        }
+
+        public void ObjectRemove(Baseline baseline, ObjectHandle obj)
+        {
+            if (baseline.OwnershipSemantics == OwnershipSemantics.SharedRef)
+            {
+                throw new OwnershipException("`baseline` must be mutable");
+            }
+            generated.__Internal.TpClientContractExampleContractObjectRemove(baseline.Inner.Value.p, obj.Inner.Value.p);
+        }
     }
 
     public class ExampleStates : OpaqueWrapper<ExampleStates>
