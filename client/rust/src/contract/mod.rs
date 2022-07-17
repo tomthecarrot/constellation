@@ -234,7 +234,10 @@ pub mod c_api {
     mod _ExampleContract {
         use super::ContractDataHandle as CContractDataHandle;
         use super::ExampleStates;
+        use crate::baseline::Baseline;
+        use crate::contract::properties::dynamic::DynTpProperty;
         use crate::contract::{Contract, ContractDataHandle, ContractId};
+        use crate::object::c_api::ObjectHandle as CObjectHandle;
 
         use rsharp::remangle;
         use safer_ffi::prelude::*;
@@ -294,6 +297,43 @@ pub mod c_api {
         #[ffi_export]
         pub fn ExampleContract__states<'a>(c: &'a ExampleContract) -> &'a ExampleStates {
             c.states()
+        }
+
+        #[remangle(substitute!())]
+        #[ffi_export]
+        pub fn ExampleContract__object_create(
+            contract: &ExampleContract,
+            baseline: &mut Baseline,
+            u8_0: u8,
+            u8_1: u8,
+            i8_0: i8,
+            i8_1: i8,
+            f32_0: f32,
+            f32_1: f32,
+        ) -> repr_c::Box<CObjectHandle> {
+            let states = [
+                DynTpProperty::Primitive(u8_0.into()),
+                DynTpProperty::Primitive(u8_1.into()),
+                DynTpProperty::Primitive(i8_0.into()),
+                DynTpProperty::Primitive(i8_1.into()),
+                DynTpProperty::Primitive(f32_0.into()),
+                DynTpProperty::Primitive(f32_1.into()),
+            ];
+            let obj = baseline
+                .object_create(contract, states.into_iter(), [].into_iter())
+                .unwrap();
+            Box::new(CObjectHandle::from(obj)).into()
+        }
+
+        #[remangle(substitute!())]
+        #[ffi_export]
+        pub fn ExampleContract__object_remove(
+            baseline: &mut Baseline,
+            obj: repr_c::Box<CObjectHandle>,
+        ) {
+            baseline
+                .object_remove::<ExampleContract>(obj.inner)
+                .unwrap()
         }
     }
     pub use _ExampleContract::ExampleContract;

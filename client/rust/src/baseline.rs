@@ -442,8 +442,6 @@ pub mod c_api {
         baseline.object_mut(handle.inner).unwrap()
     }
 
-    // TODO: object_create/remove
-
     macro_rules! monomorphize {
         // Base case
         ($path:literal, $t:ty $(,)?) => {
