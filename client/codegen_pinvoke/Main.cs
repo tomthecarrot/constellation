@@ -29,8 +29,8 @@ namespace Codegen
 
     public class Codegen : CppSharp.ILibrary
     {
-        static DirectoryInfo project_dir = GetProjectDir();
-        LibInfo lib_info;
+        private static DirectoryInfo project_dir = GetProjectDir();
+        private LibInfo lib_info;
         private const bool overwrite = true;
 
         static int Main(string[] args)
