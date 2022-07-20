@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\crates\rsharp\cs\src\rsharp.csproj" />
+    <ProjectReference Include="..\..\..\client\cs\src\client.csproj" />
   </ItemGroup>
 
   <ItemGroup>
