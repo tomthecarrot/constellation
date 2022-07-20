@@ -10,6 +10,7 @@ members = [
     "crates/better_borrow",
     "crates/rsharp/rust",
     "crates/rsharp/rust/macro",
+    "demos/unity_states/rust",
 ]
 
 [profile.release]
