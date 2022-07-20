@@ -69,6 +69,8 @@ namespace Codegen
                     return -1;
                 }
 
+                lib.output_dir.Delete(true);
+
                 CppSharp.ConsoleDriver.Run(new Codegen(lib));
             }
 
