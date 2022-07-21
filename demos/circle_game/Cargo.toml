@@ -46,9 +46,8 @@ features = ["console"]
 
 # The `console_error_panic_hook` crate provides better debugging of panics by
 # logging them with `console.error`. This is great for development, but requires
-# all the `std::fmt` and `std::panicking` infrastructure, so it's only enabled
-# in debug mode.
-[target.'cfg(all(target_arch = "wasm32", debug_assertions))'.dependencies]
+# all the `std::fmt` and `std::panicking` infrastructure
+[target.'cfg(all(target_arch = "wasm32"))'.dependencies]
 console_error_panic_hook = "0.1.5"
 
 # These crates are used for running unit tests.
