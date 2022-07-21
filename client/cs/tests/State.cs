@@ -16,7 +16,7 @@ public class TestState
     public void TestI8()
     {
         var st = new States.State_I8(new RBox_I8(-20));
-        Sys.Console.WriteLine(st.ToString());
+        output.WriteLine(st.ToString());
 
         Assert.Equal(-20, st.Value.Value);
 

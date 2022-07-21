@@ -17,7 +17,7 @@ public class TestKeyframe
     public void TestScalar()
     {
         var kf = new Channels.Keyframe_U8(new RBox_U8(10), 1.0);
-        Sys.Console.WriteLine(kf.ToString());
+        output.WriteLine(kf.ToString());
 
         Assert.Equal(10, kf.Value.Value);
         Assert.Equal(1.0, kf.Time);
