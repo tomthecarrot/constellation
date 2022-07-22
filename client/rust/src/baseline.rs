@@ -61,18 +61,6 @@ impl Baseline {
         self.kind
     }
 
-    // ---- Called by the Baseline on its fork ----
-
-    // TODO[SER-259]: determine method for notifying Baseline fork.
-
-    fn on_state_change<T: ITpPropertyStatic>(&self, state: StateHandle<T>) {
-        todo!("Notify fork");
-    }
-
-    fn on_channel_change<T: ITpPropertyStatic>(&self, channel: ChannelHandle<T>) {
-        todo!("Notify fork");
-    }
-
     // ---- Object and Contract Acessors ----
 
     pub fn register_contract<C: Contract>(&mut self) -> Result<C> {
