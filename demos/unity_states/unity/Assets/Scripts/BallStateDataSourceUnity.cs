@@ -17,6 +17,7 @@ public class BallStateDataSourceUnity : MonoBehaviour, IBallStateDataSource
     void Update()
     {
         // TODO[SER-383]
+        LogCurrentData();
     }
 
     public void LogCurrentData()
@@ -115,10 +116,10 @@ public class BallStateDataSourceUnity : MonoBehaviour, IBallStateDataSource
         get
         {
             UnityEngine.Color c = this.meshRenderer.materials[0].color;
-            ushort r = (ushort)(c.r * 255);
-            ushort g = (ushort)(c.g * 255);
-            ushort b = (ushort)(c.b * 255);
-            ushort a = (ushort)(c.a * 255);
+            ushort r = (ushort)(c.r * 65535);
+            ushort g = (ushort)(c.g * 65535);
+            ushort b = (ushort)(c.b * 65535);
+            ushort a = (ushort)(c.a * 65535);
 
             ulong rgba = (ulong)((r << 48) | (g << 32) | (b << 16) | a);
             return rgba;
