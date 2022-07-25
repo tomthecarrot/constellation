@@ -1,6 +1,7 @@
 using UnityEngine;
 using TP = Teleportal.Client;
 using States = Teleportal.Client.Contract.Properties.States;
+using RSharp;
 
 // Attach to Ball prefab.
 [RequireComponent(typeof(BallStateDataSourceUnity))]
@@ -35,6 +36,7 @@ public class BallStateDataSourcePlatform : MonoBehaviour, IBallStateDataSource
     {
         // TODO[SER-383]
         LogCurrentData();
+        this.pos_y = this.dataSourceUnity.pos_y;
     }
 
     private void InstantiatePlatformObject()
@@ -100,6 +102,10 @@ public class BallStateDataSourcePlatform : MonoBehaviour, IBallStateDataSource
         get
         {
             return this.baselineMain.State(this.stateHandlePosY).Value.Value;
+        }
+        set
+        {
+            this.baselineMain.State(this.stateHandlePosY).Value = new RSharp.RBox_F32(value);
         }
     }
 
