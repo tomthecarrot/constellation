@@ -3,6 +3,7 @@ using Sys = System;
 using Xunit;
 using RSharp;
 using Baseline = Teleportal.Client.Baseline;
+using ExampleContract = Teleportal.Client.Contract.ExampleContract;
 
 public class TestStateId
 {
@@ -16,7 +17,7 @@ public class TestStateId
     public void TestContractDataHandle()
     {
         var baseline = new Baseline(true);
-        var contract = baseline.registerContractExample();
+        var contract = ExampleContract.register(baseline);
         var s = contract.States;
 
         var u8_0 = s.U8_0;
