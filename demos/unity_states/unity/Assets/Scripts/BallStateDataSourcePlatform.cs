@@ -95,6 +95,10 @@ public class BallStateDataSourcePlatform : MonoBehaviour, IBallStateDataSource
         {
             return this.baselineMain.State(this.stateHandlePosX).Value.Value;
         }
+        set
+        {
+            this.baselineMain.State(this.stateHandlePosX).Value = new RSharp.RBox_F32(value);
+        }
     }
 
     public float pos_y
@@ -115,6 +119,10 @@ public class BallStateDataSourcePlatform : MonoBehaviour, IBallStateDataSource
         {
             return this.baselineMain.State(this.stateHandlePosZ).Value.Value;
         }
+        set
+        {
+            this.baselineMain.State(this.stateHandlePosZ).Value = new RSharp.RBox_F32(value);
+        }
     }
 
     public short euler_x
@@ -122,6 +130,10 @@ public class BallStateDataSourcePlatform : MonoBehaviour, IBallStateDataSource
         get
         {
             return this.baselineMain.State(this.stateHandleEulerX).Value.Value;
+        }
+        set
+        {
+            this.baselineMain.State(this.stateHandleEulerX).Value = new RSharp.RBox_I16(value);
         }
     }
 
@@ -131,6 +143,10 @@ public class BallStateDataSourcePlatform : MonoBehaviour, IBallStateDataSource
         {
             return this.baselineMain.State(this.stateHandleEulerY).Value.Value;
         }
+        set
+        {
+            this.baselineMain.State(this.stateHandleEulerY).Value = new RSharp.RBox_I16(value);
+        }
     }
 
     public short euler_z
@@ -138,6 +154,10 @@ public class BallStateDataSourcePlatform : MonoBehaviour, IBallStateDataSource
         get
         {
             return this.baselineMain.State(this.stateHandleEulerZ).Value.Value;
+        }
+        set
+        {
+            this.baselineMain.State(this.stateHandleEulerZ).Value = new RSharp.RBox_I16(value);
         }
     }
 
@@ -147,6 +167,10 @@ public class BallStateDataSourcePlatform : MonoBehaviour, IBallStateDataSource
         {
             return this.baselineMain.State(this.stateHandleScaleX).Value.Value;
         }
+        set
+        {
+            this.baselineMain.State(this.stateHandleScaleX).Value = new RSharp.RBox_F32(value);
+        }
     }
 
     public float scale_y
@@ -154,6 +178,10 @@ public class BallStateDataSourcePlatform : MonoBehaviour, IBallStateDataSource
         get
         {
             return this.baselineMain.State(this.stateHandleScaleY).Value.Value;
+        }
+        set
+        {
+            this.baselineMain.State(this.stateHandleScaleY).Value = new RSharp.RBox_F32(value);
         }
     }
 
@@ -163,6 +191,10 @@ public class BallStateDataSourcePlatform : MonoBehaviour, IBallStateDataSource
         {
             return this.baselineMain.State(this.stateHandleScaleZ).Value.Value;
         }
+        set
+        {
+            this.baselineMain.State(this.stateHandleScaleZ).Value = new RSharp.RBox_F32(value);
+        }
     }
 
     public ulong color
@@ -170,6 +202,10 @@ public class BallStateDataSourcePlatform : MonoBehaviour, IBallStateDataSource
         get
         {
             return this.baselineMain.State(this.stateHandleColor).Value.Value;
+        }
+        set
+        {
+            this.baselineMain.State(this.stateHandleColor).Value = new RSharp.RBox_U64(value);
         }
     }
 }
