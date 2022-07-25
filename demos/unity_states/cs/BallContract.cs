@@ -8,7 +8,7 @@ public class BallContract : OpaqueWrapper<BallContract>
 {
     unsafe BallContract(Ptr<BallContract> inner) : base(inner, OwnershipSemantics.Owned) { }
 
-    unsafe BallContract Register(Baseline baseline)
+    public static unsafe BallContract Register(Baseline baseline)
     {
         if (baseline.OwnershipSemantics == OwnershipSemantics.SharedRef)
         {
@@ -18,7 +18,7 @@ public class BallContract : OpaqueWrapper<BallContract>
         return new BallContract(p);
     }
 
-    unsafe void Unregister(Baseline baseline)
+    public unsafe void Unregister(Baseline baseline)
     {
         if (baseline.OwnershipSemantics == OwnershipSemantics.SharedRef)
         {
@@ -32,7 +32,7 @@ public class BallContract : OpaqueWrapper<BallContract>
         ffi.BallContract_drop(inner.p);
     }
 
-    ContractDataHandle Handle
+    public ContractDataHandle Handle
     {
         get
         {
@@ -41,7 +41,7 @@ public class BallContract : OpaqueWrapper<BallContract>
         }
     }
 
-    BallStates States
+    public BallStates States
     {
         get
         {
@@ -50,7 +50,7 @@ public class BallContract : OpaqueWrapper<BallContract>
         }
     }
 
-    ObjectHandle ObjectCreate(
+    public ObjectHandle ObjectCreate(
         Baseline baseline,
         float pos_x,
         float pos_y,
@@ -79,7 +79,7 @@ public class BallContract : OpaqueWrapper<BallContract>
         return new ObjectHandle(p);
     }
 
-    void ObjectRemove(Baseline baseline, ContractDataHandle contract)
+    public static void ObjectRemove(Baseline baseline, ContractDataHandle contract)
     {
         if (baseline.OwnershipSemantics == OwnershipSemantics.SharedRef)
         {
