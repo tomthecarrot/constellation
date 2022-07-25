@@ -12,13 +12,10 @@ public class BallStateDataSourceUnity : MonoBehaviour, IBallStateDataSource
     {
         this.dataSourcePlatform = GetComponent<BallStateDataSourcePlatform>();
         this.meshRenderer = GetComponent<MeshRenderer>();
-
-        // TODO[SER-383]
     }
 
     void Update()
     {
-        // TODO[SER-383]
         LogCurrentData();
     }
 

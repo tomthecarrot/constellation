@@ -34,9 +34,8 @@ public class BallStateDataSourcePlatform : MonoBehaviour, IBallStateDataSource
 
     void Update()
     {
-        // TODO[SER-383]
+        ApplyUnityStateToPlatformBaseline();
         LogCurrentData();
-        this.pos_y = this.dataSourceUnity.pos_y;
     }
 
     private void InstantiatePlatformObject()
@@ -67,6 +66,20 @@ public class BallStateDataSourcePlatform : MonoBehaviour, IBallStateDataSource
         this.stateHandleScaleY = this.baselineMain.BindStateF32(this.ballStates.ScaleY, this.ballObject);
         this.stateHandleScaleZ = this.baselineMain.BindStateF32(this.ballStates.ScaleZ, this.ballObject);
         this.stateHandleColor = this.baselineMain.BindStateU64(this.ballStates.Color, this.ballObject);
+    }
+
+    private void ApplyUnityStateToPlatformBaseline()
+    {
+        this.pos_x = this.dataSourceUnity.pos_x;
+        this.pos_y = this.dataSourceUnity.pos_y;
+        this.pos_z = this.dataSourceUnity.pos_z;
+        this.euler_x = this.dataSourceUnity.euler_x;
+        this.euler_y = this.dataSourceUnity.euler_y;
+        this.euler_z = this.dataSourceUnity.euler_z;
+        this.scale_x = this.dataSourceUnity.scale_x;
+        this.scale_y = this.dataSourceUnity.scale_y;
+        this.scale_z = this.dataSourceUnity.scale_z;
+        this.color = this.dataSourceUnity.color;
     }
 
     public void LogCurrentData()
