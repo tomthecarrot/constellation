@@ -27,6 +27,14 @@ namespace Teleportal.Client
             return new States.State_I8(p, OwnershipSemantics.SharedRef);
         }
 
+        public States.State_I16 State(States.StateHandle_I16 state_handle)
+        {
+            var p = new Ptr<States.State_I16>(
+                ffi.TpClientBaselineBaselineStateI16(this.Inner.Value.p, state_handle.Inner.Value.p)
+            );
+            return new States.State_I16(p, OwnershipSemantics.SharedRef);
+        }
+
         public States.State_F32 State(States.StateHandle_F32 state_handle)
         {
             var p = new Ptr<States.State_F32>(
@@ -46,6 +54,14 @@ namespace Teleportal.Client
                 ffi.TpClientBaselineBaselineStateMutU8(this.Inner.Value.p, state_handle.Inner.Value.p)
             );
             return new States.State_U8(p, OwnershipSemantics.MutRef);
+        }
+
+        public States.State_U64 State(States.StateHandle_U64 state_handle)
+        {
+            var p = new Ptr<States.State_U64>(
+                ffi.TpClientBaselineBaselineStateU64(this.Inner.Value.p, state_handle.Inner.Value.p)
+            );
+            return new States.State_U64(p, OwnershipSemantics.SharedRef);
         }
 
         public States.State_I8 StateMut(States.StateHandle_I8 state_handle)
