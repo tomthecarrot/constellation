@@ -1,14 +1,16 @@
 using UnityEngine;
 
 // Attach to Ball prefab.
+[RequireComponent(typeof(BallStateDataSourcePlatform))]
 [RequireComponent(typeof(MeshRenderer))]
 public class BallStateDataSourceUnity : MonoBehaviour, IBallStateDataSource
 {
-
+    private BallStateDataSourcePlatform dataSourcePlatform;
     private MeshRenderer meshRenderer;
 
     void Awake()
     {
+        this.dataSourcePlatform = GetComponent<BallStateDataSourcePlatform>();
         this.meshRenderer = GetComponent<MeshRenderer>();
 
         // TODO[SER-383]
@@ -22,12 +24,13 @@ public class BallStateDataSourceUnity : MonoBehaviour, IBallStateDataSource
 
     public void LogCurrentData()
     {
+        string type = this.type.ToString();
         string pos = $"({this.pos_x.ToString()}, {this.pos_y.ToString()}, {this.pos_z.ToString()})";
         string euler = $"({this.euler_x.ToString()}, {this.euler_y.ToString()}, {this.euler_z.ToString()})";
         string scale = $"({this.scale_x.ToString()}, {this.scale_y.ToString()}, {this.scale_z.ToString()})";
         string color = $"{this.color.ToString()}";
 
-        string debug_str = $"{pos}\n{euler}\n{scale}\n{color}";
+        string debug_str = $"{type}:\n{pos}\n{euler}\n{scale}\n{color}";
         Debug.Log(debug_str);
     }
 
@@ -115,15 +118,22 @@ public class BallStateDataSourceUnity : MonoBehaviour, IBallStateDataSource
     {
         get
         {
-            // Convert to 16-bit raw RGBA
-            UnityEngine.Color c = this.meshRenderer.materials[0].color;
-            ushort r = (ushort)(c.r * 65535);
-            ushort g = (ushort)(c.g * 65535);
-            ushort b = (ushort)(c.b * 65535);
-            ushort a = (ushort)(c.a * 65535);
+            if (null == this.meshRenderer || this.meshRenderer.materials.Length == 0)
+            {
+                return 0;
+            }
+            else
+            {
+                // Convert to 16-bit raw RGBA
+                UnityEngine.Color c = this.meshRenderer.materials[0].color;
+                ushort r = (ushort)(c.r * 65535);
+                ushort g = (ushort)(c.g * 65535);
+                ushort b = (ushort)(c.b * 65535);
+                ushort a = (ushort)(c.a * 65535);
 
-            ulong rgba = (ulong)((r << 48) | (g << 32) | (b << 16) | a);
-            return rgba;
+                ulong rgba = (ulong)((r << 48) | (g << 32) | (b << 16) | a);
+                return rgba;
+            }
         }
     }
 }
