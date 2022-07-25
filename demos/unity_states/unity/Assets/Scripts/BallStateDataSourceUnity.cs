@@ -115,6 +115,7 @@ public class BallStateDataSourceUnity : MonoBehaviour, IBallStateDataSource
     {
         get
         {
+            // Convert to 16-bit raw RGBA
             UnityEngine.Color c = this.meshRenderer.materials[0].color;
             ushort r = (ushort)(c.r * 65535);
             ushort g = (ushort)(c.g * 65535);
