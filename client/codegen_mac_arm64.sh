@@ -20,6 +20,10 @@ cargo build -p rsharp --target x86_64-apple-darwin
 cargo build -p unity_states
 cargo build -p unity_states --target x86_64-apple-darwin
 
+ln -s $PLATFORM_DIR/target/debug/libtp_client.dylib $PLATFORM_DIR/target/debug/libtp_client
+ln -s $PLATFORM_DIR/target/debug/librsharp.dylib $PLATFORM_DIR/target/debug/librsharp
+ln -s $PLATFORM_DIR/target/debug/libunity_states.dylib $PLATFORM_DIR/target/debug/libunity_states
+
 if [ ! -f $CLIENT_DIR/cs/tests/bin/Debug/net6.0/libtp_client.dylib ]; then
     ln -s $PLATFORM_DIR/target/debug/deps/libtp_client.dylib $CLIENT_DIR/cs/tests/bin/Debug/net6.0/libtp_client.dylib
 fi
