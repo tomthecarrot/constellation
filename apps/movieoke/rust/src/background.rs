@@ -44,7 +44,8 @@ impl Contract for MKEBackgroundContract {
 #[states]
 #[cfg_attr(feature = "safer-ffi", derive_ReprC, ReprC::opaque)]
 pub struct MKEBackgroundStates {
-    background_object: f32,
+    background_object: ObjectHandle,
+    addressable_id: String,
 }
 
 #[cfg(feature = "c_api")]
@@ -53,7 +54,7 @@ pub mod c_api {
     use super::*;
     use tp_client::baseline::Baseline;
     use tp_client::contract::c_api::ContractDataHandle as CContractDataHandle;
-    use tp_client::contract::properties::states::c_api::StateId_F32;
+    use tp_client::contract::properties::states::c_api::{StateId_ObjectHandle, StateId_String};
     use tp_client::object::c_api::ObjectHandle as CObjectHandle;
 
     use safer_ffi::prelude::*;
@@ -64,8 +65,15 @@ pub mod c_api {
         #[ffi_export]
         fn MKEBackgroundStates__background_object(
             s: &MKEBackgroundStates,
-        ) -> repr_c::Box<StateId_F32> {
+        ) -> repr_c::Box<StateId_ObjectHandle> {
             repr_c::Box::new(s.background_object.into())
+        }
+
+        #[ffi_export]
+        fn MKEBackgroundStates__addressable_id(
+            s: &MKEBackgroundStates,
+        ) -> repr_c::Box<StateId_String> {
+            repr_c::Box::new(s.addressable_id.into())
         }
     }
 
@@ -104,12 +112,12 @@ pub mod c_api {
         fn MKEBackgroundContract__object_create(
             baseline: &mut Baseline,
             contract: &MKEBackgroundContract,
-            background_object: f32,
-            // addressable_id: String,
+            background_object: ObjectHandle,
+            addressable_id: String,
         ) -> repr_c::Box<CObjectHandle> {
             let states = [
                 DynTpProperty::Primitive(background_object.into()),
-                // DynTpProperty::Primitive(addressable_id.into()),
+                DynTpProperty::Primitive(addressable_id.into()),
             ];
             repr_c::Box::new(
                 baseline
