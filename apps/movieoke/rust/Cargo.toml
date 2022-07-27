@@ -1,0 +1,18 @@
+[package]
+name = "movieoke_platform_bridge"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+crate-type = ["rlib", "cdylib"]
+
+[features]
+default = ["c_api"]
+c_api = ["safer-ffi/headers"]
+
+[dependencies]
+tp_client = { path = "../../../client/rust" }
+safer-ffi = { version = "0.0.10", optional = true }
