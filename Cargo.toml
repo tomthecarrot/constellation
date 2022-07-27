@@ -9,6 +9,7 @@ members = [
     "crates/datastructures/arena",
     "crates/rsharp/rust",
     "crates/rsharp/rust/macro",
+    "apps/movieoke/rust",
     "demos/circle_game",
     "demos/unity_states/rust",
 ]
