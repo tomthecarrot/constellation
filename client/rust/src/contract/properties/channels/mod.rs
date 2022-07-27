@@ -99,7 +99,7 @@ pub mod c_api {
     pub use super::handle::c_api::*;
 
     use crate::contract::c_api::ContractDataHandle as CContractDataHandle;
-    use crate::contract::properties::c_api::simple_primitives;
+    use crate::contract::properties::c_api::copy_primitives;
     use crate::contract::ContractDataHandle;
     use crate::object::ObjectHandle;
 
@@ -140,5 +140,5 @@ pub mod c_api {
         };
     }
     // This is like doing `monomorphize!("whatever", Keyframe, u8, u16, ...)
-    simple_primitives!(; types, monomorphize, "tp_client::contract::properties::channels");
+    copy_primitives!(; types, monomorphize, "tp_client::contract::properties::channels");
 }

@@ -55,7 +55,7 @@ pub mod c_api {
     #![allow(non_camel_case_types, non_snake_case, dead_code)]
     use super::*;
 
-    use crate::contract::properties::c_api::simple_primitives;
+    use crate::contract::properties::c_api::copy_primitives;
     use crate::contract::ContractDataHandle;
     use crate::object::ObjectHandle;
 
@@ -98,5 +98,5 @@ pub mod c_api {
         };
     }
     // This is like doing `monomorphize!("whatever", Keyframe, u8, u16, ...)
-    simple_primitives!(; types, monomorphize, "tp_client::contract::properties::states");
+    copy_primitives!(; types, monomorphize, "tp_client::contract::properties::states");
 }

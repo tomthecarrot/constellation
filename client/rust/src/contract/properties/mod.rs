@@ -242,7 +242,8 @@ pub(crate) use primitives;
 
 #[cfg(feature = "c_api")]
 pub mod c_api {
-    macro_rules! simple_primitives {
+    /// Primitives that implement `Copy`
+    macro_rules! copy_primitives {
         (; types, $macro_name:ident, $($x:tt)+) => {
             $macro_name!(
                 $($x)+,
@@ -281,7 +282,7 @@ pub mod c_api {
             );
         };
     }
-    pub(crate) use simple_primitives;
+    pub(crate) use copy_primitives;
 
     /// Implements From traits to convert references of wrapper types using `ref-cast`
     macro_rules! impl_from_refcast {
@@ -315,5 +316,7 @@ pub mod c_api {
         pub use u32;
         pub use u64;
         pub use u8;
+
+        pub use safer_ffi::String;
     }
 }
