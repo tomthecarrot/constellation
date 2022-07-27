@@ -7,8 +7,14 @@ CLIENT_DIR=$(realpath $(dirname $0))
 PLATFORM_DIR=$(realpath $CLIENT_DIR/..)
 RSHARP_DIR="$PLATFORM_DIR/crates/rsharp"
 
+# Partial clean
+
 rm -rf $CLIENT_DIR/cs/src/generated
 rm -rf $RSHARP_DIR/cs/src/generated
+
+if [ -f $PLATFORM_DIR/target/debug ]; then
+    rm -rf $PLATFORM_DIR/target/debug
+fi
 
 cd $PLATFORM_DIR
 cargo build -p tp_client
