@@ -3,12 +3,8 @@ using TP = Teleportal.Client;
 using States = Teleportal.Client.Contract.Properties.States;
 using RSharp;
 
-// Attach to Ball prefab.
-[RequireComponent(typeof(BallStateDataSourceUnity))]
 public class BallStateDataSourcePlatform : MonoBehaviour, IBallStateDataSource
 {
-    private BallStateDataSourceUnity dataSourceUnity;
-
     // Platform interop types
     private TP.Baseline baselineMain;
     private BallContract ballContract;
@@ -27,13 +23,11 @@ public class BallStateDataSourcePlatform : MonoBehaviour, IBallStateDataSource
 
     void Awake()
     {
-        this.dataSourceUnity = GetComponent<BallStateDataSourceUnity>();
         InstantiatePlatformObject();
     }
 
     void Update()
     {
-        ApplyUnityStateToPlatformBaseline();
         LogCurrentData();
     }
 
@@ -43,10 +37,10 @@ public class BallStateDataSourcePlatform : MonoBehaviour, IBallStateDataSource
         this.ballContract = BallContract.Register(this.baselineMain);
         this.ballObject = this.ballContract.ObjectCreate(
             this.baselineMain,
-            this.dataSourceUnity.pos_x, this.dataSourceUnity.pos_y, this.dataSourceUnity.pos_z,
-            this.dataSourceUnity.euler_x, this.dataSourceUnity.euler_y, this.dataSourceUnity.euler_z,
-            this.dataSourceUnity.scale_x, this.dataSourceUnity.scale_y, this.dataSourceUnity.scale_z,
-            this.dataSourceUnity.color
+            0f, 0f, 0f,
+            0, 0, 0,
+            0f, 0f, 0f,
+            0
         );
 
         ConfigurePlatformObjectStates();
@@ -64,20 +58,6 @@ public class BallStateDataSourcePlatform : MonoBehaviour, IBallStateDataSource
         this.stateHandleScaleY = this.baselineMain.BindStateF32(this.ballContract.States.ScaleY, this.ballObject);
         this.stateHandleScaleZ = this.baselineMain.BindStateF32(this.ballContract.States.ScaleZ, this.ballObject);
         this.stateHandleColor = this.baselineMain.BindStateU64(this.ballContract.States.Color, this.ballObject);
-    }
-
-    private void ApplyUnityStateToPlatformBaseline()
-    {
-        this.pos_x = this.dataSourceUnity.pos_x;
-        this.pos_y = this.dataSourceUnity.pos_y;
-        this.pos_z = this.dataSourceUnity.pos_z;
-        this.euler_x = this.dataSourceUnity.euler_x;
-        this.euler_y = this.dataSourceUnity.euler_y;
-        this.euler_z = this.dataSourceUnity.euler_z;
-        this.scale_x = this.dataSourceUnity.scale_x;
-        this.scale_y = this.dataSourceUnity.scale_y;
-        this.scale_z = this.dataSourceUnity.scale_z;
-        this.color = this.dataSourceUnity.color;
     }
 
     public void LogCurrentData()
