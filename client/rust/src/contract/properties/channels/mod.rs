@@ -14,7 +14,7 @@ pub use crate::contract::properties::dynamic::apply_to_channel_id;
 
 use crate::contract::properties::dynamic::TpPropertyType;
 use crate::contract::properties::dynamic::__macro::{DynEnum, DynTpPropId};
-use crate::contract::properties::traits::{ITpProperty, ITpPropertyStatic};
+use crate::contract::properties::traits::{ITpProperty, ITpPropertyStatic, ITpData};
 use crate::contract::ContractDataHandle;
 
 use std::any::TypeId;
@@ -44,7 +44,7 @@ impl ChannelArenaMap {
 
 /// Represents a particular channel field of a contract. For actual channel data
 /// of a specific object, see [`ChannelHandle`].
-#[derive(Clone, Copy, Debug, Hash, Eq, PartialEq)]
+#[derive(Clone, Debug, Hash, Eq, PartialEq)]
 pub struct ChannelId<T: ITpProperty> {
     idx: usize, // idx into an object's channel properties
     contract: ContractDataHandle,
@@ -70,6 +70,7 @@ impl<T: ITpProperty> ChannelId<T> {
         }
     }
 }
+impl<T: ITpData> Copy for ChannelId<T> {}
 
 pub trait IChannels {
     fn type_ids() -> &'static [TypeId];
@@ -99,7 +100,7 @@ pub mod c_api {
     pub use super::handle::c_api::*;
 
     use crate::contract::c_api::ContractDataHandle as CContractDataHandle;
-    use crate::contract::properties::c_api::copy_primitives;
+    use crate::contract::properties::primitives;
     use crate::contract::ContractDataHandle;
     use crate::object::ObjectHandle;
 
@@ -140,5 +141,5 @@ pub mod c_api {
         };
     }
     // This is like doing `monomorphize!("whatever", Keyframe, u8, u16, ...)
-    copy_primitives!(; types, monomorphize, "tp_client::contract::properties::channels");
+    primitives!(; types, monomorphize, "tp_client::contract::properties::channels");
 }

@@ -380,7 +380,7 @@ pub mod c_api {
     use super::*;
     use crate::contract::c_api::ContractDataHandle as CContractDataHandle;
     use crate::contract::c_api::ExampleContract;
-    use crate::contract::properties::c_api::copy_primitives;
+    use crate::contract::properties::primitives;
     use crate::object::c_api::ObjectHandle as CObjectHandle;
 
     use rsharp::remangle;
@@ -518,7 +518,7 @@ pub mod c_api {
     }
 
     // This is like doing `monomorphize!("whatever", Keyframe, u8, u16, ...)
-    copy_primitives!(; types, monomorphize, "tp_client::baseline");
+    primitives!(; types, monomorphize, "tp_client::baseline");
 
     // ---- Example contract for tests ---- //
 
