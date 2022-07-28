@@ -13,7 +13,6 @@ public class BallStateDataSourcePlatform : MonoBehaviour, IBallStateDataSource
     private TP.Baseline baselineMain;
     private BallContract ballContract;
     private TP.Object.ObjectHandle ballObject;
-    private BallStates ballStates;
 
     private States.StateHandle_F32 stateHandlePosX;
     private States.StateHandle_F32 stateHandlePosY;
@@ -55,17 +54,16 @@ public class BallStateDataSourcePlatform : MonoBehaviour, IBallStateDataSource
 
     private void ConfigurePlatformObjectStates()
     {
-        this.ballStates = this.ballContract.States;
-        this.stateHandlePosX = this.baselineMain.BindStateF32(this.ballStates.PosX, this.ballObject);
-        this.stateHandlePosY = this.baselineMain.BindStateF32(this.ballStates.PosY, this.ballObject);
-        this.stateHandlePosZ = this.baselineMain.BindStateF32(this.ballStates.PosZ, this.ballObject);
-        this.stateHandleEulerX = this.baselineMain.BindStateI16(this.ballStates.EulerX, this.ballObject);
-        this.stateHandleEulerY = this.baselineMain.BindStateI16(this.ballStates.EulerY, this.ballObject);
-        this.stateHandleEulerZ = this.baselineMain.BindStateI16(this.ballStates.EulerZ, this.ballObject);
-        this.stateHandleScaleX = this.baselineMain.BindStateF32(this.ballStates.ScaleX, this.ballObject);
-        this.stateHandleScaleY = this.baselineMain.BindStateF32(this.ballStates.ScaleY, this.ballObject);
-        this.stateHandleScaleZ = this.baselineMain.BindStateF32(this.ballStates.ScaleZ, this.ballObject);
-        this.stateHandleColor = this.baselineMain.BindStateU64(this.ballStates.Color, this.ballObject);
+        this.stateHandlePosX = this.baselineMain.BindStateF32(this.ballContract.States.PosX, this.ballObject);
+        this.stateHandlePosY = this.baselineMain.BindStateF32(this.ballContract.States.PosY, this.ballObject);
+        this.stateHandlePosZ = this.baselineMain.BindStateF32(this.ballContract.States.PosZ, this.ballObject);
+        this.stateHandleEulerX = this.baselineMain.BindStateI16(this.ballContract.States.EulerX, this.ballObject);
+        this.stateHandleEulerY = this.baselineMain.BindStateI16(this.ballContract.States.EulerY, this.ballObject);
+        this.stateHandleEulerZ = this.baselineMain.BindStateI16(this.ballContract.States.EulerZ, this.ballObject);
+        this.stateHandleScaleX = this.baselineMain.BindStateF32(this.ballContract.States.ScaleX, this.ballObject);
+        this.stateHandleScaleY = this.baselineMain.BindStateF32(this.ballContract.States.ScaleY, this.ballObject);
+        this.stateHandleScaleZ = this.baselineMain.BindStateF32(this.ballContract.States.ScaleZ, this.ballObject);
+        this.stateHandleColor = this.baselineMain.BindStateU64(this.ballContract.States.Color, this.ballObject);
     }
 
     private void ApplyUnityStateToPlatformBaseline()

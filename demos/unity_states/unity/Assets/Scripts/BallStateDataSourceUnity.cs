@@ -1,16 +1,13 @@
 using UnityEngine;
 
 // Attach to Ball prefab.
-[RequireComponent(typeof(BallStateDataSourcePlatform))]
 [RequireComponent(typeof(MeshRenderer))]
 public class BallStateDataSourceUnity : MonoBehaviour, IBallStateDataSource
 {
-    private BallStateDataSourcePlatform dataSourcePlatform;
     private MeshRenderer meshRenderer;
 
     void Awake()
     {
-        this.dataSourcePlatform = GetComponent<BallStateDataSourcePlatform>();
         this.meshRenderer = GetComponent<MeshRenderer>();
     }
 
