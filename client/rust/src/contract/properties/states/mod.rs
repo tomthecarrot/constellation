@@ -58,7 +58,8 @@ pub mod c_api {
     pub use super::id::c_api::*;
 
     use super::*;
-    use crate::contract::properties::c_api::{c_types, impl_from_refcast, simple_primitives};
+    use crate::contract::properties::c_api::{c_types, impl_from_refcast};
+    use crate::contract::properties::primitives;
     use crate::contract::ContractDataHandle;
     use crate::object::ObjectHandle;
 
@@ -90,7 +91,7 @@ pub mod c_api {
                     #[remangle($path)]
                     #[ffi_export]
                     pub fn [<State_ $t:camel __new>](value: repr_c::Box<c_types::$t>) -> repr_c::Box<Monomorphized> {
-                        let value = $t::from(*value);
+                        let value = $t::from(*value.into());
                         repr_c::Box::new(State::new(value).into())
                     }
 
@@ -109,7 +110,8 @@ pub mod c_api {
                     #[remangle($path)]
                     #[ffi_export]
                     pub fn [<State_ $t:camel __value_set>]<'a>(state: &'a mut Monomorphized, new_value: ::safer_ffi::boxed::Box<c_types::$t>) {
-                        state.inner.value = (*new_value).into();
+                        let new_value = $t::from(*new_value.into());
+                        state.inner.value = new_value;
                     }
                 }
                 pub use [<_State_ $t:camel>]::Monomorphized as [<State_ $t:camel>];
@@ -123,5 +125,5 @@ pub mod c_api {
     }
 
     // This is like doing `monomorphize!("whatever", State, u8, u16, ...)
-    simple_primitives!(; types, monomorphize, "tp_client::contract::properties::states");
+    primitives!(; types, monomorphize, "tp_client::contract::properties::states");
 }
