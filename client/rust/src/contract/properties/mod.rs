@@ -242,58 +242,18 @@ pub(crate) use primitives;
 
 #[cfg(feature = "c_api")]
 pub mod c_api {
-    /// Primitives that implement `Copy`
-    macro_rules! copy_primitives {
-        (; types, $macro_name:ident, $($x:tt)+) => {
-            $macro_name!(
-                $($x)+,
-                u8,
-                u16,
-                u32,
-                u64,
-                i8,
-                i16,
-                i32,
-                i64,
-                bool,
-                f32,
-                f64,
-                // String,
-                ObjectHandle,
-                ContractDataHandle,
-            );
-        };
-        (; types, $macro_name:ident) => {
-            $macro_name!(
-                u8,
-                u16,
-                u32,
-                u64,
-                i8,
-                i16,
-                i32,
-                i64,
-                bool,
-                f32,
-                f64,
-                // String,
-                ObjectHandle,
-                ContractDataHandle,
-            );
-        };
-    }
-    pub(crate) use copy_primitives;
-
     /// Implements From traits to convert references of wrapper types using `ref-cast`
     macro_rules! impl_from_refcast {
         ($from_t:ty, $for_t:ty) => {
             impl<'a> From<&'a $from_t> for &'a $for_t {
                 fn from(other: &'a $from_t) -> &'a $for_t {
+                    use ref_cast::RefCast;
                     <$for_t>::ref_cast(other)
                 }
             }
             impl<'a> From<&'a mut $from_t> for &'a mut $for_t {
                 fn from(other: &'a mut $from_t) -> &'a mut $for_t {
+                    use ref_cast::RefCast;
                     <$for_t>::ref_cast_mut(other)
                 }
             }
@@ -317,10 +277,10 @@ pub mod c_api {
         pub use u64;
         pub use u8;
 
-        pub use super::_String::String;
+        pub use super::_string::String;
     }
 
-    mod _String {
+    mod _string {
         use derive_more::{From, Into};
         use safer_ffi::prelude::*;
 
@@ -331,5 +291,6 @@ pub mod c_api {
         pub struct String {
             inner: std::string::String,
         }
+        impl_from_refcast!(std::string::String, String);
     }
 }

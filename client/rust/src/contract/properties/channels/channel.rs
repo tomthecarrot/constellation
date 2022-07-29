@@ -81,7 +81,7 @@ pub mod c_api {
                     #[remangle($path)]
                     #[ffi_export]
                     pub fn [<Keyframe_ $t:camel __new>](value: repr_c::Box<c_types::$t>, time: f64) -> repr_c::Box<Monomorphized> {
-                        let value = $t::from(*value);
+                        let value = $t::from(*value.into());
                         repr_c::Box::new(Keyframe::new(value, time).into())
                     }
 
