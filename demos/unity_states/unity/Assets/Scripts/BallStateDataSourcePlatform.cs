@@ -8,7 +8,6 @@ public class BallStateDataSourcePlatform : MonoBehaviour, IBallStateDataSource
     // Platform interop types
     private TP.Baseline baselineMain;
     private BallContract ballContract;
-    private TP.Object.ObjectHandle ballObject;
 
     private States.StateHandle_F32 stateHandlePosX;
     private States.StateHandle_F32 stateHandlePosY;
@@ -23,41 +22,36 @@ public class BallStateDataSourcePlatform : MonoBehaviour, IBallStateDataSource
 
     void Awake()
     {
-        InstantiatePlatformObject();
+        TP.Object.ObjectHandle ballObject;
+        { // Create ball contract & object
+            this.baselineMain = new TP.Baseline(true);
+            this.ballContract = BallContract.Register(this.baselineMain);
+            ballObject = this.ballContract.ObjectCreate(
+                this.baselineMain,
+                0f, 0f, 0f,
+                0, 0, 0,
+                0f, 0f, 0f,
+                0
+            );
+        }
+
+        { // Bind StateIDs to Object
+            this.stateHandlePosX = this.baselineMain.BindStateF32(this.ballContract.States.PosX, ballObject);
+            this.stateHandlePosY = this.baselineMain.BindStateF32(this.ballContract.States.PosY, ballObject);
+            this.stateHandlePosZ = this.baselineMain.BindStateF32(this.ballContract.States.PosZ, ballObject);
+            this.stateHandleEulerX = this.baselineMain.BindStateI16(this.ballContract.States.EulerX, ballObject);
+            this.stateHandleEulerY = this.baselineMain.BindStateI16(this.ballContract.States.EulerY, ballObject);
+            this.stateHandleEulerZ = this.baselineMain.BindStateI16(this.ballContract.States.EulerZ, ballObject);
+            this.stateHandleScaleX = this.baselineMain.BindStateF32(this.ballContract.States.ScaleX, ballObject);
+            this.stateHandleScaleY = this.baselineMain.BindStateF32(this.ballContract.States.ScaleY, ballObject);
+            this.stateHandleScaleZ = this.baselineMain.BindStateF32(this.ballContract.States.ScaleZ, ballObject);
+            this.stateHandleColor = this.baselineMain.BindStateU64(this.ballContract.States.Color, ballObject);
+        }
     }
 
     void Update()
     {
         LogCurrentData();
-    }
-
-    private void InstantiatePlatformObject()
-    {
-        this.baselineMain = new TP.Baseline(true);
-        this.ballContract = BallContract.Register(this.baselineMain);
-        this.ballObject = this.ballContract.ObjectCreate(
-            this.baselineMain,
-            0f, 0f, 0f,
-            0, 0, 0,
-            0f, 0f, 0f,
-            0
-        );
-
-        ConfigurePlatformObjectStates();
-    }
-
-    private void ConfigurePlatformObjectStates()
-    {
-        this.stateHandlePosX = this.baselineMain.BindStateF32(this.ballContract.States.PosX, this.ballObject);
-        this.stateHandlePosY = this.baselineMain.BindStateF32(this.ballContract.States.PosY, this.ballObject);
-        this.stateHandlePosZ = this.baselineMain.BindStateF32(this.ballContract.States.PosZ, this.ballObject);
-        this.stateHandleEulerX = this.baselineMain.BindStateI16(this.ballContract.States.EulerX, this.ballObject);
-        this.stateHandleEulerY = this.baselineMain.BindStateI16(this.ballContract.States.EulerY, this.ballObject);
-        this.stateHandleEulerZ = this.baselineMain.BindStateI16(this.ballContract.States.EulerZ, this.ballObject);
-        this.stateHandleScaleX = this.baselineMain.BindStateF32(this.ballContract.States.ScaleX, this.ballObject);
-        this.stateHandleScaleY = this.baselineMain.BindStateF32(this.ballContract.States.ScaleY, this.ballObject);
-        this.stateHandleScaleZ = this.baselineMain.BindStateF32(this.ballContract.States.ScaleZ, this.ballObject);
-        this.stateHandleColor = this.baselineMain.BindStateU64(this.ballContract.States.Color, this.ballObject);
     }
 
     public void LogCurrentData()

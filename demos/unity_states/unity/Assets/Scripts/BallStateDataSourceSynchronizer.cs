@@ -23,27 +23,19 @@ public class BallStateDataSourceSynchronizer : MonoBehaviour
 
     void Update()
     {
-        ApplyUnityStateToPlatformBaseline();
-    }
-
-    private bool ApplyUnityStateToPlatformBaseline()
-    {
-        if (!this.readyToSynchronize)
+        // Apply Unity state to Platform baseline.
+        if (this.readyToSynchronize)
         {
-            return false;
+            this.srcPlatform.pos_x = this.srcUnity.pos_x;
+            this.srcPlatform.pos_y = this.srcUnity.pos_y;
+            this.srcPlatform.pos_z = this.srcUnity.pos_z;
+            this.srcPlatform.euler_x = this.srcUnity.euler_x;
+            this.srcPlatform.euler_y = this.srcUnity.euler_y;
+            this.srcPlatform.euler_z = this.srcUnity.euler_z;
+            this.srcPlatform.scale_x = this.srcUnity.scale_x;
+            this.srcPlatform.scale_y = this.srcUnity.scale_y;
+            this.srcPlatform.scale_z = this.srcUnity.scale_z;
+            this.srcPlatform.color = this.srcUnity.color;
         }
-
-        this.srcPlatform.pos_x = this.srcUnity.pos_x;
-        this.srcPlatform.pos_y = this.srcUnity.pos_y;
-        this.srcPlatform.pos_z = this.srcUnity.pos_z;
-        this.srcPlatform.euler_x = this.srcUnity.euler_x;
-        this.srcPlatform.euler_y = this.srcUnity.euler_y;
-        this.srcPlatform.euler_z = this.srcUnity.euler_z;
-        this.srcPlatform.scale_x = this.srcUnity.scale_x;
-        this.srcPlatform.scale_y = this.srcUnity.scale_y;
-        this.srcPlatform.scale_z = this.srcUnity.scale_z;
-        this.srcPlatform.color = this.srcUnity.color;
-
-        return true;
     }
 }
