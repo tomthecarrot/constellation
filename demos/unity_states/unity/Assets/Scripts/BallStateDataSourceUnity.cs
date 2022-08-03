@@ -1,6 +1,6 @@
 using UnityEngine;
 
-// Attach to Ball prefab.
+/// Attach to Ball prefab.
 [RequireComponent(typeof(MeshRenderer))]
 public class BallStateDataSourceUnity : MonoBehaviour, IBallStateDataSource
 {
@@ -108,26 +108,26 @@ public class BallStateDataSourceUnity : MonoBehaviour, IBallStateDataSource
         }
     }
 
+    /// Will throw an exception if the mesh renderer is null or doesn't include a material.
     public ulong color
     {
         get
         {
             if (null == this.meshRenderer || this.meshRenderer.materials.Length == 0)
             {
-                return 0;
+                throw new System.Exception("Mesh renderer is not attached or doesn't include a material.");
             }
-            else
-            {
-                // Convert to 16-bit raw RGBA
-                UnityEngine.Color c = this.meshRenderer.materials[0].color;
-                ushort r = (ushort)(c.r * 65535);
-                ushort g = (ushort)(c.g * 65535);
-                ushort b = (ushort)(c.b * 65535);
-                ushort a = (ushort)(c.a * 65535);
 
-                ulong rgba = (ulong)((r << 48) | (g << 32) | (b << 16) | a);
-                return rgba;
-            }
+            // Convert to 16-bit raw RGBA.
+            UnityEngine.Color c = this.meshRenderer.materials[0].color;
+            const ushort scale = System.UInt16.MaxValue; // scale from [0,1] to [0,65535]
+            ushort r = (ushort)(c.r * scale);
+            ushort g = (ushort)(c.g * scale);
+            ushort b = (ushort)(c.b * scale);
+            ushort a = (ushort)(c.a * scale);
+
+            ulong rgba = (ulong)((r << 48) | (g << 32) | (b << 16) | a);
+            return rgba;
         }
     }
 }
