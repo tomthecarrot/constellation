@@ -20,11 +20,20 @@ namespace Teleportal.Client
             var p = new Ptr<States.StateHandle_I8>(ffi.TpClientBaselineBaselineBindStateI8(this.Inner.Value.p, id.Inner.Value.p, obj.Inner.Value.p));
             return new States.StateHandle_I8(p);
         }
+        public States.StateHandle_I16 BindStateI16(States.StateId_I16 id, ObjectHandle obj)
+        {
+            var p = new Ptr<States.StateHandle_I16>(ffi.TpClientBaselineBaselineBindStateI16(this.Inner.Value.p, id.Inner.Value.p, obj.Inner.Value.p));
+            return new States.StateHandle_I16(p);
+        }
         public States.StateHandle_F32 BindStateF32(States.StateId_F32 id, ObjectHandle obj)
         {
             var p = new Ptr<States.StateHandle_F32>(ffi.TpClientBaselineBaselineBindStateF32(this.Inner.Value.p, id.Inner.Value.p, obj.Inner.Value.p));
             return new States.StateHandle_F32(p);
         }
-
+        public States.StateHandle_U64 BindStateU64(States.StateId_U64 id, ObjectHandle obj)
+        {
+            var p = new Ptr<States.StateHandle_U64>(ffi.TpClientBaselineBaselineBindStateU64(this.Inner.Value.p, id.Inner.Value.p, obj.Inner.Value.p));
+            return new States.StateHandle_U64(p);
+        }
     }
 }
