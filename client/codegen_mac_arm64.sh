@@ -21,6 +21,7 @@ mv $PLATFORM_DIR/target/debug/deps/libunity_states.dylib $CLIENT_DIR/cs/tests/bi
 
 cargo test -p tp_client
 cargo run -p rsharp
+cargo test -p unity_states
 
 cd $CLIENT_DIR/codegen_pinvoke
 dotnet run -a x64 # CppSharp is compiled for x64.

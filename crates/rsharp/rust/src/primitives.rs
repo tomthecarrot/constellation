@@ -14,7 +14,7 @@ macro_rules! primitives {
             bool,
             f32,
             f64,
-            // String,
+            reprc_string,
             // ObjectHandle,
             // ContractDataHandle,
         );
@@ -32,7 +32,7 @@ macro_rules! primitives {
             bool,
             f32,
             f64,
-            // String,
+            reprc_string,
             // ObjectHandle,
             // ContractDataHandle,
         );

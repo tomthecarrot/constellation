@@ -17,12 +17,14 @@ namespace Codegen
     {
         public DirectoryInfo output_dir { get; init; }
         public DirectoryInfo input_dir { get; init; }
+        public DirectoryInfo cargo_artifact_dir { get; init; }
         public string crate_name { get; init; }
 
-        public LibInfo(string output_dir, string input_dir, string crate_name)
+        public LibInfo(string output_dir, string input_dir, string cargo_artifact_dir, string crate_name)
         {
             this.output_dir = new DirectoryInfo(output_dir);
             this.input_dir = new DirectoryInfo(input_dir);
+            this.cargo_artifact_dir = new DirectoryInfo(cargo_artifact_dir);
             this.crate_name = crate_name;
         }
     }
@@ -47,6 +49,7 @@ namespace Codegen
                     project_dir.FullName, "client", "cs", "src", "generated", "cpp_sharp"
                 ),
                 input_dir: Path.Join(project_dir.FullName, "client", "rust"),
+                cargo_artifact_dir: Path.Join(project_dir.FullName, "target", "debug"),
                 "tp_client"
             ));
 
@@ -55,6 +58,7 @@ namespace Codegen
                     project_dir.FullName, "demos", "unity_states", "cs", "generated", "cpp_sharp"
                 ),
                 input_dir: Path.Join(project_dir.FullName, "demos", "unity_states", "rust"),
+                cargo_artifact_dir: Path.Join(project_dir.FullName, "target", "debug"),
                 "unity_states"
             ));
 
@@ -85,9 +89,6 @@ namespace Codegen
         /// Setup the driver options here.
         public void Setup(CppSharp.Driver driver)
         {
-
-            var cargo_artifact_dir = Path.Join(project_dir.FullName, "target", "debug");
-
             var options = driver.Options;
             options.GeneratorKind = Gen.GeneratorKind.CSharp;
             options.OutputDir = this.lib_info.output_dir.FullName;
@@ -97,8 +98,8 @@ namespace Codegen
             var module = options.AddModule(this.lib_info.crate_name);
             module.IncludeDirs.Add(this.lib_info.input_dir.FullName);
             module.Headers.Add("generated.h");
-            module.LibraryDirs.Add(cargo_artifact_dir);
-            module.Libraries.Add($"lib{this.lib_info.crate_name}.so");
+            module.LibraryDirs.Add(this.lib_info.cargo_artifact_dir.FullName);
+            module.Libraries.Add($"lib{this.lib_info.crate_name}.so"); // macOS: remove .so extension.
             // module.Undefines.Add("__cplusplus");
         }
 
@@ -112,12 +113,12 @@ namespace Codegen
         public void Postprocess(Driver driver, ASTContext ctx) { }
 
         /// Get the toplevel folder in the project
-        static DirectoryInfo GetProjectDir()
+        public static DirectoryInfo GetProjectDir()
         {
             var assembly_file = new DirectoryInfo(Rflct.Assembly.GetExecutingAssembly().Location);
 
             DirectoryInfo project_dir = assembly_file;
-            const uint n_steps_up = 6;
+            const uint n_steps_up = 6; // macOS: 7 steps up.
             for (var i = 0; i < n_steps_up; i++)
             {
                 project_dir = project_dir.Parent ?? project_dir.Root;

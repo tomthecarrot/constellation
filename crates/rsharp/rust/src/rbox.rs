@@ -2,6 +2,7 @@
 
 use crate::{primitives, remangle};
 use safer_ffi::prelude::*;
+type reprc_string = safer_ffi::String;
 
 macro_rules! boxes {
     // Base case
