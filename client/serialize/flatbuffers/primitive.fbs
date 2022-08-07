@@ -1,0 +1,90 @@
+include "object.fbs";
+include "contract.fbs";
+
+namespace tp_serialize.primitive;
+
+// unions of structs not supported in rust flatbuffers, so using tables instead
+
+table U8 {
+    v: uint8;
+}
+
+table U16 {
+    v: uint16;
+}
+
+table U32 {
+    v: uint32;
+}
+
+table U64 {
+    v: uint64;
+}
+
+table I8 {
+    v: int8;
+}
+
+table I16 {
+    v: int16;
+}
+
+table I32 {
+    v: int32;
+}
+
+table I64 {
+    v: int64;
+}
+
+table Bool {
+    v: bool;
+}
+
+table F32 {
+    v: float32;
+}
+
+table F64 {
+    v: float64;
+}
+
+table String {
+    v: string;
+}
+
+/// Contains any "primitive" data.
+union TpPrimitive {
+    U8,
+    U16,
+    U32,
+    U64,
+    I8,
+    I16,
+    I32,
+    I64,
+    Bool,
+    F32,
+    F64,
+    String,
+    tp_serialize.object.ObjectHandle,
+    tp_serialize.contract.ContractDataHandle,
+}
+
+/// Indicates the type of data in a `TpPrimitive`.
+enum TpPrimitiveKind: byte {
+    U8 = 0,
+    U16,
+    U32,
+    U64,
+    I8,
+    I16,
+    I32,
+    I64,
+    Bool,
+    F32,
+    F64,
+    String,
+    ObjectHandle,
+    ContractDataHandle,
+}

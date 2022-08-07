@@ -1,0 +1,18 @@
+include "primitive.fbs";
+
+namespace tp_serialize.state;
+
+
+table State {
+    p: tp_serialize.primitive.TpPrimitive;
+}
+
+table StateId {
+    /// Index into Object.states
+    idx: uint16;
+}
+
+table StateHandle {
+    /// Index into Baseline.states
+    idx: uint32;
+}

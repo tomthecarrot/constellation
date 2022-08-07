@@ -1,0 +1,27 @@
+include "state.fbs";
+include "primitive.fbs";
+
+namespace tp_serialize.contract;
+
+table Contract {
+    id: ContractId;
+    states: ContractStates;
+}
+
+table ContractId {
+    name: string;
+    v_major: uint16;
+    v_minor: uint16;
+    v_patch: uint16;
+}
+
+table ContractStates {
+    ids: [tp_serialize.state.StateId];
+    names: [string];
+    types: [tp_serialize.primitive.TpPrimitiveKind];
+}
+
+table ContractDataHandle {
+    /// Index into Baseline.contracts
+    idx: uint16;
+}

@@ -4,6 +4,7 @@ resolver = "2" # As of Nov 2021, rust doesn't seem to use new resolver if you do
 members = [
     "client/codegen_wrapped",
     "client/rust",
+    "client/serialize/rust",
     "contract_macro",
     "crates/better_borrow",
     "crates/datastructures/arena",
