@@ -143,10 +143,10 @@ type_info!(F64, "F64", "double*", "RBox_F64", true, "double", O::Both);
 type_info!(
     String,
     "String",
-    "string",
+    "IntPtr",
     "RBox_String",
     true,
-    "string",
+    "IntPtr",
     O::Both
 );
 type_info!(
