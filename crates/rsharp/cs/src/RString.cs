@@ -2,6 +2,7 @@ using System;
 
 namespace RSharp
 {
+    // TODO[SER-446]
     public sealed class RString : OpaqueWrapper<RString>
     {
         public RString(Ptr<RString> inner) : base(inner, OwnershipSemantics.Owned) { }
