@@ -144,10 +144,10 @@ type_info!(
     String,
     "String",
     "IntPtr",
-    "RBox_String",
-    true,
-    "IntPtr",
-    O::Both
+    "RString",
+    false,
+    "RString",
+    O::Owned
 );
 type_info!(
     ObjectHandle,
