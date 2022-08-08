@@ -1,0 +1,7 @@
+include "baseline.fbs";
+include "contract.fbs";
+include "object.fbs";
+include "primitive.fbs";
+include "state.fbs";
+
+namespace tp_serialize;

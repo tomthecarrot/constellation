@@ -1,0 +1,11 @@
+include "contract.fbs";
+include "state.fbs";
+include "object.fbs";
+
+namespace tp_serialize.baseline;
+
+table Baseline {
+    contracts: [tp_serialize.contract.Contract];
+    states: [tp_serialize.state.State];
+    objects: [tp_serialize.object.Object];
+}

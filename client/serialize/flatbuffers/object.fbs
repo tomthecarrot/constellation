@@ -1,0 +1,14 @@
+include "contract.fbs";
+include "state.fbs";
+
+namespace tp_serialize.object;
+
+table Object {
+    contract: tp_serialize.contract.ContractDataHandle;
+    states: [tp_serialize.state.StateHandle];
+}
+
+table ObjectHandle {
+    /// Index into Baseline.objects
+    idx: uint32;
+}
