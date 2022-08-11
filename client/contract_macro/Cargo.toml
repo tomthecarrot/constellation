@@ -1,6 +1,6 @@
 [package]
 name = "tp_contract_macro"
-version = "0.1.0"
+version = "0.0.0"
 edition = "2021"
 rust-version = "1.58"
 # Prevent accidental `cargo publish`
@@ -17,4 +17,4 @@ quote = "1"
 proc-macro2 = "1"
 
 [dev-dependencies]
-tp_client = { path = "../client/rust" }
+tp_client = { path = "../rust" }

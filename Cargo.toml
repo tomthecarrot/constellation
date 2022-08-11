@@ -5,7 +5,7 @@ members = [
     "client/codegen_wrapped",
     "client/rust",
     "client/serialize/rust",
-    "contract_macro",
+    "client/contract_macro",
     "crates/better_borrow",
     "crates/datastructures/arena",
     "crates/rsharp/rust",
