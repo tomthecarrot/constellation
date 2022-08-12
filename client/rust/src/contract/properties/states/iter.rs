@@ -7,6 +7,7 @@ use std::any::TypeId;
 pub trait IStates: Sized {
     fn type_ids() -> &'static [TypeId];
     fn enumerate_types() -> &'static [TpPropertyType];
+    fn field_names() -> &'static [&'static str];
 }
 
 impl IStates for () {
@@ -15,6 +16,10 @@ impl IStates for () {
     }
 
     fn enumerate_types() -> &'static [TpPropertyType] {
+        &[]
+    }
+
+    fn field_names() -> &'static [&'static str] {
         &[]
     }
 }
