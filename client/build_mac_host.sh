@@ -1,5 +1,4 @@
-# Automates build process for Platform codegen on Apple Silicon Macs.
-# This script should be run from the `client` directory.
+# Automates build process for Platform codegen on macOS.
 
 set -e
 
@@ -12,8 +11,7 @@ rm -rf $RSHARP_DIR/cs/src/generated
 
 # Build Platform core and demo libraries.
 cd $PLATFORM_DIR
-cargo build -p tp_client
-cargo build -p rsharp
+cargo build -p tp_client # includes `rsharp`
 cargo build -p unity_states
 
 # Strip .dylib extension for symlink compatibility across OS targets.
