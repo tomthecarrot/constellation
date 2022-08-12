@@ -32,6 +32,7 @@ macro_rules! template_impl {
             // ---- Field Names ----
             let type_ids_ident = quote::format_ident!("type_ids");
             let enumerate_types_ident = quote::format_ident!("enumerate_types");
+            let field_names_ident = quote::format_ident!("field_names");
 
             // Parse struct
             let s: &mut syn::DataStruct = match item.data {
@@ -64,17 +65,19 @@ macro_rules! template_impl {
             };
 
             // Holds the contents of the field initializer
-            let mut field_init = TokenStream::new();
+            let mut field_init_ts = TokenStream::new();
             // Holds the typeids of each field as the contents of vec![...]
             let mut typeids = Vec::new();
             // Holds the TpPropertyTypes of each field;
             let mut prop_types = Vec::new();
+            // Holds the names of the fields
+            let mut field_names = Vec::new();
             let s_name = &item.ident;
             for (i, f) in fields.iter_mut().enumerate() {
                 let inner_t = f.ty.clone();
                 // won't panic because we already checked that the fields were named
                 let f_name = f.ident.as_ref().unwrap();
-                if [&type_ids_ident, &enumerate_types_ident].contains(&f_name) {
+                if [&type_ids_ident, &enumerate_types_ident, &field_names_ident].contains(&f_name) {
                     return Err(Error::new(
                         f_name.span(),
                         "this field identifier is reserved",
@@ -97,7 +100,7 @@ macro_rules! template_impl {
                 });
 
                 // Add field initialization to the list
-                field_init.extend(quote_spanned! {inner_t.span()=>
+                field_init_ts.extend(quote_spanned! {inner_t.span()=>
                     #f_name: $handle_type::new(#i, id),
                 });
 
@@ -108,11 +111,19 @@ macro_rules! template_impl {
                     }
                 });
 
+                // Add `TpPropertyType`
                 prop_types.push({
                     quote_spanned! {inner_t.span()=>
                         <#inner_t as ::tp_client::contract::properties::traits::ITpPropertyStatic>::PROPERTY_TYPE
                     }
-                })
+                });
+
+                // Add the field name
+                field_names.push({
+                    quote_spanned! {f_name.span()=>
+                        std::stringify!(#f_name)
+                    }
+                });
             }
 
             // Field-agnostic impl blocks
@@ -120,7 +131,7 @@ macro_rules! template_impl {
                 impl #s_name {
                     pub fn new(id: ::tp_client::contract::ContractDataHandle) -> Self {
                         Self {
-                            #field_init
+                            #field_init_ts
                         }
                     }
                 }
@@ -138,6 +149,13 @@ macro_rules! template_impl {
                             static ref PROP_TYPES: Vec<::tp_client::contract::properties::dynamic::TpPropertyType> = vec![#(#prop_types),*];
                         }
                         PROP_TYPES.as_slice()
+                    }
+
+                    fn #field_names_ident() -> &'static [&'static str] {
+                        ::tp_client::lazy_static::lazy_static! {
+                            static ref FIELD_NAMES: Vec<&'static str> = vec![#(#field_names),*];
+                        }
+                        FIELD_NAMES.as_slice()
                     }
                 }
 

@@ -14,7 +14,7 @@ pub use crate::contract::properties::dynamic::apply_to_channel_id;
 
 use crate::contract::properties::dynamic::TpPropertyType;
 use crate::contract::properties::dynamic::__macro::{DynEnum, DynTpPropId};
-use crate::contract::properties::traits::{ITpProperty, ITpPropertyStatic, ITpData};
+use crate::contract::properties::traits::{ITpData, ITpProperty, ITpPropertyStatic};
 use crate::contract::ContractDataHandle;
 
 use std::any::TypeId;
@@ -75,6 +75,7 @@ impl<T: ITpData> Copy for ChannelId<T> {}
 pub trait IChannels {
     fn type_ids() -> &'static [TypeId];
     fn enumerate_types() -> &'static [TpPropertyType];
+    fn field_names() -> &'static [&'static str];
 }
 
 impl IChannels for () {
@@ -83,6 +84,10 @@ impl IChannels for () {
     }
 
     fn enumerate_types() -> &'static [TpPropertyType] {
+        &[]
+    }
+
+    fn field_names() -> &'static [&'static str] {
         &[]
     }
 }
