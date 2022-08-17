@@ -1,0 +1,11 @@
+include "properties.fbs";
+include "state.fbs";
+
+namespace tp_serialize;
+
+table Baseline {
+    states: [State];
+}
+
+file_identifier "TPF1"
+root_type Baseline;

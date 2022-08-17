@@ -20,6 +20,7 @@ pub mod time;
 pub use engine::Engine;
 
 // This generates the C header file for the bindings. See safer-ffi's guide.
+#[cfg(feature = "c_api")]
 #[safer_ffi::cfg_headers]
 #[test]
 fn generate_headers() -> ::std::io::Result<()> {
