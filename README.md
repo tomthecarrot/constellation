@@ -1,8 +1,8 @@
-<img src="logo.png" width="200"/>
+<img src="logo.jpg" width="250"/>
 
-# Teleportal Platform
+# Constellation by Teleportal
 
-The teleportal platform is a time-sampled and realtime data model and spatial computing
+Constellation is a time-sampled and realtime data model and spatial computing
 library. For more info, reach out to us as [hello@teleportal.app][hello email].
 
 
