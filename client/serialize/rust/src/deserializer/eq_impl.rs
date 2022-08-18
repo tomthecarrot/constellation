@@ -1,4 +1,4 @@
-use crate::c;
+use super::c;
 
 impl PartialEq<c::TpPropertyType> for crate::primitive::TpPrimitiveKind {
     fn eq(&self, other: &c::TpPropertyType) -> bool {
