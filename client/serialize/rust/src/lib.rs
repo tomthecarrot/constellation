@@ -1,4 +1,5 @@
 mod generated;
+mod impls;
 
 pub use generated::tp_serialize::*;
 
@@ -87,7 +88,7 @@ impl<'a> Deserializer<'a> {
                             .then_some(())?;
                         // Types match?
                         std::iter::zip(C::States::enumerate_types().into_iter(), types.iter())
-                            .all(|(a, b)| types_match(*a, b))
+                            .all(|(a, b)| *a == b)
                             .then_some(())?;
 
                         Some(())
@@ -112,38 +113,65 @@ impl<'a> Deserializer<'a> {
                 return Ok(());
             };
 
-            for (object_idx, o) in objects_t.into_iter().enumerate() {
-                //
-            }
+            let contract_idx = *self.contract_idxs.get_by_left(&C::ID).unwrap();
+            let num_states = C::States::enumerate_types().len();
+
+            objects_t
+                .into_iter()
+                .enumerate()
+                // Filter to just the objects that match our contract
+                .filter(|(_idx, obj)| {
+                    let c = if let Some(c) = obj.contract() {
+                        c
+                    } else {
+                        return false;
+                    };
+                    c.idx() as usize == contract_idx
+                })
+                // create states and object in baseline
+                .try_for_each(|(idx, obj_t)| -> Result<()> {
+                    // Validate that number of states in object matches contract
+                    let obj_states_t = {
+                        obj_t.states();
+                        if obj_t.states().map_or(0, |x| x.len()) != num_states {
+                            return Err(eyre!(
+                                "number of states in serialized object did not match contract"
+                            ));
+                        }
+                        if let Some(s) = obj_t.states() {
+                            s
+                        } else {
+                            return Ok(());
+                        }
+                    };
+
+                    // Go through the object's states and validate that they match the
+                    // contract
+                    for (i, (obj_state_t, typ)) in
+                        std::iter::zip(obj_states_t, C::States::enumerate_types().into_iter())
+                            .enumerate()
+                    {
+                        let states_t = baseline_t
+                            .states()
+                            .ok_or(eyre!("Expected at least one state!"))?;
+                        let state_t = states_t.get(obj_state_t.idx() as usize);
+                        if state_t.p_type() != *typ {
+                            return Err(eyre!(
+                                "state #{i} type was {:?} but expected {:?}",
+                                state_t.p_type().variant_name().unwrap(),
+                                *typ,
+                            ));
+                        }
+                    }
+
+                    // TODO: Actually create the states
+                    Ok(())
+                })?;
 
             Ok(())
         };
         helper()?;
 
         Ok(contract)
-    }
-}
-
-/// Checks if `client` and `table` represent the same `TpPropertyType`
-fn types_match(client: c::TpPropertyType, table: primitive::TpPrimitiveKind) -> bool {
-    use c::TpPrimitiveType as C;
-    use c::TpPropertyType::Primitive;
-    use primitive::TpPrimitiveKind as T;
-    match (table, client) {
-        (T::U8, Primitive(C::U8))
-        | (T::U16, Primitive(C::U16))
-        | (T::U32, Primitive(C::U32))
-        | (T::U64, Primitive(C::U64))
-        | (T::I8, Primitive(C::I8))
-        | (T::I16, Primitive(C::I16))
-        | (T::I32, Primitive(C::I32))
-        | (T::I64, Primitive(C::I64))
-        | (T::Bool, Primitive(C::Bool))
-        | (T::F32, Primitive(C::F32))
-        | (T::F64, Primitive(C::F64))
-        | (T::String, Primitive(C::String))
-        | (T::ObjectHandle, Primitive(C::ObjectHandle))
-        | (T::ContractDataHandle, Primitive(C::ContractDataHandle)) => true,
-        _ => false,
     }
 }
