@@ -10,3 +10,6 @@ publish = false
 
 [dependencies]
 flatbuffers = "2"
+tp_client = { path = "../../rust" }
+eyre = "0.6"
+bimap = "0.6"

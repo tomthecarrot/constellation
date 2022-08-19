@@ -797,6 +797,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "bimap"
+version = "0.6.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bc0455254eb5c6964c4545d8bac815e1a1be4f3afe0ae695ea539c12d728d44b"
+
+[[package]]
 name = "bindgen"
 version = "0.59.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3636,7 +3642,10 @@ dependencies = [
 name = "tp_serialize"
 version = "0.0.0"
 dependencies = [
+ "bimap",
+ "eyre",
  "flatbuffers",
+ "tp_client",
 ]
 
 [[package]]
