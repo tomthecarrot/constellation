@@ -17,4 +17,10 @@ safer-ffi = { version = "0.0.10", features = ["proc_macros", "headers"] }
 handlebars = "4.2"
 eyre = "0.6"
 serde = { version = "1", features = ["derive"] }
+derive_more = "0.99"
+ref-cast = "1"
 lazy_static = "1"
+
+[features]
+default = ["c_api"]
+c_api = ["safer-ffi/headers"]

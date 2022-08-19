@@ -3124,10 +3124,12 @@ dependencies = [
 name = "rsharp"
 version = "0.0.0"
 dependencies = [
+ "derive_more",
  "eyre",
  "handlebars",
  "lazy_static",
  "paste",
+ "ref-cast",
  "rsharp_macro",
  "safer-ffi",
  "serde",

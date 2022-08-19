@@ -29,6 +29,41 @@ mod private {
     impl<T> Sealed for Option<T> {}
 }
 
+/// Implements From traits to convert references of wrapper types using `ref-cast`
+#[macro_export]
+macro_rules! impl_from_refcast {
+    ($from_t:ty, $for_t:ty) => {
+        impl<'a> From<&'a $from_t> for &'a $for_t {
+            fn from(other: &'a $from_t) -> &'a $for_t {
+                use ref_cast::RefCast;
+                <$for_t>::ref_cast(other)
+            }
+        }
+        impl<'a> From<&'a mut $from_t> for &'a mut $for_t {
+            fn from(other: &'a mut $from_t) -> &'a mut $for_t {
+                use ref_cast::RefCast;
+                <$for_t>::ref_cast_mut(other)
+            }
+        }
+    };
+}
+
+#[cfg(feature = "c_api")]
+pub mod c_api {
+    pub mod _string {
+        use derive_more::{From, Into};
+        use safer_ffi::prelude::*;
+
+        #[derive_ReprC]
+        #[ReprC::opaque]
+        #[repr(transparent)]
+        #[derive(ref_cast::RefCast, From, Into, Debug, Clone, Eq, PartialEq, Hash)]
+        pub struct String {
+            inner: std::string::String,
+        }
+    }
+}
+
 // This generates the C header file for the bindings. See safer-ffi's guide.
 #[safer_ffi::cfg_headers]
 #[test]
