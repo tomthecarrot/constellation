@@ -18,3 +18,5 @@ handlebars = "4.2"
 eyre = "0.6"
 serde = { version = "1", features = ["derive"] }
 lazy_static = "1"
+derive_more = "0.99"
+ref-cast = "1"

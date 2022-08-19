@@ -1,7 +1,10 @@
 pub mod codegen;
-mod primitives;
 mod rbox;
 mod rvec;
+pub mod string;
+mod types;
+
+pub use types::{opaque_types, value_types};
 
 pub use rsharp_macro::{remangle, substitute};
 
