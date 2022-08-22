@@ -1,3 +1,6 @@
+#![allow(non_snake_case)]
+
+use crate::remangle;
 use derive_more::{From, Into};
 use ref_cast::RefCast;
 use safer_ffi::prelude::*;
@@ -9,6 +12,31 @@ use safer_ffi::prelude::*;
 pub struct String {
     inner: std::string::String,
 }
+
+#[remangle("rsharp")]
+#[ffi_export]
+pub fn String__copy_utf8(utf8: c_slice::Ref<u8>) -> repr_c::Box<String> {
+    let utf8 = utf8.as_slice();
+    repr_c::Box::new(
+        std::string::String::from_utf8(utf8.to_vec())
+            .expect("Invalid utf8!")
+            .into(),
+    )
+}
+
+#[remangle("rsharp")]
+#[ffi_export]
+pub fn String__copy_utf16(utf16: c_slice::Ref<u16>) -> repr_c::Box<String> {
+    let utf16 = utf16.as_slice();
+    repr_c::Box::new(
+        std::string::String::from_utf16(utf16)
+            .expect("Invalid utf16")
+            .into(),
+    )
+}
+
+// ---- From trait impls ----
+
 impl<'a> From<&'a std::string::String> for &'a String {
     fn from(from: &'a std::string::String) -> &'a String {
         String::ref_cast(from)
