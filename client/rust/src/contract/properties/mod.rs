@@ -277,20 +277,6 @@ pub mod c_api {
         pub use u64;
         pub use u8;
 
-        pub use super::_string::String;
-    }
-
-    mod _string {
-        use derive_more::{From, Into};
-        use safer_ffi::prelude::*;
-
-        #[derive_ReprC]
-        #[ReprC::opaque]
-        #[repr(transparent)]
-        #[derive(ref_cast::RefCast, From, Into, Debug, Clone, Eq, PartialEq, Hash)]
-        pub struct String {
-            inner: std::string::String,
-        }
-        impl_from_refcast!(std::string::String, String);
+        pub use rsharp::string::String;
     }
 }

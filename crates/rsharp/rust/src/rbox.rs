@@ -1,22 +1,23 @@
 #![allow(non_camel_case_types, non_snake_case)]
 
-use crate::{primitives, remangle};
+use crate::remangle;
+use crate::value_types::value_types;
 use safer_ffi::prelude::*;
 
 macro_rules! boxes {
     // Base case
     ($path:literal, $t:ty $(,)?) => {
         paste::paste! {
-            /// Copies `value` into a rust `Box`
+
             #[remangle($path)]
             #[ffi_export]
-            pub fn [<Box _ $t:camel __new>](value: $t) -> repr_c::Box<$t> {
+            pub fn [<Box _ $t:camel __new>](value: $t) -> repr_c::Box<crate::value_types::$t> {
                 repr_c::Box::new(value)
             }
 
             #[remangle($path)]
             #[ffi_export]
-            pub fn [<Box _ $t:camel __drop>](value: repr_c::Box<$t>) {
+            pub fn [<Box _ $t:camel __drop>](value: repr_c::Box<crate::value_types::$t>) {
                 drop(value)
             }
         }
@@ -28,4 +29,4 @@ macro_rules! boxes {
     };
 }
 
-primitives!(; types, boxes, "rsharp");
+value_types!(; types, boxes, "rsharp");
