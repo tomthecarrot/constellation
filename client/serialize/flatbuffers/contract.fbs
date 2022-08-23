@@ -15,8 +15,8 @@ table ContractId {
     v_patch: uint16;
 }
 
+/// The indices in the arrays are the `StateId`
 table ContractStates {
-    ids: [tp_serialize.state.StateId];
     names: [string];
     types: [tp_serialize.primitive.TpPrimitiveKind];
 }
