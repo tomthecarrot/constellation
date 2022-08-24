@@ -1,7 +1,22 @@
 /// Types that can be used in FFI when behind a pointer, also known as "opaque" types.
 pub mod opaque_types {
-    pub use super::value_types::*;
     pub use crate::string::String;
+
+    macro_rules! opaque_types {
+        (; types, $macro_name:ident, $($x:tt)+) => {
+            $macro_name!(
+                $($x)+,
+                String,
+            );
+        };
+        (; types, $macro_name:ident) => {
+            $macro_name!(
+                String,
+            );
+        };
+    }
+
+    pub(crate) use opaque_types;
 }
 
 /// Types that can be used in FFI without a pointer. Also known as "value" types.

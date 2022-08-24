@@ -18,7 +18,7 @@ namespace RSharp
         }
 
         public unsafe {{type_cs}} Value {
-            get => *({{type_cs}}{{ptr_literal}})this.Inner.Value.p;
+            get => {{ptr_literal}}({{type_cs}}{{ptr_literal}})this.Inner.Value.p;
         }
 
 
