@@ -1,23 +1,10 @@
-mod eq_impl;
-
 use bimap::BiHashMap;
 use eyre::{eyre, Result, WrapErr};
+use tp_client::baseline::BaselineKind;
 use tp_client::contract::properties::dynamic::{DynTpPrimitive, DynTpProperty};
 use tp_client::contract::properties::states::IStates;
 
-/// The types related to the tp_client
-mod c {
-    pub use tp_client::baseline::Baseline;
-    pub use tp_client::contract::properties::dynamic::{TpPrimitiveType, TpPropertyType};
-    pub use tp_client::contract::{Contract, ContractDataHandle, ContractId};
-}
-
-/// The types related to the flatbuffer
-mod t {
-    pub use crate::baseline::Baseline;
-    pub use crate::generated::tp_serialize::object::Object;
-    pub use crate::generated::tp_serialize::primitive::TpPrimitive;
-}
+use crate::{c, t};
 
 pub struct Deserializer<'a> {
     data: &'a [u8],
@@ -26,17 +13,17 @@ pub struct Deserializer<'a> {
     contract_data_handles: BiHashMap<c::ContractId, c::ContractDataHandle>,
 }
 impl<'a> Deserializer<'a> {
-    pub fn new(data: &'a [u8], baseline: c::Baseline) -> Self {
+    pub fn new(data: &'a [u8], baseline_kind: BaselineKind) -> Self {
         Self {
             data,
-            baseline,
+            baseline: c::Baseline::new(baseline_kind),
             contract_idxs: Default::default(),
             contract_data_handles: Default::default(),
         }
     }
 
-    /// Deserialize all objects related to contract `C` into `baseline`.
-    /// Usually, this gets called once per relevant contract
+    /// Deserialize all objects related to contract `C`. Usually, this gets called
+    /// once per relevant contract.
     pub fn deserialize<C: c::Contract>(&mut self) -> Result<C> {
         let baseline_t = flatbuffers::root::<t::Baseline>(self.data)
             .wrap_err("Error while verifying flatbuffer")?;
@@ -77,11 +64,9 @@ impl<'a> Deserializer<'a> {
                         let states_t = c.states()?;
                         let nfields = C::States::field_names().len();
                         let names = states_t.names()?;
-                        let ids = states_t.ids()?;
                         let types = states_t.types()?;
                         // Lengths match?
-                        (names.len() == nfields && ids.len() == nfields && types.len() == nfields)
-                            .then_some(())?;
+                        (names.len() == nfields && types.len() == nfields).then_some(())?;
                         // Names match?
                         std::iter::zip(C::States::field_names().into_iter(), names.iter())
                             .all(|(a, b)| *a == b)
@@ -239,5 +224,11 @@ impl<'a> Deserializer<'a> {
         helper()?;
 
         Ok(contract)
+    }
+
+    /// Finish deserialization, and return the [`c::Baseline`] with the deserialized
+    /// results.
+    pub fn finish(self) -> c::Baseline {
+        self.baseline
     }
 }
