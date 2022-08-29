@@ -7,6 +7,8 @@ use crate::contract::properties::dynamic::{
 };
 use crate::contract::properties::primitives;
 use crate::contract::properties::traits::ITpPropertyStatic;
+use crate::contract::ContractDataHandle;
+use crate::object::ObjectHandle;
 
 DynEnum!(DynStateHandle, StateHandle | derive(Clone, PartialEq));
 impl IStateHandle for DynStateHandle {
@@ -88,3 +90,32 @@ impl IStateHandle for DynStateHandle {
 impl Copy for DynStateHandlePrimitive {}
 impl Copy for DynStateHandleVec {}
 impl Copy for DynStateHandle {}
+
+macro_rules! impl_from {
+    // base case
+    ($t:ty) => {
+        impl From<StateHandle<$t>> for DynStateHandle {
+            fn from(other: StateHandle<$t>) -> Self {
+                Self::Primitive(DynStateHandlePrimitive::from(other))
+            }
+        }
+
+        impl From<StateHandle<Vec<$t>>> for DynStateHandle {
+            fn from(other: StateHandle<Vec<$t>>) -> Self {
+                Self::Vec(DynStateHandleVec::from(other))
+            }
+        }
+    };
+
+    // recursive case
+    ($t:ty, $($tail:ty),+) => {
+        impl_from!($t);
+        impl_from!($($tail),+);
+    };
+
+    // handle trailing comma
+    ($($tail:ty),+,) => {
+        impl_from!($($tail),+);
+    };
+}
+primitives!(; types, impl_from);

@@ -6,8 +6,13 @@
 // Necessary to allow proc macros to have the correct crate name when invoked from
 // this crate
 extern crate self as tp_client;
+
 /// Reexported for the sake of the proc macros
-pub use ::lazy_static;
+mod re_exports {
+    pub use ::lazy_static;
+    pub use ::paste;
+}
+pub use self::re_exports::*;
 
 pub mod action;
 pub mod baseline;
@@ -21,7 +26,7 @@ pub use engine::Engine;
 
 // This generates the C header file for the bindings. See safer-ffi's guide.
 #[cfg(feature = "c_api")]
-#[safer_ffi::cfg_headers]
+#[cfg_attr(feature = "c_api", safer_ffi::cfg_headers)]
 #[test]
 fn generate_headers() -> ::std::io::Result<()> {
     let builder = ::safer_ffi::headers::builder();

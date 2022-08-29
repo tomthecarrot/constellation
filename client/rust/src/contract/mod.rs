@@ -5,7 +5,7 @@ use crate::contract::properties::channels::{ChannelsIter, IChannels};
 use crate::contract::properties::states::{IStates, StatesIter};
 use crate::object::ObjectHandle;
 
-#[cfg(feature = "safer-ffi")]
+#[cfg(feature = "c_api")]
 use safer_ffi::derive_ReprC;
 
 use std::collections::HashSet;
@@ -57,7 +57,7 @@ pub trait Contract {
 
 /// Contains stateful data about the contract
 #[cfg_attr(
-    feature = "safer-ffi",
+    feature = "c_api",
     derive_ReprC,
     ReprC::opaque("tp_client__contract__ContractData")
 )]

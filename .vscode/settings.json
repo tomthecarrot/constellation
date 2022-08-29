@@ -2,5 +2,8 @@
     "files.insertFinalNewline": true,
     "files.trimFinalNewlines": true,
     "editor.formatOnSave": true,
-    "files.trimTrailingWhitespace": true
+    "files.trimTrailingWhitespace": true,
+    "rust-analyzer.cargo.features": [
+        "c_api"
+    ]
 }

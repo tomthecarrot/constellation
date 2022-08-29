@@ -1,7 +1,7 @@
 pub mod dyn_handle;
 pub mod dyn_state;
 mod handle;
-pub(crate) mod id;
+pub mod id;
 
 mod iter;
 
