@@ -26,7 +26,7 @@ pub use engine::Engine;
 
 // This generates the C header file for the bindings. See safer-ffi's guide.
 #[cfg(feature = "c_api")]
-#[cfg_attr(feature = "c_api", safer_ffi::cfg_headers)]
+#[safer_ffi::cfg_headers]
 #[test]
 fn generate_headers() -> ::std::io::Result<()> {
     let builder = ::safer_ffi::headers::builder();

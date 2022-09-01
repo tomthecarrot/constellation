@@ -373,7 +373,7 @@ impl<T: ITpPropertyStatic> core::ops::IndexMut<ChannelHandle<T>> for Baseline {
 }
 
 #[cfg(feature = "c_api")]
-#[cfg_attr(feature = "c_api", rsharp::substitute("tp_client::baseline"))]
+#[rsharp::substitute("tp_client::baseline")]
 pub mod c_api {
     #![allow(non_camel_case_types, non_snake_case, dead_code)]
 

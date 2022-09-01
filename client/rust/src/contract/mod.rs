@@ -85,7 +85,7 @@ impl ContractData {
     }
 }
 
-#[cfg_attr(feature = "c_api", rsharp::substitute("tp_client::contract"))]
+#[rsharp::substitute("tp_client::contract")]
 #[cfg(feature = "c_api")]
 pub mod c_api {
     #![allow(non_camel_case_types, non_snake_case, dead_code)]
