@@ -10,7 +10,10 @@ mod vec;
 pub mod __macro;
 
 pub use primitive::{DynTpPrimitive, TpPrimitiveType};
-pub use property::{DynTpProperty, DynTpPropertyMut, DynTpPropertyRef};
+pub use property::{
+    DynTpPrimitiveMut, DynTpPrimitiveRef, DynTpProperty, DynTpPropertyMut, DynTpPropertyRef,
+    DynTpVecMut, DynTpVecRef,
+};
 pub use vec::DynTpVec;
 
 pub(in crate::contract::properties) use __macro::DynEnum;

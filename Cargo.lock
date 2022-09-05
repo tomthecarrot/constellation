@@ -3641,6 +3641,7 @@ dependencies = [
  "bimap",
  "eyre",
  "flatbuffers",
+ "paste",
  "tp_client",
 ]
 
