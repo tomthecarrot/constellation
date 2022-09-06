@@ -6,8 +6,13 @@
 // Necessary to allow proc macros to have the correct crate name when invoked from
 // this crate
 extern crate self as tp_client;
+
 /// Reexported for the sake of the proc macros
-pub use ::lazy_static;
+mod re_exports {
+    pub use ::lazy_static;
+    pub use ::paste;
+}
+pub use self::re_exports::*;
 
 pub mod action;
 pub mod baseline;

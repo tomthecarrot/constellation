@@ -172,7 +172,7 @@ pub(in crate::contract::properties) use DynTpPropId;
 #[macro_export]
 macro_rules! apply_to_dyn {
     ($mod_path:path, $enum_type:ident, $prim_type:ident, $vec_type:ident, $dyn_prop:expr, $closure:expr) => {{
-        ::paste::paste! {
+        ::tp_client::paste::paste! {
             use $mod_path::$enum_type;
             use $mod_path::$prim_type as PS;
             use $mod_path::$vec_type as PV;
@@ -213,7 +213,7 @@ macro_rules! apply_to_dyn {
         }
     }};
 }
-pub(crate) use apply_to_dyn;
+pub use apply_to_dyn;
 
 /// Applies the provided closure expression to a [`DynStateId`].
 ///

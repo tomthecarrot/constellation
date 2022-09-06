@@ -1,6 +1,6 @@
 use super::property::{
-    DynTpPrimitiveMut, DynTpPrimitiveRef, DynTpProperty, DynTpPropertyMut, DynTpPropertyRef,
-    DynTpVecMut, DynTpVecRef,
+    DynTpPrimitive, DynTpPrimitiveMut, DynTpPrimitiveRef, DynTpProperty, DynTpPropertyMut,
+    DynTpPropertyRef, DynTpVec, DynTpVecMut, DynTpVecRef,
 };
 use crate::contract::properties::primitives;
 use crate::contract::ContractDataHandle;
@@ -38,6 +38,12 @@ macro_rules! impl_from {
         }
 
         // ---- Impl conversion from primitive to property ----
+        impl From<$t> for DynTpProperty {
+            fn from(other: $t) -> Self {
+                DynTpPrimitive::from(other).into()
+            }
+        }
+
         impl <'a> From<&'a $t> for DynTpPropertyRef<'a> {
             fn from(other: &'a $t) -> Self {
                 DynTpPrimitiveRef::from(other).into()
@@ -50,6 +56,12 @@ macro_rules! impl_from {
         }
 
         // ---- Impl conversion from vec to property ----
+        impl From<Vec<$t>> for DynTpProperty {
+            fn from(other: Vec<$t>) -> Self {
+                DynTpVec::from(other).into()
+            }
+        }
+
         impl <'a> From<&'a Vec<$t>> for DynTpPropertyRef<'a> {
             fn from(other: &'a Vec<$t>) -> Self {
                 DynTpVecRef::from(other).into()

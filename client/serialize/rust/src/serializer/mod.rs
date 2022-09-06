@@ -1,6 +1,8 @@
 use eyre::{eyre, Result, WrapErr};
 use flatbuffers::{FlatBufferBuilder, WIPOffset};
+use tp_client::apply_to_state_id;
 use tp_client::contract::properties::states::IStates;
+use tp_client::contract::properties::states::dyn_state::DynStateRef;
 
 use crate::baseline::BaselineArgs;
 use crate::contract::{ContractArgs, ContractIdArgs, ContractStatesArgs};
@@ -27,12 +29,26 @@ impl<'b> Serializer<'b> {
 
     /// Serialize all objects related to contract `C`. Usually, this gets called once
     /// per relevant contract.
-    pub fn serialize<C: c::Contract>(&mut self) -> Result<()> {
+    pub fn serialize<C: c::Contract>(&mut self, contract: C) -> Result<()> {
         let fbb = &mut self.fbb;
+        let contract_data: &c::ContractData = self.baseline.contract_data(contract.handle())?;
 
         self.contracts.push(Self::serialize_contract::<C>(fbb)?);
 
         // TODO: serialize states and objects
+        // let mut state_handles = Vec::new();
+        for &obj_handle in contract_data.objects().iter() {
+            // state_handles.clear();
+            for state_id in contract.state_iter() {
+                let state: DynStateRef = apply_to_state_id!(state_id, |state_id| {
+                    self.baseline
+                        .bind_state(state_id, obj_handle)
+                        .wrap_err("Failed to bind StateId to Object")
+                        .and_then(|h| self.baseline.state(h))
+                        .map(DynStateRef::from)
+                })?;
+            }
+        }
         Ok(())
     }
 
