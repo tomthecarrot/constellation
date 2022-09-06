@@ -26,7 +26,7 @@ cp $PLATFORM_DIR/target/debug/deps/libunity_states $CLIENT_DIR/cs/tests/bin/Debu
 
 # Generate C bindings.
 cargo test -p tp_client
-cargo run -p rsharp
+cargo run -p rsharp_codegen
 cargo test -p unity_states
 
 # Generate C# bindings.

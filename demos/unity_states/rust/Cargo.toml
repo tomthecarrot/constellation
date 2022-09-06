@@ -9,10 +9,6 @@ publish = false
 [lib]
 crate-type = ["rlib", "cdylib"]
 
-[features]
-default = ["c_api"]
-c_api = ["safer-ffi/headers"]
-
 [dependencies]
 tp_client = { path = "../../../client/rust" }
-safer-ffi = { version = "0.0.10", optional = true }
+safer-ffi = { version = "0.0.10", features = ["headers"] }

@@ -1,5 +1,8 @@
+mod codegen;
+
 use eyre::{Result, WrapErr};
-use rsharp::codegen::Codegen;
+
+use crate::codegen::Codegen;
 
 fn main() -> Result<()> {
     let codegen = Codegen::new("rbox.cs.tpl").wrap_err("Failed to create `Codegen`")?;

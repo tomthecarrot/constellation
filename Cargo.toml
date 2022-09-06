@@ -8,6 +8,7 @@ members = [
     "client/contract_macro",
     "crates/better_borrow",
     "crates/datastructures/arena",
+    "crates/rsharp/codegen",
     "crates/rsharp/rust",
     "crates/rsharp/rust/macro",
     "demos/circle_game",
