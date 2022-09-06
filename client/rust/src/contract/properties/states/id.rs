@@ -4,10 +4,10 @@ use crate::contract::ContractDataHandle;
 
 use std::marker::PhantomData;
 
-#[cfg(feature = "safer-ffi")]
+#[cfg(feature = "c_api")]
 use safer_ffi::derive_ReprC;
 
-#[cfg_attr(feature = "safer-ffi", derive_ReprC, ReprC::opaque)]
+#[cfg_attr(feature = "c_api", derive_ReprC, ReprC::opaque)]
 /// Represents a particular state field of a contract. For actual state data of
 /// a specific object, see [`StateHandle`].
 #[derive(Clone, Debug, Hash, Eq, PartialEq)]

@@ -1,4 +1,3 @@
-pub mod codegen;
 mod rbox;
 mod rvec;
 pub mod string;

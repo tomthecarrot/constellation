@@ -1,0 +1,12 @@
+[package]
+name = "rsharp_codegen"
+version = "0.0.0"
+edition = "2021"
+# Prevent accidental `cargo publish`
+publish = false
+
+[dependencies]
+handlebars = "4.2"
+eyre = "0.6"
+serde = { version = "1", features = ["derive"] }
+lazy_static = "1"

@@ -1,9 +1,9 @@
-#[cfg(feature = "c_api")]
 use safer_ffi::derive_ReprC;
 
 use tp_client::contract::{states, Contract, ContractDataHandle, ContractId};
 
-#[cfg_attr(feature = "safer-ffi", derive_ReprC, ReprC::opaque)]
+#[derive_ReprC]
+#[ReprC::opaque]
 pub struct BallContract {
     handle: ContractDataHandle,
     states: BallStates,
@@ -39,7 +39,8 @@ impl Contract for BallContract {
 }
 
 #[states]
-#[cfg_attr(feature = "safer-ffi", derive_ReprC, ReprC::opaque)]
+#[derive_ReprC]
+#[ReprC::opaque]
 pub struct BallStates {
     pos_x: f32,
     pos_y: f32,
@@ -53,7 +54,6 @@ pub struct BallStates {
     color: u64,
 }
 
-#[cfg(feature = "c_api")]
 mod c_api {
     #![allow(non_snake_case)]
     use super::*;
