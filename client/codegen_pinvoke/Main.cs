@@ -3,10 +3,8 @@ using Rflct = System.Reflection;
 using Console = System.Console;
 using Driver = CppSharp.Driver;
 using Gen = CppSharp.Generators;
-using E = System.Linq.Enumerable;
 using DirectoryInfo = System.IO.DirectoryInfo;
 using Path = System.IO.Path;
-using Dir = System.IO.Directory;
 using System.Collections.Generic;
 using RtInfo = System.Runtime.InteropServices.RuntimeInformation;
 using OS = System.Runtime.InteropServices.OSPlatform;
@@ -39,7 +37,8 @@ namespace Codegen
         private readonly static string DYLIB_EXTENSION =
             (RtInfo.IsOSPlatform(OS.Linux) || RtInfo.IsOSPlatform(OS.FreeBSD)) ? ".so"
             : RtInfo.IsOSPlatform(OS.Windows) ? ".dll"
-            : RtInfo.IsOSPlatform(OS.OSX) ? ".dylib"
+            // Using ".dylib" on mac silently inhibits DLLImports 🤦‍♂️
+            : RtInfo.IsOSPlatform(OS.OSX) ? ""
             : throw new Exception("unknown platform");
 
         static int Main(string[] args)
@@ -62,7 +61,6 @@ namespace Codegen
                 cargo_artifact_dir: Path.Join(project_dir.FullName, "target", "debug"),
                 "tp_client"
             ));
-
             libs.Add(new LibInfo(
                 output_dir: Path.Join(
                     project_dir.FullName, "demos", "unity_states", "cs", "generated", "cpp_sharp"
@@ -118,7 +116,10 @@ namespace Codegen
             module.IncludeDirs.Add(this.lib_info.input_dir.FullName);
             module.Headers.Add("generated.h");
             module.LibraryDirs.Add(this.lib_info.cargo_artifact_dir.FullName);
-            module.Libraries.Add($"lib{this.lib_info.crate_name}{Codegen.DYLIB_EXTENSION}");
+            // hard coding "unity_states" as a stopgap until we decide which target
+            // provides all the symbols for the necessary libraries
+            module.Libraries.Add($"libunity_states{Codegen.DYLIB_EXTENSION}");
+            module.LibraryName = this.lib_info.crate_name;
         }
 
         /// Setup your passes here.
@@ -141,7 +142,7 @@ namespace Codegen
             var assembly_file = new DirectoryInfo(Rflct.Assembly.GetExecutingAssembly().Location);
 
             DirectoryInfo project_dir = assembly_file;
-            const uint n_steps_up = 5; // macOS: 7 steps up.
+            const uint n_steps_up = 5;
             for (var i = 0; i < n_steps_up; i++)
             {
                 project_dir = project_dir.Parent ?? project_dir.Root;
@@ -149,9 +150,9 @@ namespace Codegen
 
             // We are now either at the `client` folder or one folder deeper if
             // compiling to a non-native architecture. Lets figure out which one.
+            // Yes, this is a dirty hack.
             if (project_dir.Name != "client")
             {
-                // Yes, this is a dirty hack.
                 project_dir = project_dir.Parent ?? project_dir.Root;
             }
             // Go up one more to reach the toplevel directory that holds all the projects
