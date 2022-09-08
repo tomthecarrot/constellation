@@ -115,5 +115,26 @@ namespace Teleportal.Client
              );
             return new States.State_U64(p, OwnershipSemantics.MutRef);
         }
+
+        public States.State_String State(States.StateHandle_String state_handle)
+        {
+            var p = new Ptr<States.State_String>(
+                ffi.TpClientBaselineBaselineStateString(this.Inner.Value.p, state_handle.Inner.Value.p)
+            );
+            return new States.State_String(p, OwnershipSemantics.SharedRef);
+        }
+
+        public States.State_String StateMut(States.StateHandle_String state_handle)
+        {
+            if (this.OwnershipSemantics == OwnershipSemantics.SharedRef)
+            {
+                throw new MutabilityException("`this` must be mutable!");
+            }
+
+            var p = new Ptr<States.State_String>(
+                ffi.TpClientBaselineBaselineStateMutString(this.Inner.Value.p, state_handle.Inner.Value.p)
+            );
+            return new States.State_String(p, OwnershipSemantics.MutRef);
+        }
     }
 }

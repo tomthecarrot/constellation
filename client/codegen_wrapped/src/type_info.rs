@@ -49,6 +49,7 @@ pub enum PrimitiveType {
     Bool(Bool),
     F32(F32),
     F64(F64),
+    String(String),
     ObjectHandle(ObjectHandle),
     ContractDataHandle(ContractDataHandle),
 }
@@ -59,7 +60,7 @@ impl PrimitiveType {
     pub fn types() -> &'static [PrimitiveType] {
         use PrimitiveType as P;
         lazy_static! {
-            static ref RESULT: [PrimitiveType; 13] = [
+            static ref RESULT: [PrimitiveType; 14] = [
                 P::new::<U8>(),
                 P::new::<U16>(),
                 P::new::<U32>(),
@@ -71,6 +72,7 @@ impl PrimitiveType {
                 P::new::<Bool>(),
                 P::new::<F32>(),
                 P::new::<F64>(),
+                P::new::<String>(),
                 P::new::<ObjectHandle>(),
                 P::new::<ContractDataHandle>(),
             ];
@@ -138,6 +140,15 @@ type_info!(I64, "I64", "long*", "RBox_I64", true, "long", O::Both);
 type_info!(Bool, "Bool", "bool*", "RBox_Bool", true, "bool", O::Both);
 type_info!(F32, "F32", "float*", "RBox_F32", true, "float", O::Both);
 type_info!(F64, "F64", "double*", "RBox_F64", true, "double", O::Both);
+type_info!(
+    String,
+    "String",
+    "IntPtr",
+    "RString",
+    true,
+    "RString",
+    O::Owned
+);
 type_info!(
     ObjectHandle,
     "ObjectHandle",
