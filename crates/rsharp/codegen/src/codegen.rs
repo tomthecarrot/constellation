@@ -15,7 +15,7 @@ pub struct Codegen {
 }
 
 impl Codegen {
-    pub fn new(partial_tpl_filename: &str) -> Result<Self> {
+    pub fn new(partial_tpl_filename: &str, overwrite: bool) -> Result<Self> {
         let tpl_path = Path::new(env!("CARGO_MANIFEST_DIR")).join(partial_tpl_filename);
         let partial_path = Path::new(env!("CARGO_MANIFEST_DIR")).join(partial_tpl_filename);
         let output_dir = Path::new(env!("CARGO_MANIFEST_DIR"))
@@ -23,9 +23,9 @@ impl Codegen {
             .unwrap()
             .join("cs/src/generated");
 
-        if output_dir.exists() && output_dir.read_dir()?.next().is_some() {
+        if !overwrite && output_dir.exists() && output_dir.read_dir()?.next().is_some() {
             return Err(eyre!(format!(
-                "`output_dir` is not empty! Please delete it. (output_dir={output_dir:?})"
+                "`output_dir` is not empty! Please delete it, or rerun with `-f`. (output_dir={output_dir:?})"
             )));
         }
         std::fs::create_dir_all(&output_dir)
