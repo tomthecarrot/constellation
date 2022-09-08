@@ -10,13 +10,16 @@ struct Args {
 }
 
 fn main() -> Result<()> {
+    let args = Args::parse();
+
     let codegen_keyframe =
-        Codegen::new("keyframe.cs.tpl").wrap_err("Failed to create `Codegen`")?;
-    let codegen_state = Codegen::new("state.cs.tpl").wrap_err("Failed to create `Codegen`")?;
+        Codegen::new("keyframe.cs.tpl", args.force).wrap_err("Failed to create `Codegen`")?;
+    let codegen_state =
+        Codegen::new("state.cs.tpl", args.force).wrap_err("Failed to create `Codegen`")?;
     let codegen_state_id =
-        Codegen::new("state_id.cs.tpl").wrap_err("Failed to create `Codegen`")?;
+        Codegen::new("state_id.cs.tpl", args.force).wrap_err("Failed to create `Codegen`")?;
     let codegen_state_handle =
-        Codegen::new("state_handle.cs.tpl").wrap_err("msFailed to create `Codegen`")?;
+        Codegen::new("state_handle.cs.tpl", args.force).wrap_err("msFailed to create `Codegen`")?;
 
     let cd_keyframe = ClassData::<CDKeyframe>::generate_class_data();
     let result_keyframe: Result<()> = cd_keyframe
