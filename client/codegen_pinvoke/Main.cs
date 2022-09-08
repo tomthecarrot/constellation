@@ -112,14 +112,15 @@ namespace Codegen
             options.GenerateClassTemplates = false;
             options.GenerateFinalizers = false;
 
-            var module = options.AddModule(this.lib_info.crate_name);
+            // hard coding "unity_states" as a stopgap until we decide which target
+            // provides all the symbols for the necessary libraries
+            var module = options.AddModule("unity_states");
+            module.Libraries.Add($"libunity_states{Codegen.DYLIB_EXTENSION}");
+            module.OutputNamespace = this.lib_info.crate_name;
+
             module.IncludeDirs.Add(this.lib_info.input_dir.FullName);
             module.Headers.Add("generated.h");
             module.LibraryDirs.Add(this.lib_info.cargo_artifact_dir.FullName);
-            // hard coding "unity_states" as a stopgap until we decide which target
-            // provides all the symbols for the necessary libraries
-            module.Libraries.Add($"libunity_states{Codegen.DYLIB_EXTENSION}");
-            module.LibraryName = this.lib_info.crate_name;
         }
 
         /// Setup your passes here.
