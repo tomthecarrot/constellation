@@ -21,6 +21,12 @@ pub fn String__value(s: &String) -> c_slice::Ref<u8> {
 
 #[remangle("rsharp")]
 #[ffi_export]
+pub fn String__drop(s: repr_c::Box<String>) {
+    drop(s)
+}
+
+#[remangle("rsharp")]
+#[ffi_export]
 pub fn String__copy_utf8(utf8: c_slice::Ref<u8>) -> repr_c::Box<String> {
     let utf8 = utf8.as_slice();
     repr_c::Box::new(

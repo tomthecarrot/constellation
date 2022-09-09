@@ -15,7 +15,7 @@ public class TestString
     [Fact]
     public void TestString1()
     {
-        var st = new States.State_String(RString.FromManaged("Hello!"));
+        // var st = new States.State_String(new RString("Hello!"));
         // output.WriteLine(st.ToString());
 
         // Assert.Equal("Hello!", st.Value.Value);
