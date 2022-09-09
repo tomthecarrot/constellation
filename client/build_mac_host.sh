@@ -9,6 +9,8 @@ RSHARP_DIR="$PLATFORM_DIR/crates/rsharp"
 rm -rf $CLIENT_DIR/cs/src/generated
 rm -rf $RSHARP_DIR/cs/src/generated
 
+# add Flatc
+
 # Build Platform core and demo libraries.
 cd $PLATFORM_DIR
 cargo build -p tp_client # includes `rsharp`
@@ -25,9 +27,8 @@ cp $PLATFORM_DIR/target/debug/deps/librsharp $CLIENT_DIR/cs/tests/bin/Debug/net6
 cp $PLATFORM_DIR/target/debug/deps/libunity_states $CLIENT_DIR/cs/tests/bin/Debug/net6.0/
 
 # Generate C bindings.
-cargo test -p tp_client
+cargo test --all
 cargo run -p rsharp_codegen
-cargo test -p unity_states
 
 # Generate C# bindings.
 cd $CLIENT_DIR/codegen_pinvoke
