@@ -7,9 +7,9 @@ namespace RSharp
     public class Metadata
     {
 #if UNITY_IOS && !UNITY_EDITOR
-        public const string LIBRARY_NAME = "__Internal";
+        internal const string LIBRARY_NAME = "__Internal";
 #else
-        public const string LIBRARY_NAME = "unity_states";
+        internal const string LIBRARY_NAME = "unity_states";
 #endif
     }
 
