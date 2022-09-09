@@ -7,8 +7,8 @@ namespace RSharp
 
     public sealed class RString : OpaqueWrapper<RString>
     {
-        public RString(Ptr<RString> inner) : base(inner, OwnershipSemantics.Owned) { }
-        public RString(string managedString) : this(NewHelper(managedString)) { }
+        public RString(Ptr<RString> inner, OwnershipSemantics ownershipSemantics) : base(inner, ownershipSemantics) { }
+        public RString(string managedString) : this(NewHelper(managedString), OwnershipSemantics.Owned) { }
 
         private static Ptr<RString> NewHelper(string managedString)
         {

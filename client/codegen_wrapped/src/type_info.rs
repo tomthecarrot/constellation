@@ -147,7 +147,7 @@ type_info!(
     "RString",
     true,
     "RString",
-    O::Owned
+    O::Both
 );
 type_info!(
     ObjectHandle,
