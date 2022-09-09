@@ -42,4 +42,22 @@ public class TestState
         st.Dispose();
         Assert.Throws<Sys.InvalidOperationException>(() => { var val = st.Value; });
     }
+
+    [Fact]
+    public void TestString()
+    {
+        var rs = new RString("Hello!");
+        var st = new States.State_String(rs);
+        output.WriteLine(st.ToString());
+
+        Assert.Equal("Hello!", st.Value.Value);
+
+        // Ensure that RString was moved into the State.
+        Assert.Null(rs.Inner);
+        rs.Dispose();
+        Assert.Equal("Hello!", st.Value.Value);
+
+        st.Dispose();
+        Assert.Throws<Sys.InvalidOperationException>(() => st.Value);
+    }
 }

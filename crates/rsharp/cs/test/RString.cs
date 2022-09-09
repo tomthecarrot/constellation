@@ -14,12 +14,12 @@ public class TestString
     [Fact]
     public void TestString1()
     {
-        // var rs = new RString("Hello!");
-        // output.WriteLine(rs.ToString());
+        var rs = new RString("Hello!");
+        output.WriteLine(rs.ToString());
 
-        // Assert.Equal("Hello!", rs.Value);
+        Assert.Equal("Hello!", rs.Value);
 
-        // rs.Dispose();
-        // Assert.Throws<Sys.InvalidOperationException>(() => { var val = rs; });
+        rs.Dispose();
+        Assert.Throws<Sys.InvalidOperationException>(() => rs.Value);
     }
 }
