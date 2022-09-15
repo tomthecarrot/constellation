@@ -14,8 +14,12 @@
     unused_parens,
     while_true
 )]
-#[allow(unused)]
-mod generated;
+
+dynpath::wrap! {
+    #[allow(unused)]
+    #[dynpath("OUT_DIR", "mod.rs")]
+    mod generated;
+}
 pub use self::generated::tp_serialize::*;
 
 mod deserializer;
