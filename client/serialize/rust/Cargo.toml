@@ -14,3 +14,7 @@ tp_client = { path = "../../rust" }
 eyre = "0.6"
 bimap = "0.6"
 paste = "1"
+dynpath = { git = "https://github.com/TheButlah/dynpath", rev = "0058f9d5fd28cc9760f8c4cbb99974e060297dde" }
+
+[build-dependencies]
+flatc-rust = "0.2"
