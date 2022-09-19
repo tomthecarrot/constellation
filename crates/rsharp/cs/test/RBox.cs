@@ -20,7 +20,7 @@ namespace test
         {
             output.WriteLine("Starting RBox U8 test");
             var u8 = new RBox_U8(10);
-            ssert.Equal(10, u8.Value);
+            Assert.Equal(10, u8.Value);
             u8.Dispose();
             Assert.Throws<InvalidOperationException>(() => u8.Value);
         }
