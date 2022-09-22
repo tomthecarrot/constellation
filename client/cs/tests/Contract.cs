@@ -24,7 +24,7 @@ public class TestContract
         var c_data = b.ContractData(handle);
         var name = c_data.Id.Name;
 
-        Assert.Equal(Encoding.UTF8.GetString(name), "teleportal.example-ffi-contract");
+        Assert.Equal("teleportal.example-ffi-contract", Encoding.UTF8.GetString(name));
         Assert.Equal(c_data.Id.Version, (1, 2, 3));
 
         var c_data2 = b.ContractData(handle);
