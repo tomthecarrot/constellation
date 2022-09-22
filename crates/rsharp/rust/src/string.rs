@@ -10,7 +10,7 @@ use safer_ffi::prelude::*;
 #[repr(transparent)]
 #[derive(RefCast, From, Into, Debug, Clone, Eq, PartialEq, Hash)]
 pub struct String {
-    inner: std::string::String,
+    pub inner: std::string::String,
 }
 
 #[remangle("rsharp")]
