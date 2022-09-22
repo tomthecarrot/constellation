@@ -34,12 +34,6 @@ namespace Codegen
     {
         private static DirectoryInfo project_dir = GetProjectDir();
         private readonly LibInfo lib_info;
-        private readonly static string DYLIB_EXTENSION =
-            (RtInfo.IsOSPlatform(OS.Linux) || RtInfo.IsOSPlatform(OS.FreeBSD)) ? ".so"
-            : RtInfo.IsOSPlatform(OS.Windows) ? ".dll"
-            // Using ".dylib" on mac silently inhibits DLLImports 🤦‍♂️
-            : RtInfo.IsOSPlatform(OS.OSX) ? ""
-            : throw new Exception("unknown platform");
 
         static int Main(string[] args)
         {
@@ -115,7 +109,7 @@ namespace Codegen
             // hard coding "unity_states" as a stopgap until we decide which target
             // provides all the symbols for the necessary libraries
             var module = options.AddModule("unity_states");
-            module.Libraries.Add($"libunity_states{Codegen.DYLIB_EXTENSION}");
+            module.Libraries.Add($"libunity_states");
             module.OutputNamespace = this.lib_info.crate_name;
 
             module.IncludeDirs.Add(this.lib_info.input_dir.FullName);
