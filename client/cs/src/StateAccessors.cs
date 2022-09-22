@@ -124,6 +124,14 @@ namespace Teleportal.Client
             return new States.State_String(p, OwnershipSemantics.SharedRef);
         }
 
+        public States.State_ObjectHandle State(States.StateHandle_ObjectHandle state_handle)
+        {
+            var p = new Ptr<States.State_ObjectHandle>(
+                ffi.TpClientBaselineBaselineStateObjectHandle(this.Inner.Value.p, state_handle.Inner.Value.p)
+            );
+            return new States.State_ObjectHandle(p, OwnershipSemantics.Owned);
+        }
+
         public States.State_String StateMut(States.StateHandle_String state_handle)
         {
             if (this.OwnershipSemantics == OwnershipSemantics.SharedRef)

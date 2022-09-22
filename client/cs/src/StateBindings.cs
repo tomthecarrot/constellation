@@ -40,5 +40,10 @@ namespace Teleportal.Client
             var p = new Ptr<States.StateHandle_String>(ffi.TpClientBaselineBaselineBindStateString(this.Inner.Value.p, id.Inner.Value.p, obj.Inner.Value.p));
             return new States.StateHandle_String(p);
         }
+        public States.StateHandle_ObjectHandle BindStateObjectHandle(States.StateId_ObjectHandle id, ObjectHandle obj)
+        {
+            var p = new Ptr<States.StateHandle_ObjectHandle>(ffi.TpClientBaselineBaselineBindStateObjectHandle(this.Inner.Value.p, id.Inner.Value.p, obj.Inner.Value.p));
+            return new States.StateHandle_ObjectHandle(p);
+        }
     }
 }
