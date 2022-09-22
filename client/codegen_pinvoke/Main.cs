@@ -92,7 +92,6 @@ namespace Codegen
                     lib.output_dir.Delete(true);
                 }
 
-                // TODO: move this string somewhere more sensible
                 const string single_lib_name = "constellation";
 
                 // Actually generate the code
