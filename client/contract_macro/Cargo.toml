@@ -17,4 +17,4 @@ quote = "1"
 proc-macro2 = "1"
 
 [dev-dependencies]
-tp_client = { path = "../rust" }
+constellation = { path = "../rust" }

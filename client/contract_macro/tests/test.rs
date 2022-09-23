@@ -4,8 +4,8 @@ use tp_contract_macro::{channels, states};
 #[test]
 fn test_macros() {
     #![allow(unused)] // necessary to suppress unused warnings on property fields
-    use tp_client::contract::properties::channels::IChannels;
-    use tp_client::contract::properties::states::IStates;
+    use constellation::contract::properties::channels::IChannels;
+    use constellation::contract::properties::states::IStates;
 
     #[states]
     pub struct MyStates {

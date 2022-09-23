@@ -1,4 +1,4 @@
-using generated = tp_client.generated;
+using generated = constellation.generated;
 using RSharp;
 using System.Collections.Generic;
 using ObjectHandle = Teleportal.Client.Object.ObjectHandle;
@@ -12,7 +12,7 @@ namespace Teleportal.Client.Contract
 
         override protected void NativeDrop(Ptr<ContractDataHandle> inner)
         {
-            generated.__Internal.TpClientContractContractDataHandleDrop(inner.p);
+            generated.__Internal.ConstellationContractContractDataHandleDrop(inner.p);
         }
     }
 
@@ -29,7 +29,7 @@ namespace Teleportal.Client.Contract
         {
             get
             {
-                var cid = new Ptr<ContractId>(generated.__Internal.TpClientContractContractDataId(this.Inner.Value.p));
+                var cid = new Ptr<ContractId>(generated.__Internal.ConstellationContractContractDataId(this.Inner.Value.p));
                 return new ContractId(cid);
             }
         }
@@ -53,7 +53,7 @@ namespace Teleportal.Client.Contract
         {
             get
             {
-                var slice = generated.__Internal.TpClientContractContractIdName(this.Inner.Value.p);
+                var slice = generated.__Internal.ConstellationContractContractIdName(this.Inner.Value.p);
                 unsafe
                 {
                     return new System.ReadOnlySpan<byte>((byte*)slice.ptr, (int)slice.len);
@@ -65,7 +65,7 @@ namespace Teleportal.Client.Contract
         {
             get
             {
-                var version = generated.__Internal.tp_client__contract__ContractId__version(this.Inner.Value.p);
+                var version = generated.__Internal.constellation__contract__ContractId__version(this.Inner.Value.p);
                 return (version.major, version.minor, version.patch);
             }
         }

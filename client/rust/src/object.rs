@@ -116,7 +116,7 @@ impl Object {
 pub type ObjectHandle = arena::Index<Object>;
 
 #[cfg(feature = "c_api")]
-#[rsharp::substitute("tp_client::object")]
+#[rsharp::substitute("constellation::object")]
 pub mod c_api {
     #![allow(non_camel_case_types, non_snake_case, dead_code)]
 

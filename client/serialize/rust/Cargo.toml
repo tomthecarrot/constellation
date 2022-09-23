@@ -10,7 +10,7 @@ publish = false
 
 [dependencies]
 flatbuffers = "2"
-tp_client = { path = "../../rust" }
+constellation = { path = "../../rust" }
 eyre = "0.6"
 bimap = "0.6"
 paste = "1"

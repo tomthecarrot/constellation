@@ -16,7 +16,7 @@
 )]
 use safer_ffi::derive_ReprC;
 
-use tp_client::contract::{states, Contract, ContractDataHandle, ContractId};
+use constellation::contract::{states, Contract, ContractDataHandle, ContractId};
 
 #[derive_ReprC]
 #[ReprC::opaque]
@@ -49,7 +49,7 @@ impl Contract for BallContract {
         &()
     }
 
-    fn handle(&self) -> tp_client::contract::ContractDataHandle {
+    fn handle(&self) -> constellation::contract::ContractDataHandle {
         self.handle
     }
 }
@@ -75,10 +75,10 @@ mod c_api {
     use super::*;
 
     use safer_ffi::prelude::*;
-    use tp_client::baseline::Baseline;
-    use tp_client::contract::c_api::ContractDataHandle as CContractDataHandle;
-    use tp_client::contract::properties::states::c_api::{StateId_F32, StateId_I16, StateId_U64};
-    use tp_client::object::c_api::ObjectHandle as CObjectHandle;
+    use constellation::baseline::Baseline;
+    use constellation::contract::c_api::ContractDataHandle as CContractDataHandle;
+    use constellation::contract::properties::states::c_api::{StateId_F32, StateId_I16, StateId_U64};
+    use constellation::object::c_api::ObjectHandle as CObjectHandle;
 
     mod _BallStates {
         use super::*;
@@ -181,7 +181,7 @@ mod c_api {
             scale_z: f32,
             color: u64,
         ) -> repr_c::Box<CObjectHandle> {
-            use tp_client::contract::properties::dynamic::DynTpProperty;
+            use constellation::contract::properties::dynamic::DynTpProperty;
 
             let states = [
                 DynTpProperty::Primitive(pos_x.into()),

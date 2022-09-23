@@ -98,5 +98,5 @@ pub mod c_api {
         };
     }
     // This is like doing `monomorphize!("whatever", Keyframe, u8, u16, ...)
-    primitives!(; types, monomorphize, "tp_client::contract::properties::states");
+    primitives!(; types, monomorphize, "constellation::contract::properties::states");
 }

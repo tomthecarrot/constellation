@@ -1,4 +1,4 @@
-using generated = tp_client.generated;
+using generated = constellation.generated;
 using RSharp;
 using System.Collections.Generic;
 using ObjectHandle = Teleportal.Client.Object.ObjectHandle;
@@ -15,7 +15,7 @@ namespace Teleportal.Client.Contract
 
         override protected void NativeDrop(Ptr<ExampleContract> inner)
         {
-            generated.__Internal.TpClientContractExampleContractDrop(inner.p);
+            generated.__Internal.ConstellationContractExampleContractDrop(inner.p);
         }
 
         public static ExampleContract register(Baseline baseline)
@@ -26,7 +26,7 @@ namespace Teleportal.Client.Contract
             }
 
             var p = new Ptr<ExampleContract>(
-                generated.__Internal.TpClientBaselineBaselineRegisterContractExample(
+                generated.__Internal.ConstellationBaselineBaselineRegisterContractExample(
                     baseline.Inner.Value.p
                 )
             );
@@ -38,7 +38,7 @@ namespace Teleportal.Client.Contract
             get
             {
                 var p = new Ptr<ContractDataHandle>(
-                    generated.__Internal.TpClientContractExampleContractHandle(
+                    generated.__Internal.ConstellationContractExampleContractHandle(
                         this.Inner.Value.p
                     )
                 );
@@ -51,7 +51,7 @@ namespace Teleportal.Client.Contract
             get
             {
                 var p = new Ptr<ExampleStates>(
-                    generated.__Internal.TpClientContractExampleContractStates(
+                    generated.__Internal.ConstellationContractExampleContractStates(
                         this.Inner.Value.p
                     )
                 );
@@ -65,7 +65,7 @@ namespace Teleportal.Client.Contract
             {
                 throw new OwnershipException("`baseline` must be mutable");
             }
-            var p = new Ptr<ObjectHandle>(generated.__Internal.TpClientContractExampleContractObjectCreate(this.Inner.Value.p, baseline.Inner.Value.p, u8_0, u8_1, i8_0, i8_1, f32_0, f32_1));
+            var p = new Ptr<ObjectHandle>(generated.__Internal.ConstellationContractExampleContractObjectCreate(this.Inner.Value.p, baseline.Inner.Value.p, u8_0, u8_1, i8_0, i8_1, f32_0, f32_1));
             return new ObjectHandle(p);
         }
 
@@ -75,7 +75,7 @@ namespace Teleportal.Client.Contract
             {
                 throw new OwnershipException("`baseline` must be mutable");
             }
-            generated.__Internal.TpClientContractExampleContractObjectRemove(baseline.Inner.Value.p, obj.Inner.Value.p);
+            generated.__Internal.ConstellationContractExampleContractObjectRemove(baseline.Inner.Value.p, obj.Inner.Value.p);
         }
     }
 
@@ -94,7 +94,7 @@ namespace Teleportal.Client.Contract
         {
             get
             {
-                var p = new Ptr<States.StateId_U8>(generated.__Internal.TpClientContractExampleStatesU8_0(this.Inner.Value.p));
+                var p = new Ptr<States.StateId_U8>(generated.__Internal.ConstellationContractExampleStatesU8_0(this.Inner.Value.p));
                 return new States.StateId_U8(p, OwnershipSemantics.Owned);
             }
         }
@@ -103,7 +103,7 @@ namespace Teleportal.Client.Contract
         {
             get
             {
-                var p = new Ptr<States.StateId_U8>(generated.__Internal.TpClientContractExampleStatesU8_1(this.Inner.Value.p));
+                var p = new Ptr<States.StateId_U8>(generated.__Internal.ConstellationContractExampleStatesU8_1(this.Inner.Value.p));
                 return new States.StateId_U8(p, OwnershipSemantics.Owned);
             }
         }
@@ -112,7 +112,7 @@ namespace Teleportal.Client.Contract
         {
             get
             {
-                var p = new Ptr<States.StateId_I8>(generated.__Internal.TpClientContractExampleStatesI8_0(this.Inner.Value.p));
+                var p = new Ptr<States.StateId_I8>(generated.__Internal.ConstellationContractExampleStatesI8_0(this.Inner.Value.p));
                 return new States.StateId_I8(p, OwnershipSemantics.Owned);
             }
         }
@@ -121,7 +121,7 @@ namespace Teleportal.Client.Contract
         {
             get
             {
-                var p = new Ptr<States.StateId_I8>(generated.__Internal.TpClientContractExampleStatesI8_1(this.Inner.Value.p));
+                var p = new Ptr<States.StateId_I8>(generated.__Internal.ConstellationContractExampleStatesI8_1(this.Inner.Value.p));
                 return new States.StateId_I8(p, OwnershipSemantics.Owned);
             }
         }
@@ -130,7 +130,7 @@ namespace Teleportal.Client.Contract
         {
             get
             {
-                var p = new Ptr<States.StateId_F32>(generated.__Internal.TpClientContractExampleStatesF32_0(this.Inner.Value.p));
+                var p = new Ptr<States.StateId_F32>(generated.__Internal.ConstellationContractExampleStatesF32_0(this.Inner.Value.p));
                 return new States.StateId_F32(p, OwnershipSemantics.Owned);
             }
         }
@@ -139,7 +139,7 @@ namespace Teleportal.Client.Contract
         {
             get
             {
-                var p = new Ptr<States.StateId_F32>(generated.__Internal.TpClientContractExampleStatesF32_1(this.Inner.Value.p));
+                var p = new Ptr<States.StateId_F32>(generated.__Internal.ConstellationContractExampleStatesF32_1(this.Inner.Value.p));
                 return new States.StateId_F32(p, OwnershipSemantics.Owned);
             }
         }

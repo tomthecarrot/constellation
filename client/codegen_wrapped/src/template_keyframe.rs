@@ -25,14 +25,14 @@ impl ClassData<CDKeyframe> {
             only_owned: false,
             new_args: format!("{} value, double time", type_info.owned_ident()),
             new_expr: Some(format!(
-                "generated.__Internal.TpClientContractPropertiesChannelsKeyframe{}New(
+                "generated.__Internal.ConstellationContractPropertiesChannelsKeyframe{}New(
                     ({}) value.StealInner().p, time
                 )",
                 type_info.mangled_name(),
                 type_info.ptr_raw(),
             )),
             drop_ident: Some(format!(
-                "generated.__Internal.TpClientContractPropertiesChannelsKeyframe{}Drop",
+                "generated.__Internal.ConstellationContractPropertiesChannelsKeyframe{}Drop",
                 type_info.mangled_name()
             )),
             additional_methods: Some(CDKeyframe {

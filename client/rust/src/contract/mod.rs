@@ -19,7 +19,7 @@ use std::collections::HashSet;
 #[cfg_attr(
     feature = "c_api",
     derive_ReprC,
-    ReprC::opaque("tp_client__contract__ContractId")
+    ReprC::opaque("constellation__contract__ContractId")
 )]
 pub struct ContractId {
     pub name: &'static str,
@@ -59,7 +59,7 @@ pub trait Contract {
 #[cfg_attr(
     feature = "c_api",
     derive_ReprC,
-    ReprC::opaque("tp_client__contract__ContractData")
+    ReprC::opaque("constellation__contract__ContractData")
 )]
 pub struct ContractData {
     id: ContractId,
@@ -85,7 +85,7 @@ impl ContractData {
     }
 }
 
-#[rsharp::substitute("tp_client::contract")]
+#[rsharp::substitute("constellation::contract")]
 #[cfg(feature = "c_api")]
 pub mod c_api {
     #![allow(non_camel_case_types, non_snake_case, dead_code)]

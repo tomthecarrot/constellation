@@ -30,12 +30,12 @@ pub use self::serializer::Serializer;
 
 mod types;
 
-/// The types related to the tp_client
+/// The types related to constellation
 mod c {
-    pub use tp_client::baseline::Baseline;
-    pub use tp_client::contract::properties::dynamic::{TpPrimitiveType, TpPropertyType};
-    pub use tp_client::contract::{Contract, ContractData, ContractDataHandle, ContractId};
-    pub use tp_client::object::ObjectHandle;
+    pub use constellation::baseline::Baseline;
+    pub use constellation::contract::properties::dynamic::{TpPrimitiveType, TpPropertyType};
+    pub use constellation::contract::{Contract, ContractData, ContractDataHandle, ContractId};
+    pub use constellation::object::ObjectHandle;
 }
 
 /// The types related to the flatbuffer

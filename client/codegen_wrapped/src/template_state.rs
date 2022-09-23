@@ -27,14 +27,14 @@ impl ClassData<CDState> {
             only_owned: false,
             new_args: format!("{} value", type_info.owned_ident()),
             new_expr: Some(format!(
-                "generated.__Internal.TpClientContractPropertiesStatesState{}New(
+                "generated.__Internal.ConstellationContractPropertiesStatesState{}New(
                     ({}) value.StealInner().p
                 )",
                 type_info.mangled_name(),
                 type_info.ptr_raw(),
             )),
             drop_ident: Some(format!(
-                "generated.__Internal.TpClientContractPropertiesStatesState{}Drop",
+                "generated.__Internal.ConstellationContractPropertiesStatesState{}Drop",
                 type_info.mangled_name()
             )),
             additional_methods: Some(CDState {

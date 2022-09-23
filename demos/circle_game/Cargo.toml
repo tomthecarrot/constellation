@@ -20,7 +20,7 @@ crate-type = ["cdylib", "rlib"]
 # Dependencies shared by both native and WASM
 [dependencies]
 
-tp_client = { path = "../../client/rust" }
+constellation = { path = "../../client/rust" }
 bevy_prototype_lyon = "0.4"
 lazy_static = "1"
 bevy = "0.6"

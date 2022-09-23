@@ -114,7 +114,7 @@ macro_rules! template_impl {
                 // Add `TpPropertyType`
                 prop_types.push({
                     quote_spanned! {inner_t.span()=>
-                        <#inner_t as ::tp_client::contract::properties::traits::ITpPropertyStatic>::PROPERTY_TYPE
+                        <#inner_t as ::constellation::contract::properties::traits::ITpPropertyStatic>::PROPERTY_TYPE
                     }
                 });
 
@@ -129,7 +129,7 @@ macro_rules! template_impl {
             // Field-agnostic impl blocks
             impl_ts.extend(quote! {
                 impl #s_name {
-                    pub fn new(id: ::tp_client::contract::ContractDataHandle) -> Self {
+                    pub fn new(id: ::constellation::contract::ContractDataHandle) -> Self {
                         Self {
                             #field_init_ts
                         }
@@ -138,21 +138,21 @@ macro_rules! template_impl {
 
                 impl $trait_name for #s_name {
                     fn #type_ids_ident() -> &'static [::std::any::TypeId] {
-                        ::tp_client::lazy_static::lazy_static! {
+                        ::constellation::lazy_static::lazy_static! {
                             static ref TYPE_IDS: Vec<::std::any::TypeId> = vec![#(#typeids),*];
                         }
                         TYPE_IDS.as_slice()
                     }
 
-                    fn #enumerate_types_ident() -> &'static [::tp_client::contract::properties::dynamic::TpPropertyType] {
-                        ::tp_client::lazy_static::lazy_static! {
-                            static ref PROP_TYPES: Vec<::tp_client::contract::properties::dynamic::TpPropertyType> = vec![#(#prop_types),*];
+                    fn #enumerate_types_ident() -> &'static [::constellation::contract::properties::dynamic::TpPropertyType] {
+                        ::constellation::lazy_static::lazy_static! {
+                            static ref PROP_TYPES: Vec<::constellation::contract::properties::dynamic::TpPropertyType> = vec![#(#prop_types),*];
                         }
                         PROP_TYPES.as_slice()
                     }
 
                     fn #field_names_ident() -> &'static [&'static str] {
-                        ::tp_client::lazy_static::lazy_static! {
+                        ::constellation::lazy_static::lazy_static! {
                             static ref FIELD_NAMES: Vec<&'static str> = vec![#(#field_names),*];
                         }
                         FIELD_NAMES.as_slice()
@@ -175,12 +175,12 @@ pub(crate) mod imp {
     use super::*;
     template_impl!(
         states,
-        ::tp_client::contract::properties::states::StateId,
-        ::tp_client::contract::properties::states::IStates,
+        ::constellation::contract::properties::states::StateId,
+        ::constellation::contract::properties::states::IStates,
     );
     template_impl!(
         channels,
-        ::tp_client::contract::properties::channels::ChannelId,
-        ::tp_client::contract::properties::channels::IChannels,
+        ::constellation::contract::properties::channels::ChannelId,
+        ::constellation::contract::properties::channels::IChannels,
     );
 }

@@ -1,4 +1,4 @@
-using generated = tp_client.generated;
+using generated = constellation.generated;
 using RSharp;
 using IntPtr = System.IntPtr;
 
@@ -6,9 +6,9 @@ using IntPtr = System.IntPtr;
 
 namespace Teleportal.Client.Contract.Properties.Channels
 {
-    using struct_RVec_Keyframe_U8 = tp_client.Vec_tp_client_contract_properties_channelsKeyframeU8.__Internal;
-    using struct_RVec_Keyframe_U8_ptr = tp_client.Vec_tp_client_contract_properties_channelsKeyframeU8_ptr.__Internal;
-    using struct_RVec_Keyframe_U8_const_ptr = tp_client.Vec_tp_client_contract_properties_channelsKeyframeU8_const_ptr.__Internal;
+    using struct_RVec_Keyframe_U8 = constellation.Vec_constellation_contract_properties_channelsKeyframeU8.__Internal;
+    using struct_RVec_Keyframe_U8_ptr = constellation.Vec_constellation_contract_properties_channelsKeyframeU8_ptr.__Internal;
+    using struct_RVec_Keyframe_U8_const_ptr = constellation.Vec_constellation_contract_properties_channelsKeyframeU8_const_ptr.__Internal;
 
     public sealed class RVec_Keyframe_U8 : RVec<Keyframe_U8, struct_RVec_Keyframe_U8>
     {
@@ -16,11 +16,11 @@ namespace Teleportal.Client.Contract.Properties.Channels
         // TODO: Make versions from const_ptr and ptr
         public RVec_Keyframe_U8(struct_RVec_Keyframe_U8 inner) : base(inner) { }
 
-        public RVec_Keyframe_U8() : base(NewHelper(generated.__Internal.TpClientContractPropertiesChannelsRVecKeyframeU8New)) { }
+        public RVec_Keyframe_U8() : base(NewHelper(generated.__Internal.ConstellationContractPropertiesChannelsRVecKeyframeU8New)) { }
 
         override protected void NativeDrop(struct_RVec_Keyframe_U8 inner)
         {
-            generated.__Internal.TpClientContractPropertiesChannelsRVecKeyframeU8Drop(inner);
+            generated.__Internal.ConstellationContractPropertiesChannelsRVecKeyframeU8Drop(inner);
         }
 
         public unsafe override void push(Keyframe_U8 e)
@@ -34,7 +34,7 @@ namespace Teleportal.Client.Contract.Properties.Channels
                 throw new System.Exception("Tried to call a method on a value that was already disposed!");
             }
             var shared = this.Inner.Value;
-            generated.__Internal.TpClientContractPropertiesChannelsRVecKeyframeU8Push((IntPtr)(&shared), e.Inner.Value.p);
+            generated.__Internal.ConstellationContractPropertiesChannelsRVecKeyframeU8Push((IntPtr)(&shared), e.Inner.Value.p);
             e.Inner = null;  // move from `e`
             this.Inner = shared;
         }
@@ -45,7 +45,7 @@ namespace Teleportal.Client.Contract.Properties.Channels
             {
                 var inner = this.Inner.Value;
                 var inner_ptr = &inner;
-                var item = new Ptr<Keyframe_U8>(generated.__Internal.TpClientContractPropertiesChannelsRVecKeyframeU8Get((IntPtr)(inner_ptr), (ulong)index));
+                var item = new Ptr<Keyframe_U8>(generated.__Internal.ConstellationContractPropertiesChannelsRVecKeyframeU8Get((IntPtr)(inner_ptr), (ulong)index));
                 return new Keyframe_U8(item, OwnershipSemantics.SharedRef);
             }
 
@@ -63,7 +63,7 @@ namespace Teleportal.Client.Contract.Properties.Channels
                 value.Inner = null;  // Move from `value`
 
                 var array = new Ptr<Keyframe_U8>(this.Inner.Value.ptr);
-                generated.__Internal.TpClientContractPropertiesChannelsRVecKeyframeU8Set(array.p, (ulong)index, val_ptr.p);
+                generated.__Internal.ConstellationContractPropertiesChannelsRVecKeyframeU8Set(array.p, (ulong)index, val_ptr.p);
             }
         }
     }

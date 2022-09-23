@@ -962,13 +962,13 @@ dependencies = [
  "bevy_prototype_lyon",
  "color-eyre",
  "console_error_panic_hook",
+ "constellation",
  "derive_more",
  "eyre",
  "futures",
  "js-sys",
  "lazy_static",
  "rand",
- "tp_client",
  "tracing-wasm",
  "wasm-bindgen",
  "wasm-bindgen-futures 0.3.27",
@@ -1127,6 +1127,30 @@ checksum = "a06aeb73f470f66dcdbf7223caeebb85984942f22f1adb2a088cf9668146bbbc"
 dependencies = [
  "cfg-if 1.0.0",
  "wasm-bindgen",
+]
+
+[[package]]
+name = "constellation"
+version = "0.0.0"
+dependencies = [
+ "arena",
+ "better_borrow",
+ "crossbeam-channel",
+ "derive_more",
+ "enum_dispatch",
+ "eyre",
+ "itertools",
+ "keyframe",
+ "lazy_static",
+ "log",
+ "paste",
+ "rand",
+ "ref-cast",
+ "rsharp",
+ "safer-ffi",
+ "tp_contract_macro",
+ "tracing",
+ "typemap",
 ]
 
 [[package]]
@@ -3630,37 +3654,13 @@ dependencies = [
 ]
 
 [[package]]
-name = "tp_client"
-version = "0.0.0"
-dependencies = [
- "arena",
- "better_borrow",
- "crossbeam-channel",
- "derive_more",
- "enum_dispatch",
- "eyre",
- "itertools",
- "keyframe",
- "lazy_static",
- "log",
- "paste",
- "rand",
- "ref-cast",
- "rsharp",
- "safer-ffi",
- "tp_contract_macro",
- "tracing",
- "typemap",
-]
-
-[[package]]
 name = "tp_contract_macro"
 version = "0.0.0"
 dependencies = [
+ "constellation",
  "proc-macro2 1.0.43",
  "quote 1.0.21",
  "syn",
- "tp_client",
 ]
 
 [[package]]
@@ -3668,12 +3668,12 @@ name = "tp_serialize"
 version = "0.0.0"
 dependencies = [
  "bimap",
+ "constellation",
  "dynpath",
  "eyre",
  "flatbuffers",
  "flatc-rust",
  "paste",
- "tp_client",
 ]
 
 [[package]]
@@ -3829,8 +3829,8 @@ checksum = "f962df74c8c05a667b5ee8bcf162993134c104e96440b663c8daa176dc772d8c"
 name = "unity_states"
 version = "0.0.0"
 dependencies = [
+ "constellation",
  "safer-ffi",
- "tp_client",
 ]
 
 [[package]]

@@ -9,7 +9,7 @@ namespace RSharp
 #if UNITY_IOS && !UNITY_EDITOR
         internal const string LIBRARY_NAME = "__Internal";
 #else
-        internal const string LIBRARY_NAME = "unity_states";
+        internal const string LIBRARY_NAME = "constellation";
 #endif
     }
 

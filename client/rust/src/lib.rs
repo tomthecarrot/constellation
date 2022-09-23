@@ -19,12 +19,12 @@
 
 // Necessary to allow proc macros to have the correct crate name when invoked from
 // this crate
-extern crate self as tp_client;
+extern crate self as constellation;
 
 /// Reexported for the sake of the proc macros
 mod re_exports {
-    pub use ::lazy_static;
-    pub use ::paste;
+    pub use lazy_static;
+    pub use paste;
 }
 pub use self::re_exports::*;
 

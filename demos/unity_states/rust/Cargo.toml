@@ -10,5 +10,5 @@ publish = false
 crate-type = ["rlib", "cdylib"]
 
 [dependencies]
-tp_client = { path = "../../../client/rust" }
+constellation = { path = "../../../client/rust" }
 safer-ffi = { version = "0.0.10", features = ["headers"] }

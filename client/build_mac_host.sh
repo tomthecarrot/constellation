@@ -17,7 +17,7 @@ cargo run -p cs_codegen -- -f
 cargo run -p rsharp_codegen -- -f
 
 # Rename library from specific -> generic for symbol compatibility.
-# mv $PLATFORM_DIR/target/debug/libunity_states.dylib $PLATFORM_DIR/target/debug/libconstellation.dylib
+mv $PLATFORM_DIR/target/debug/libunity_states.dylib $PLATFORM_DIR/target/debug/libconstellation.dylib
 
 # Generate C# bindings.
 cd $CLIENT_DIR/codegen_pinvoke

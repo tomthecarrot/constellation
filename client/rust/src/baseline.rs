@@ -373,7 +373,7 @@ impl<T: ITpPropertyStatic> core::ops::IndexMut<ChannelHandle<T>> for Baseline {
 }
 
 #[cfg(feature = "c_api")]
-#[rsharp::substitute("tp_client::baseline")]
+#[rsharp::substitute("constellation::baseline")]
 pub mod c_api {
     #![allow(non_camel_case_types, non_snake_case, dead_code)]
 
@@ -518,7 +518,7 @@ pub mod c_api {
     }
 
     // This is like doing `monomorphize!("whatever", Keyframe, u8, u16, ...)
-    primitives!(; types, monomorphize, "tp_client::baseline");
+    primitives!(; types, monomorphize, "constellation::baseline");
 
     // ---- Example contract for tests ---- //
 

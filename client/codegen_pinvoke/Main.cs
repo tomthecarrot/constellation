@@ -54,7 +54,7 @@ namespace Codegen
                 ),
                 input_dir: Path.Join(project_dir.FullName, "client", "rust"),
                 cargo_artifact_dir: Path.Join(project_dir.FullName, "target", "debug"),
-                "tp_client"
+                "constellation"
             ));
             libs.Add(new LibInfo(
                 output_dir: Path.Join(
@@ -86,7 +86,7 @@ namespace Codegen
                     lib.output_dir.Delete(true);
                 }
 
-                const string single_lib_name = "unity_states";
+                const string single_lib_name = "constellation";
 
                 // Actually generate the code
                 CppSharp.ConsoleDriver.Run(new Codegen(lib, single_lib_name));

@@ -1,4 +1,4 @@
-use tp_client::contract::{states, Contract, ContractDataHandle, ContractId};
+use constellation::contract::{states, Contract, ContractDataHandle, ContractId};
 
 #[derive(Debug)]
 pub struct Circle {

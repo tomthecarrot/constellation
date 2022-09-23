@@ -1,10 +1,10 @@
 use eyre::{eyre, Result, WrapErr};
 use flatbuffers::{FlatBufferBuilder, WIPOffset};
 use paste::paste;
-use tp_client::apply_to_state_id;
-use tp_client::contract::properties::dynamic::{DynTpPrimitiveRef, DynTpPropertyRef};
-use tp_client::contract::properties::states::dyn_state::DynStateRef;
-use tp_client::contract::properties::states::IStates;
+use constellation::apply_to_state_id;
+use constellation::contract::properties::dynamic::{DynTpPrimitiveRef, DynTpPropertyRef};
+use constellation::contract::properties::states::dyn_state::DynStateRef;
+use constellation::contract::properties::states::IStates;
 
 use crate::baseline::BaselineArgs;
 use crate::contract::{ContractArgs, ContractDataHandleArgs, ContractIdArgs, ContractStatesArgs};

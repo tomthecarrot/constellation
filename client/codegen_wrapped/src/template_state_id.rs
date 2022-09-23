@@ -20,7 +20,7 @@ impl ClassData<CDStateId> {
             new_args: "".to_owned(),
             new_expr: None,
             drop_ident: Some(format!(
-                "generated.__Internal.TpClientContractPropertiesStatesStateId{}Drop",
+                "generated.__Internal.ConstellationContractPropertiesStatesStateId{}Drop",
                 type_info.mangled_name()
             )),
             additional_methods: Some(CDStateId {

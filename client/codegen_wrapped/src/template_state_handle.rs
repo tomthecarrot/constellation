@@ -17,7 +17,7 @@ impl ClassData<CDStateHandle> {
             new_args: "".to_owned(),
             new_expr: None,
             drop_ident: Some(format!(
-                "generated.__Internal.TpClientContractPropertiesStatesStateHandle{}Drop",
+                "generated.__Internal.ConstellationContractPropertiesStatesStateHandle{}Drop",
                 type_info.mangled_name()
             )),
             additional_methods: None,

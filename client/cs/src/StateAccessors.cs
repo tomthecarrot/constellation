@@ -1,4 +1,4 @@
-using ffi = tp_client.generated.__Internal;
+using ffi = constellation.generated.__Internal;
 using States = Teleportal.Client.Contract.Properties.States;
 using ObjectHandle = Teleportal.Client.Object.ObjectHandle;
 using RSharp;
@@ -14,7 +14,7 @@ namespace Teleportal.Client
         {
 
             var p = new Ptr<States.State_U8>(
-                ffi.TpClientBaselineBaselineStateU8(this.Inner.Value.p, state_handle.Inner.Value.p)
+                ffi.ConstellationBaselineBaselineStateU8(this.Inner.Value.p, state_handle.Inner.Value.p)
             );
             return new States.State_U8(p, OwnershipSemantics.SharedRef);
         }
@@ -27,7 +27,7 @@ namespace Teleportal.Client
             }
 
             var p = new Ptr<States.State_U8>(
-                ffi.TpClientBaselineBaselineStateMutU8(this.Inner.Value.p, state_handle.Inner.Value.p)
+                ffi.ConstellationBaselineBaselineStateMutU8(this.Inner.Value.p, state_handle.Inner.Value.p)
             );
             return new States.State_U8(p, OwnershipSemantics.MutRef);
         }
@@ -35,7 +35,7 @@ namespace Teleportal.Client
         public States.State_I8 State(States.StateHandle_I8 state_handle)
         {
             var p = new Ptr<States.State_I8>(
-                ffi.TpClientBaselineBaselineStateI8(this.Inner.Value.p, state_handle.Inner.Value.p)
+                ffi.ConstellationBaselineBaselineStateI8(this.Inner.Value.p, state_handle.Inner.Value.p)
             );
             return new States.State_I8(p, OwnershipSemantics.SharedRef);
         }
@@ -48,7 +48,7 @@ namespace Teleportal.Client
             }
 
             var p = new Ptr<States.State_I8>(
-                 ffi.TpClientBaselineBaselineStateMutI8(this.Inner.Value.p, state_handle.Inner.Value.p)
+                 ffi.ConstellationBaselineBaselineStateMutI8(this.Inner.Value.p, state_handle.Inner.Value.p)
              );
             return new States.State_I8(p, OwnershipSemantics.MutRef);
         }
@@ -56,7 +56,7 @@ namespace Teleportal.Client
         public States.State_I16 State(States.StateHandle_I16 state_handle)
         {
             var p = new Ptr<States.State_I16>(
-                ffi.TpClientBaselineBaselineStateI16(this.Inner.Value.p, state_handle.Inner.Value.p)
+                ffi.ConstellationBaselineBaselineStateI16(this.Inner.Value.p, state_handle.Inner.Value.p)
             );
             return new States.State_I16(p, OwnershipSemantics.SharedRef);
         }
@@ -69,7 +69,7 @@ namespace Teleportal.Client
             }
 
             var p = new Ptr<States.State_I16>(
-                 ffi.TpClientBaselineBaselineStateMutI16(this.Inner.Value.p, state_handle.Inner.Value.p)
+                 ffi.ConstellationBaselineBaselineStateMutI16(this.Inner.Value.p, state_handle.Inner.Value.p)
              );
             return new States.State_I16(p, OwnershipSemantics.MutRef);
         }
@@ -77,7 +77,7 @@ namespace Teleportal.Client
         public States.State_F32 State(States.StateHandle_F32 state_handle)
         {
             var p = new Ptr<States.State_F32>(
-                ffi.TpClientBaselineBaselineStateF32(this.Inner.Value.p, state_handle.Inner.Value.p)
+                ffi.ConstellationBaselineBaselineStateF32(this.Inner.Value.p, state_handle.Inner.Value.p)
             );
             return new States.State_F32(p, OwnershipSemantics.SharedRef);
         }
@@ -90,7 +90,7 @@ namespace Teleportal.Client
             }
 
             var p = new Ptr<States.State_F32>(
-                  ffi.TpClientBaselineBaselineStateMutF32(this.Inner.Value.p, state_handle.Inner.Value.p)
+                  ffi.ConstellationBaselineBaselineStateMutF32(this.Inner.Value.p, state_handle.Inner.Value.p)
               );
             return new States.State_F32(p, OwnershipSemantics.MutRef);
         }
@@ -98,7 +98,7 @@ namespace Teleportal.Client
         public States.State_U64 State(States.StateHandle_U64 state_handle)
         {
             var p = new Ptr<States.State_U64>(
-                ffi.TpClientBaselineBaselineStateU64(this.Inner.Value.p, state_handle.Inner.Value.p)
+                ffi.ConstellationBaselineBaselineStateU64(this.Inner.Value.p, state_handle.Inner.Value.p)
             );
             return new States.State_U64(p, OwnershipSemantics.SharedRef);
         }
@@ -111,7 +111,7 @@ namespace Teleportal.Client
             }
 
             var p = new Ptr<States.State_U64>(
-                 ffi.TpClientBaselineBaselineStateMutU64(this.Inner.Value.p, state_handle.Inner.Value.p)
+                 ffi.ConstellationBaselineBaselineStateMutU64(this.Inner.Value.p, state_handle.Inner.Value.p)
              );
             return new States.State_U64(p, OwnershipSemantics.MutRef);
         }
@@ -119,7 +119,7 @@ namespace Teleportal.Client
         public States.State_String State(States.StateHandle_String state_handle)
         {
             var p = new Ptr<States.State_String>(
-                ffi.TpClientBaselineBaselineStateString(this.Inner.Value.p, state_handle.Inner.Value.p)
+                ffi.ConstellationBaselineBaselineStateString(this.Inner.Value.p, state_handle.Inner.Value.p)
             );
             return new States.State_String(p, OwnershipSemantics.SharedRef);
         }
@@ -127,7 +127,7 @@ namespace Teleportal.Client
         public States.State_ObjectHandle State(States.StateHandle_ObjectHandle state_handle)
         {
             var p = new Ptr<States.State_ObjectHandle>(
-                ffi.TpClientBaselineBaselineStateObjectHandle(this.Inner.Value.p, state_handle.Inner.Value.p)
+                ffi.ConstellationBaselineBaselineStateObjectHandle(this.Inner.Value.p, state_handle.Inner.Value.p)
             );
             return new States.State_ObjectHandle(p, OwnershipSemantics.Owned);
         }
@@ -140,7 +140,7 @@ namespace Teleportal.Client
             }
 
             var p = new Ptr<States.State_String>(
-                ffi.TpClientBaselineBaselineStateMutString(this.Inner.Value.p, state_handle.Inner.Value.p)
+                ffi.ConstellationBaselineBaselineStateMutString(this.Inner.Value.p, state_handle.Inner.Value.p)
             );
             return new States.State_String(p, OwnershipSemantics.MutRef);
         }

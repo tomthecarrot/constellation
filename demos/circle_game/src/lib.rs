@@ -23,10 +23,10 @@ mod components;
 use crate::circle::Circle;
 use crate::circle_bundle::CircleBundle;
 use crate::components::{tp, BaselineKind, PosHandle};
-use tp_client::contract::properties::dynamic::{DynTpPrimitive, DynTpProperty};
-use tp_client::contract::Contract;
-use tp_client::engine::Engine;
-use tp_client::realm::{Realm, RealmID};
+use constellation::contract::properties::dynamic::{DynTpPrimitive, DynTpProperty};
+use constellation::contract::Contract;
+use constellation::engine::Engine;
+use constellation::realm::{Realm, RealmID};
 
 use bevy::prelude::*;
 use bevy_prototype_lyon::prelude::*;

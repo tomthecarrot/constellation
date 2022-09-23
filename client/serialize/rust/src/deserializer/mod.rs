@@ -1,8 +1,8 @@
 use bimap::BiHashMap;
 use eyre::{eyre, Result, WrapErr};
-use tp_client::baseline::BaselineKind;
-use tp_client::contract::properties::dynamic::{DynTpPrimitive, DynTpProperty};
-use tp_client::contract::properties::states::IStates;
+use constellation::baseline::BaselineKind;
+use constellation::contract::properties::dynamic::{DynTpPrimitive, DynTpProperty};
+use constellation::contract::properties::states::IStates;
 
 use crate::{c, t};
 

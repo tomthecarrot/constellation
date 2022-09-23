@@ -3,9 +3,9 @@ use derive_more::From;
 
 // Local reexport for convenience
 pub mod tp {
-    pub use tp_client::baseline::BaselineKind;
-    pub use tp_client::contract::properties::states::StateHandle;
-    pub use tp_client::object::ObjectHandle;
+    pub use constellation::baseline::BaselineKind;
+    pub use constellation::contract::properties::states::StateHandle;
+    pub use constellation::object::ObjectHandle;
 }
 
 #[derive(Component, From, Clone, Copy, Debug)]

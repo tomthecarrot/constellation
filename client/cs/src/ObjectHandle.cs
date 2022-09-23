@@ -1,4 +1,4 @@
-using generated = tp_client.generated;
+using generated = constellation.generated;
 using RSharp;
 using System.Collections.Generic;
 
@@ -12,7 +12,7 @@ namespace Teleportal.Client.Object
 
         override protected void NativeDrop(Ptr<ObjectHandle> inner)
         {
-            generated.__Internal.TpClientObjectObjectHandleDrop(inner.p);
+            generated.__Internal.ConstellationObjectObjectHandleDrop(inner.p);
         }
     }
 

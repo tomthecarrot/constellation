@@ -1,4 +1,4 @@
-using generated = tp_client.generated;
+using generated = constellation.generated;
 using RSharp;
 using System.Collections.Generic;
 using ObjectHandle = Teleportal.Client.Object.ObjectHandle;
@@ -14,7 +14,7 @@ namespace Teleportal.Client
     {
 
         public Baseline(bool is_main) : base(new Ptr<Baseline>(
-            generated.__Internal.TpClientBaselineBaselineNew((byte)(is_main ? 0 : 1))),
+            generated.__Internal.ConstellationBaselineBaselineNew((byte)(is_main ? 0 : 1))),
             OwnershipSemantics.Owned
         )
         { }
@@ -23,14 +23,14 @@ namespace Teleportal.Client
 
         override protected void NativeDrop(Ptr<Baseline> inner)
         {
-            generated.__Internal.TpClientBaselineBaselineDrop(inner.p);
+            generated.__Internal.ConstellationBaselineBaselineDrop(inner.p);
         }
 
         public bool IsMain
         {
             get
             {
-                return generated.__Internal.TpClientBaselineBaselineKind(this.Inner.Value.p) == 0;
+                return generated.__Internal.ConstellationBaselineBaselineKind(this.Inner.Value.p) == 0;
             }
         }
 
@@ -43,7 +43,7 @@ namespace Teleportal.Client
                 throw new System.ArgumentNullException("`h` was already disposed!");
             }
             var p = new Ptr<ContractData>(
-                generated.__Internal.TpClientBaselineBaselineContractData(
+                generated.__Internal.ConstellationBaselineBaselineContractData(
                     this.Inner.Value.p,
                     h.Inner.Value.p
                 )
