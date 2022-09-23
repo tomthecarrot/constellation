@@ -6,36 +6,23 @@ CLIENT_DIR=$(realpath $(dirname $0))
 PLATFORM_DIR=$(realpath $CLIENT_DIR/..)
 RSHARP_DIR="$PLATFORM_DIR/crates/rsharp"
 
-rm -rf $CLIENT_DIR/cs/src/generated
-rm -rf $RSHARP_DIR/cs/src/generated
-
-# add Flatc
 
 # Build Platform core and demo libraries.
 cd $PLATFORM_DIR
-cargo build -p tp_client # includes `rsharp`
-cargo build -p unity_states
-
-# Strip .dylib extension for symlink compatibility across OS targets.
-mv $PLATFORM_DIR/target/debug/deps/libtp_client.dylib $PLATFORM_DIR/target/debug/deps/libtp_client
-mv $PLATFORM_DIR/target/debug/deps/librsharp.dylib $PLATFORM_DIR/target/debug/deps/librsharp
-mv $PLATFORM_DIR/target/debug/deps/libunity_states.dylib $PLATFORM_DIR/target/debug/deps/libunity_states
-
-# Copy Platform libraries for C# tests.
-cp $PLATFORM_DIR/target/debug/deps/libtp_client $CLIENT_DIR/cs/tests/bin/Debug/net6.0/
-cp $PLATFORM_DIR/target/debug/deps/librsharp $CLIENT_DIR/cs/tests/bin/Debug/net6.0/
-cp $PLATFORM_DIR/target/debug/deps/libunity_states $CLIENT_DIR/cs/tests/bin/Debug/net6.0/
+cargo build --all
 
 # Generate C bindings.
 cargo test --all
-cargo run -p rsharp_codegen
+cargo run -p cs_codegen -- -f
+cargo run -p rsharp_codegen -- -f
+
+# Rename library from specific -> generic for symbol compatibility.
+# mv $PLATFORM_DIR/target/debug/libunity_states.dylib $PLATFORM_DIR/target/debug/libconstellation.dylib
 
 # Generate C# bindings.
 cd $CLIENT_DIR/codegen_pinvoke
+dotnet restore
 dotnet run -a x64 # CppSharp is compiled for x64.
-
-cd $CLIENT_DIR/codegen_wrapped
-cargo run
 
 cd $CLIENT_DIR/cs/tests
 dotnet test

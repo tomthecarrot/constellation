@@ -34,6 +34,7 @@ namespace Codegen
     {
         private static DirectoryInfo project_dir = GetProjectDir();
         private readonly LibInfo lib_info;
+        private string single_lib_name;
 
         static int Main(string[] args)
         {
@@ -85,16 +86,19 @@ namespace Codegen
                     lib.output_dir.Delete(true);
                 }
 
+                const string single_lib_name = "unity_states";
+
                 // Actually generate the code
-                CppSharp.ConsoleDriver.Run(new Codegen(lib_info: lib));
+                CppSharp.ConsoleDriver.Run(new Codegen(lib, single_lib_name));
             }
 
             return 0;
         }
 
-        private Codegen(LibInfo lib_info)
+        public Codegen(LibInfo lib_info, string single_lib_name)
         {
             this.lib_info = lib_info;
+            this.single_lib_name = single_lib_name;
         }
 
         /// Setup the driver options here.
@@ -106,10 +110,8 @@ namespace Codegen
             options.GenerateClassTemplates = false;
             options.GenerateFinalizers = false;
 
-            // hard coding "unity_states" as a stopgap until we decide which target
-            // provides all the symbols for the necessary libraries
-            var module = options.AddModule("unity_states");
-            module.Libraries.Add($"libunity_states");
+            var module = options.AddModule(this.single_lib_name);
+            module.Libraries.Add($"lib{this.single_lib_name}");
             module.OutputNamespace = this.lib_info.crate_name;
 
             module.IncludeDirs.Add(this.lib_info.input_dir.FullName);
@@ -146,7 +148,10 @@ namespace Codegen
             // We are now either at the `client` folder or one folder deeper if
             // compiling to a non-native architecture. Lets figure out which one.
             // Yes, this is a dirty hack.
-            if (project_dir.Name != "client")
+            // The "client" directory comes from this repo (Constellation).
+            // The "codegen_movieoke" directory is added temporarily to support codegen
+            // in the Movieoke repo, which references this codegen csproj.
+            if (project_dir.Name != "client" && project_dir.Name != "codegen_movieoke")
             {
                 project_dir = project_dir.Parent ?? project_dir.Root;
             }
