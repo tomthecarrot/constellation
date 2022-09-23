@@ -6,9 +6,6 @@ CLIENT_DIR=$(realpath $(dirname $0))
 PLATFORM_DIR=$(realpath $CLIENT_DIR/..)
 RSHARP_DIR="$PLATFORM_DIR/crates/rsharp"
 
-mkdir -p $CLIENT_DIR/serialize/rust/src/generated
-cd $CLIENT_DIR/serialize/rust/src/generated
-flatc --rust ../../../flatbuffers/all.fbs --gen-all --rust-module-root-file
 
 # Build Platform core and demo libraries.
 cd $PLATFORM_DIR

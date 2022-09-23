@@ -35,12 +35,6 @@ namespace Codegen
         private static DirectoryInfo project_dir = GetProjectDir();
         private readonly LibInfo lib_info;
         private string single_lib_name;
-        private readonly static string DYLIB_EXTENSION =
-            (RtInfo.IsOSPlatform(OS.Linux) || RtInfo.IsOSPlatform(OS.FreeBSD)) ? ".so"
-            : RtInfo.IsOSPlatform(OS.Windows) ? ".dll"
-            // Using ".dylib" on mac silently inhibits DLLImports 🤦‍♂️
-            : RtInfo.IsOSPlatform(OS.OSX) ? ""
-            : throw new Exception("unknown platform");
 
         static int Main(string[] args)
         {
