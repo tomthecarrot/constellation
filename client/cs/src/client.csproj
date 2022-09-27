@@ -22,6 +22,23 @@
     <TpNativePrefix>$(MSBuildThisFileDirectory)..\..\..\target\debug\libunity_states</TpNativePrefix>
   </PropertyGroup>
 
+  <!-- This automatically handles code generation needed by this library -->
+  <Target Name="codegen" BeforeTargets="BeforeCompile" >
+    <Message Text="Running code generators (wrapped)" Importance="high" />
+    <Exec Command="cargo run -p cs_codegen -- -f" />
+    <Message Text="Generating C headers" Importance="high" />
+    <Exec Command="cargo test -p tp_client -p unity_states" />
+    <Message Text="Building native library" Importance="high" />
+    <Exec Command="cargo build -p unity_states" />
+    <Message Text="Running code generators (cpp_sharp)" Importance="high" />
+    <Exec Command="dotnet run -a x64" WorkingDirectory="$(MSBuildThisFileDirectory)..\..\codegen_pinvoke" />
+
+    <ItemGroup>
+      <Compile Include="generated\wrapped\*.cs" KeepDuplicates="false"/>
+      <Compile Include="generated\cpp_sharp\*.cs" KeepDuplicates="false"/>
+    </ItemGroup>
+  </Target>
+
   <!--
     What the fuck is this shit, I hate MSBuild.
     Taken from: https://github.com/dotnet/sdk/issues/10575

@@ -13,6 +13,15 @@
     <TpNativePrefix>$(MSBuildThisFileDirectory)..\..\..\..\target\debug\libunity_states</TpNativePrefix>
   </PropertyGroup>
 
+  <!-- This automatically handles code generation needed by this library -->
+  <Target Name="codegen" BeforeTargets="BeforeCompile" >
+  <Message Text="Running code generators" Importance="high" />
+    <Exec command="cargo run -p rsharp_codegen -- -f" />
+    <ItemGroup>
+      <Compile Include="generated\*.cs" KeepDuplicates="false"/>
+    </ItemGroup>
+  </Target>
+
   <!--
     What the fuck is this shit, I hate MSBuild.
     Taken from: https://github.com/dotnet/sdk/issues/10575
