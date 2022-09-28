@@ -13,7 +13,7 @@ public class BallStateDataSourceUnity : MonoBehaviour, IBallStateDataSource
 
     void Update()
     {
-        LogCurrentData();
+        // LogCurrentData();
     }
 
     public void LogCurrentData()
