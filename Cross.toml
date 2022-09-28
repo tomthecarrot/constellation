@@ -1,0 +1,2 @@
+[target.aarch64-apple-ios]
+image = "ghcr.io/cross-rs/aarch64-apple-ios-cross:local"
