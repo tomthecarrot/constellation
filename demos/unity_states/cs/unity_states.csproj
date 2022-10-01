@@ -9,6 +9,13 @@
     <PackageReference Include="CppSharp.Runtime" Version="1.0.3" />
   </ItemGroup>
 
+  <!-- This automatically handles code generation needed by this library -->
+  <Target Name="codegen" BeforeTargets="BeforeCompile" >
+    <!-- Note: the `tp_client` dependency already did cpp_sharp codegen. -->
+    <ItemGroup>
+      <Compile Include="generated\cpp_sharp\*.cs" KeepDuplicates="false"/>
+    </ItemGroup>
+  </Target>
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
