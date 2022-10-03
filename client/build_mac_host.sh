@@ -1,3 +1,4 @@
+#!/bin/bash
 # Automates build process for Platform codegen on macOS.
 
 set -ex
@@ -39,11 +40,11 @@ rsync $PLATFORM_DIR/target/$HOST_TARGET_TRIPLE/$BUILD_PROFILE_DIRNAME/lib$LIB_NA
 
 # Create empty files to symlink against in the event that
 # we don't cross-compile to all of these platforms.
-mkdir target/aarch64-apple-darwin && touch $_/$LIB_NAME.dylib
-mkdir target/aarch64-apple-ios && touch $_/$LIB_NAME.a
-mkdir target/aarch64-linux-android && touch $_/$LIB_NAME.so
-mkdir target/armv7-linux-androideabi && touch $_/$LIB_NAME.so
-mkdir target/x86_64-unknown-linux-gnu && touch $_/$LIB_NAME.so
+mkdir -p target/aarch64-apple-darwin && touch $_/$LIB_NAME.dylib
+mkdir -p target/aarch64-apple-ios && touch $_/$LIB_NAME.a
+mkdir -p target/aarch64-linux-android && touch $_/$LIB_NAME.so
+mkdir -p target/armv7-linux-androideabi && touch $_/$LIB_NAME.so
+mkdir -p target/x86_64-unknown-linux-gnu && touch $_/$LIB_NAME.so
 
 ## CROSS-COMPILE TO LINUX
 
@@ -83,8 +84,8 @@ fi
 # https://github.com/0xTELEPORTAL/constellation/pull/118#discussion_r981944921
 if ! [ -z "$WORKAROUND_ROSETTA_ISSUE" ]
 then
-    TMP_ID_0=13
-    TMP_ID_1=14
+    TMP_ID_0=15
+    TMP_ID_1=16
     mv $CLIENT_DIR/codegen_pinvoke/codegen.csproj $CLIENT_DIR/codegen_pinvoke/codegen$TMP_ID_0.csproj
 fi
 
