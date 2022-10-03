@@ -3,7 +3,7 @@
 set -ex
 
 # Defaults
-BUILD_TYPE="debug"
+BUILD_PROFILE="dev"
 
 # Parse CLI options
 while getopts ":ailrw" options; do
@@ -11,7 +11,7 @@ while getopts ":ailrw" options; do
         a) FLAG_ANDROID=true ;;
         i) FLAG_IOS=true ;;
         l) FLAG_LINUX=true ;;
-        r) BUILD_TYPE="release" ;;
+        r) BUILD_PROFILE="release" ;;
         w) WORKAROUND_ROSETTA_ISSUE=true ;;
     esac
 done
@@ -32,8 +32,8 @@ cargo test --all
 cargo run -p cs_codegen -- -f
 cargo run -p rsharp_codegen -- -f
 
-# Move library into symlinked location (if necessary)
-rsync $PLATFORM_DIR/target/$HOST_TARGET_TRIPLE/$BUILD_TYPE/libunity_states.dylib $PLATFORM_DIR/target/$HOST_TARGET_TRIPLE/libunity_states.dylib
+# Copy native library to Unity project
+rsync $PLATFORM_DIR/target/$HOST_TARGET_TRIPLE/$BUILD_PROFILE/libunity_states.dylib $PLATFORM_DIR/target/$HOST_TARGET_TRIPLE/libunity_states.dylib
 
 ## CROSS-COMPILE TO LINUX
 
@@ -42,7 +42,7 @@ then
     cross build --target x86_64-unknown-linux-gnu -p unity_states
 
     # Move library into symlinked location (if needed)
-    rsync $PLATFORM_DIR/target/x86_64-unknown-linux-gnu/$BUILD_TYPE/libunity_states.so $PLATFORM_DIR/target/x86_64-unknown-linux-gnu/libunity_states.so
+    rsync $PLATFORM_DIR/target/x86_64-unknown-linux-gnu/$BUILD_PROFILE/libunity_states.so $PLATFORM_DIR/target/x86_64-unknown-linux-gnu/libunity_states.so
 fi
 
 ## CROSS-COMPILE TO ANDROID
@@ -52,9 +52,9 @@ then
     cross build --target aarch64-linux-android -p unity_states
     cross build --target armv7-linux-androideabi -p unity_states
 
-    # Move libraries into symlinked locations (if needed)
-    rsync $PLATFORM_DIR/target/aarch64-linux-android/$BUILD_TYPE/libunity_states.so $PLATFORM_DIR/target/aarch64-linux-android/libunity_states.so
-    rsync $PLATFORM_DIR/target/armv7-linux-androideabi/$BUILD_TYPE/libunity_states.so $PLATFORM_DIR/target/armv7-linux-androideabi/libunity_states.so
+    # Move library into symlinked locations (if needed)
+    rsync $PLATFORM_DIR/target/aarch64-linux-android/$BUILD_PROFILE/libunity_states.so $PLATFORM_DIR/target/aarch64-linux-android/libunity_states.so
+    rsync $PLATFORM_DIR/target/armv7-linux-androideabi/$BUILD_PROFILE/libunity_states.so $PLATFORM_DIR/target/armv7-linux-androideabi/libunity_states.so
 fi
 
 ## CROSS-COMPILE TO IOS
@@ -63,12 +63,14 @@ if ! [ -z "$FLAG_IOS" ]
 then
     cross build --target aarch64-apple-ios -p unity_states
 
-    # Move library into symlinked location (if needed)
-    rsync $PLATFORM_DIR/target/aarch64-apple-ios/$BUILD_TYPE/libunity_states.a $PLATFORM_DIR/target/aarch64-apple-ios/libunity_states.a
+    # Move library into symlinked locations (if needed)
+    rsync $PLATFORM_DIR/target/aarch64-apple-ios/$BUILD_PROFILE/libunity_states.so $PLATFORM_DIR/target/aarch64-apple-ios/libunity_states.so
 fi
 
 ## BINDINGS FOR DYNAMICALLY-LINKED TARGETS ##
 
+# This works around a Rosetta 2 issue. See this thread for details:
+# https://github.com/0xTELEPORTAL/constellation/pull/118#discussion_r981944921
 if ! [ -z "$WORKAROUND_ROSETTA_ISSUE" ]
 then
     TMP_ID_0=13
@@ -91,23 +93,26 @@ dotnet build -o bin/main
 
 ## BINDINGS FOR STATICALLY-LINKED TARGETS ##
 
-# Generate C# bindings.
-cd $CLIENT_DIR/codegen_pinvoke
-
-if ! [ -z "$WORKAROUND_ROSETTA_ISSUE" ]
+if ! [ -z "$FLAG_IOS" ]
 then
-    mv $CLIENT_DIR/codegen_pinvoke/codegen$TMP_ID_0.csproj $CLIENT_DIR/codegen_pinvoke/codegen$TMP_ID_1.csproj
+    # Generate C# bindings.
+    cd $CLIENT_DIR/codegen_pinvoke
+
+    if ! [ -z "$WORKAROUND_ROSETTA_ISSUE" ]
+    then
+        mv $CLIENT_DIR/codegen_pinvoke/codegen$TMP_ID_0.csproj $CLIENT_DIR/codegen_pinvoke/codegen$TMP_ID_1.csproj
+    fi
+
+    # CppSharp is compiled for x64.
+    # The -a flag is necessary when running on an Apple Silicon (aarch64) Mac.
+    dotnet run -a x64 -p:DefineConstants=UNITY_IOS
+
+    if ! [ -z "$WORKAROUND_ROSETTA_ISSUE" ]
+    then
+        mv $CLIENT_DIR/codegen_pinvoke/codegen$TMP_ID_1.csproj $CLIENT_DIR/codegen_pinvoke/codegen.csproj
+    fi
+
+    # Package DLLs for use in Unity demo.
+    cd $PLATFORM_DIR/demos/unity_states/cs
+    dotnet build -o bin/ios -p:DefineConstants=UNITY_IOS
 fi
-
-# CppSharp is compiled for x64.
-# The -a flag is necessary when running on an Apple Silicon (aarch64) Mac.
-dotnet run -a x64 -p:DefineConstants=UNITY_IOS
-
-if ! [ -z "$WORKAROUND_ROSETTA_ISSUE" ]
-then
-    mv $CLIENT_DIR/codegen_pinvoke/codegen$TMP_ID_1.csproj $CLIENT_DIR/codegen_pinvoke/codegen.csproj
-fi
-
-# Package DLLs for use in Unity demo.
-cd $PLATFORM_DIR/demos/unity_states/cs
-dotnet build -o bin/ios -p:DefineConstants=UNITY_IOS

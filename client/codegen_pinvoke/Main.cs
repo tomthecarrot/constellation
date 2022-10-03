@@ -113,6 +113,8 @@ namespace Codegen
             options.GenerateFinalizers = false;
 
 #if UNITY_IOS
+            // This option is only used for the iOS DLL. It replaces the argument
+            // in all `DllImport`s with `__Internal` for static linking.
             options.GenerateInternalImports = true;
 #endif
 
@@ -170,6 +172,8 @@ namespace Codegen
     }
 
 
+    /// This pass instructs CppSharp to skip copy constructors, which are not
+    /// supported since we are compiling C dylibs and static libs (not C++ ones).
     public class VisitMethodPass_IgnoreCopyConstructor : TranslationUnitPass
     {
         public override bool VisitMethodDecl(Method method)
