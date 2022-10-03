@@ -4,6 +4,8 @@ set -ex
 
 # Defaults
 BUILD_PROFILE="dev"
+BUILD_PROFILE_DIRNAME="debug"
+LIB_NAME="unity_states"
 
 # Parse CLI options
 while getopts ":ailrw" options; do
@@ -11,21 +13,21 @@ while getopts ":ailrw" options; do
         a) FLAG_ANDROID=true ;;
         i) FLAG_IOS=true ;;
         l) FLAG_LINUX=true ;;
-        r) BUILD_PROFILE="release" ;;
+        r) BUILD_PROFILE="release"; BUILD_PROFILE_DIRNAME="release" ;;
         w) WORKAROUND_ROSETTA_ISSUE=true ;;
     esac
 done
 
 ## BUILD FOR CURRENT HOST ##
 
-CLIENT_DIR=$(realpath $(dirname $0))
-PLATFORM_DIR=$(realpath $CLIENT_DIR/..)
+CLIENT_DIR=$(readlink -f $(dirname $0))
+PLATFORM_DIR=$(readlink -f $CLIENT_DIR/..)
 RSHARP_DIR="$PLATFORM_DIR/crates/rsharp"
 HOST_TARGET_TRIPLE=$(rustc -vV | sed -n 's|host: ||p')
 
 # Build Platform core and demo libraries.
 cd $PLATFORM_DIR
-cross build --target $HOST_TARGET_TRIPLE -p unity_states
+cross build --profile $BUILD_PROFILE --target $HOST_TARGET_TRIPLE -p unity_states
 
 # Generate C bindings.
 cargo test --all
@@ -33,38 +35,46 @@ cargo run -p cs_codegen -- -f
 cargo run -p rsharp_codegen -- -f
 
 # Copy native library to Unity project
-rsync $PLATFORM_DIR/target/$HOST_TARGET_TRIPLE/$BUILD_PROFILE/libunity_states.dylib $PLATFORM_DIR/target/$HOST_TARGET_TRIPLE/libunity_states.dylib
+rsync $PLATFORM_DIR/target/$HOST_TARGET_TRIPLE/$BUILD_PROFILE_DIRNAME/lib$LIB_NAME.dylib $PLATFORM_DIR/target/$HOST_TARGET_TRIPLE/lib$LIB_NAME.dylib
+
+# Create empty files to symlink against in the event that
+# we don't cross-compile to all of these platforms.
+mkdir target/aarch64-apple-darwin && touch $_/$LIB_NAME.dylib
+mkdir target/aarch64-apple-ios && touch $_/$LIB_NAME.a
+mkdir target/aarch64-linux-android && touch $_/$LIB_NAME.so
+mkdir target/armv7-linux-androideabi && touch $_/$LIB_NAME.so
+mkdir target/x86_64-unknown-linux-gnu && touch $_/$LIB_NAME.so
 
 ## CROSS-COMPILE TO LINUX
 
 if ! [ -z "$FLAG_LINUX" ]
 then
-    cross build --target x86_64-unknown-linux-gnu -p unity_states
+    cross build --profile $BUILD_PROFILE --target x86_64-unknown-linux-gnu -p unity_states
 
     # Move library into symlinked location (if needed)
-    rsync $PLATFORM_DIR/target/x86_64-unknown-linux-gnu/$BUILD_PROFILE/libunity_states.so $PLATFORM_DIR/target/x86_64-unknown-linux-gnu/libunity_states.so
+    rsync $PLATFORM_DIR/target/x86_64-unknown-linux-gnu/$BUILD_PROFILE_DIRNAME/lib$LIB_NAME.so $PLATFORM_DIR/target/x86_64-unknown-linux-gnu/lib$LIB_NAME.so
 fi
 
 ## CROSS-COMPILE TO ANDROID
 
 if ! [ -z "$FLAG_ANDROID" ]
 then
-    cross build --target aarch64-linux-android -p unity_states
-    cross build --target armv7-linux-androideabi -p unity_states
+    cross build --profile $BUILD_PROFILE --target aarch64-linux-android -p unity_states
+    cross build --profile $BUILD_PROFILE --target armv7-linux-androideabi -p unity_states
 
     # Move library into symlinked locations (if needed)
-    rsync $PLATFORM_DIR/target/aarch64-linux-android/$BUILD_PROFILE/libunity_states.so $PLATFORM_DIR/target/aarch64-linux-android/libunity_states.so
-    rsync $PLATFORM_DIR/target/armv7-linux-androideabi/$BUILD_PROFILE/libunity_states.so $PLATFORM_DIR/target/armv7-linux-androideabi/libunity_states.so
+    rsync $PLATFORM_DIR/target/aarch64-linux-android/$BUILD_PROFILE_DIRNAME/lib$LIB_NAME.so $PLATFORM_DIR/target/aarch64-linux-android/lib$LIB_NAME.so
+    rsync $PLATFORM_DIR/target/armv7-linux-androideabi/$BUILD_PROFILE_DIRNAME/lib$LIB_NAME.so $PLATFORM_DIR/target/armv7-linux-androideabi/lib$LIB_NAME.so
 fi
 
 ## CROSS-COMPILE TO IOS
 
 if ! [ -z "$FLAG_IOS" ]
 then
-    cross build --target aarch64-apple-ios -p unity_states
+    cross build --profile $BUILD_PROFILE --target aarch64-apple-ios -p unity_states
 
     # Move library into symlinked locations (if needed)
-    rsync $PLATFORM_DIR/target/aarch64-apple-ios/$BUILD_PROFILE/libunity_states.so $PLATFORM_DIR/target/aarch64-apple-ios/libunity_states.so
+    rsync $PLATFORM_DIR/target/aarch64-apple-ios/$BUILD_PROFILE_DIRNAME/lib$LIB_NAME.so $PLATFORM_DIR/target/aarch64-apple-ios/lib$LIB_NAME.so
 fi
 
 ## BINDINGS FOR DYNAMICALLY-LINKED TARGETS ##
@@ -79,7 +89,7 @@ then
 fi
 
 # Generate C# bindings.
-rsync $PLATFORM_DIR/target/$HOST_TARGET_TRIPLE/libunity_states.dylib $PLATFORM_DIR/target/
+rsync $PLATFORM_DIR/target/$HOST_TARGET_TRIPLE/lib$LIB_NAME.dylib $PLATFORM_DIR/target/
 cd $CLIENT_DIR/codegen_pinvoke
 dotnet restore
 dotnet run -a x64 # CppSharp is compiled for x64.
