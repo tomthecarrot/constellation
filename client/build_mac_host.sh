@@ -78,10 +78,10 @@ fi
 
 if ! [ -z "$FLAG_IOS" ]
 then
-    cross build --profile $BUILD_PROFILE --target aarch64-apple-ios -p unity_states
+    cargo build --profile $BUILD_PROFILE --target aarch64-apple-ios -p unity_states
 
     # Move library into symlinked locations (if needed)
-    rsync $PLATFORM_DIR/target/aarch64-apple-ios/$BUILD_PROFILE_DIRNAME/lib$LIB_NAME.so $PLATFORM_DIR/target/aarch64-apple-ios/lib$LIB_NAME.so
+    rsync $PLATFORM_DIR/target/aarch64-apple-ios/$BUILD_PROFILE_DIRNAME/lib$LIB_NAME.a $PLATFORM_DIR/target/aarch64-apple-ios/lib$LIB_NAME.a
 fi
 
 ## BINDINGS FOR DYNAMICALLY-LINKED TARGETS ##
@@ -90,8 +90,8 @@ fi
 # https://github.com/0xTELEPORTAL/constellation/pull/118#discussion_r981944921
 if ! [ -z "$WORKAROUND_ROSETTA_ISSUE" ]
 then
-    TMP_ID_0=15
-    TMP_ID_1=16
+    TMP_ID_0=52
+    TMP_ID_1=53
     mv $CLIENT_DIR/codegen_pinvoke/codegen.csproj $CLIENT_DIR/codegen_pinvoke/codegen$TMP_ID_0.csproj
 fi
 
