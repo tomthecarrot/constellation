@@ -28,7 +28,7 @@ HOST_TARGET_TRIPLE=$(rustc -vV | sed -n 's|host: ||p')
 
 # Build Platform core and demo libraries.
 cd $PLATFORM_DIR
-cross build --profile $BUILD_PROFILE --target $HOST_TARGET_TRIPLE -p unity_states
+cargo build --profile $BUILD_PROFILE --target $HOST_TARGET_TRIPLE -p unity_states
 
 # Generate C bindings.
 cargo test -p tp_client -p rsharp -p unity_states
@@ -90,8 +90,8 @@ fi
 # https://github.com/0xTELEPORTAL/constellation/pull/118#discussion_r981944921
 if ! [ -z "$WORKAROUND_ROSETTA_ISSUE" ]
 then
-    TMP_ID_0=52
-    TMP_ID_1=53
+    TMP_ID_0=54
+    TMP_ID_1=55
     mv $CLIENT_DIR/codegen_pinvoke/codegen.csproj $CLIENT_DIR/codegen_pinvoke/codegen$TMP_ID_0.csproj
 fi
 
@@ -106,7 +106,7 @@ dotnet test
 
 # Package DLLs for use in Unity demo.
 cd $PLATFORM_DIR/demos/unity_states/cs
-dotnet build -o bin/main
+CONSTELLATION_SKIP_CODEGEN=true dotnet build -o bin/main
 
 ## BINDINGS FOR STATICALLY-LINKED TARGETS ##
 
@@ -131,5 +131,5 @@ then
 
     # Package DLLs for use in Unity demo.
     cd $PLATFORM_DIR/demos/unity_states/cs
-    dotnet build -o bin/ios -p:DefineConstants=UNITY_IOS
+    CONSTELLATION_SKIP_CODEGEN=true dotnet build -o bin/ios -p:DefineConstants=UNITY_IOS
 fi
