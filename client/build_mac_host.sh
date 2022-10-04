@@ -100,8 +100,8 @@ fi
 # https://github.com/0xTELEPORTAL/constellation/pull/118#discussion_r981944921
 if ! [ -z "$WORKAROUND_ROSETTA_ISSUE" ]
 then
-    TMP_ID_0=56
-    TMP_ID_1=57
+    TMP_ID_0=60
+    TMP_ID_1=61
     mv $CLIENT_DIR/codegen_pinvoke/codegen.csproj $CLIENT_DIR/codegen_pinvoke/codegen$TMP_ID_0.csproj
 fi
 
@@ -110,6 +110,11 @@ rsync $PLATFORM_DIR/target/$HOST_TARGET_TRIPLE/lib$LIB_NAME.dylib $PLATFORM_DIR/
 cd $CLIENT_DIR/codegen_pinvoke
 dotnet restore
 dotnet run -a x64 # CppSharp is compiled for x64.
+
+if ! [ -z "$WORKAROUND_ROSETTA_ISSUE" ]
+then
+    mv $CLIENT_DIR/codegen_pinvoke/codegen$TMP_ID_0.csproj $CLIENT_DIR/codegen_pinvoke/codegen.csproj
+fi
 
 cd $CLIENT_DIR/cs/tests
 dotnet test
@@ -127,7 +132,7 @@ then
 
     if ! [ -z "$WORKAROUND_ROSETTA_ISSUE" ]
     then
-        mv $CLIENT_DIR/codegen_pinvoke/codegen$TMP_ID_0.csproj $CLIENT_DIR/codegen_pinvoke/codegen$TMP_ID_1.csproj
+        mv $CLIENT_DIR/codegen_pinvoke/codegen.csproj $CLIENT_DIR/codegen_pinvoke/codegen$TMP_ID_1.csproj
     fi
 
     # CppSharp is compiled for x64.
