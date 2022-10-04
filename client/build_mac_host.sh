@@ -25,6 +25,10 @@ CLIENT_DIR=$(readlink -f $(dirname $0))
 PLATFORM_DIR=$(readlink -f $CLIENT_DIR/..)
 RSHARP_DIR="$PLATFORM_DIR/crates/rsharp"
 HOST_TARGET_TRIPLE=$(rustc -vV | sed -n 's|host: ||p')
+CARGO_IOS_BUILDTOOL="cross"
+
+# Override for aarch64 Macs which can compile to iOS without `cross`
+if [ "$HOST_TARGET_TRIPLE" == "aarch64-apple-darwin" ]; then CARGO_IOS_BUILDTOOL="cargo"; fi
 
 # Build Platform core and demo libraries.
 cd $PLATFORM_DIR
@@ -37,6 +41,8 @@ cargo run -p rsharp_codegen -- -f
 
 # Copy native library to Unity project
 rsync $PLATFORM_DIR/target/$HOST_TARGET_TRIPLE/$BUILD_PROFILE_DIRNAME/lib$LIB_NAME.dylib $PLATFORM_DIR/target/$HOST_TARGET_TRIPLE/lib$LIB_NAME.dylib
+
+## CREATE EMPTY FILE TARGETS FOR SYMLINKS #
 
 # Create empty files to symlink against in the event that
 # we don't cross-compile to all of these platforms.
@@ -51,6 +57,10 @@ mkdir -p $MANAGED_LIB_DIR_IOS
 touch $MANAGED_LIB_DIR_IOS/client.dll
 touch $MANAGED_LIB_DIR_IOS/rsharp.dll
 touch $MANAGED_LIB_DIR_IOS/unity_states.dll
+
+## PREPARE FOR CROSS-COMPILATION ##
+
+mkdir -p $PLATFORM_DIR/target/$BUILD_PROFILE_DIRNAME
 
 ## CROSS-COMPILE TO LINUX
 
@@ -78,7 +88,7 @@ fi
 
 if ! [ -z "$FLAG_IOS" ]
 then
-    cargo build --profile $BUILD_PROFILE --target aarch64-apple-ios -p unity_states
+    $CARGO_IOS_BUILDTOOL build --profile $BUILD_PROFILE --target aarch64-apple-ios -p unity_states
 
     # Move library into symlinked locations (if needed)
     rsync $PLATFORM_DIR/target/aarch64-apple-ios/$BUILD_PROFILE_DIRNAME/lib$LIB_NAME.a $PLATFORM_DIR/target/aarch64-apple-ios/lib$LIB_NAME.a
@@ -90,8 +100,8 @@ fi
 # https://github.com/0xTELEPORTAL/constellation/pull/118#discussion_r981944921
 if ! [ -z "$WORKAROUND_ROSETTA_ISSUE" ]
 then
-    TMP_ID_0=54
-    TMP_ID_1=55
+    TMP_ID_0=56
+    TMP_ID_1=57
     mv $CLIENT_DIR/codegen_pinvoke/codegen.csproj $CLIENT_DIR/codegen_pinvoke/codegen$TMP_ID_0.csproj
 fi
 
