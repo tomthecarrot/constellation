@@ -31,7 +31,7 @@ cd $PLATFORM_DIR
 cross build --profile $BUILD_PROFILE --target $HOST_TARGET_TRIPLE -p unity_states
 
 # Generate C bindings.
-cargo test --all
+cargo test -p tp_client -p rsharp -p unity_states
 cargo run -p cs_codegen -- -f
 cargo run -p rsharp_codegen -- -f
 
@@ -40,11 +40,11 @@ rsync $PLATFORM_DIR/target/$HOST_TARGET_TRIPLE/$BUILD_PROFILE_DIRNAME/lib$LIB_NA
 
 # Create empty files to symlink against in the event that
 # we don't cross-compile to all of these platforms.
-mkdir -p target/aarch64-apple-darwin && touch $_/$LIB_NAME.dylib
-mkdir -p target/aarch64-apple-ios && touch $_/$LIB_NAME.a
-mkdir -p target/aarch64-linux-android && touch $_/$LIB_NAME.so
-mkdir -p target/armv7-linux-androideabi && touch $_/$LIB_NAME.so
-mkdir -p target/x86_64-unknown-linux-gnu && touch $_/$LIB_NAME.so
+mkdir -p target/aarch64-apple-darwin && touch $_/lib$LIB_NAME.dylib
+mkdir -p target/aarch64-apple-ios && touch $_/lib$LIB_NAME.a
+mkdir -p target/aarch64-linux-android && touch $_/lib$LIB_NAME.so
+mkdir -p target/armv7-linux-androideabi && touch $_/lib$LIB_NAME.so
+mkdir -p target/x86_64-unknown-linux-gnu && touch $_/lib$LIB_NAME.so
 
 ## CROSS-COMPILE TO LINUX
 
