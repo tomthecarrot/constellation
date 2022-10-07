@@ -1,2 +1,7 @@
-/generated/
-/bin/
+/src/bin/
+/src/obj
+/src/generated/
+
+/tests/bin/
+/tests/obj/
+/tests/generated/

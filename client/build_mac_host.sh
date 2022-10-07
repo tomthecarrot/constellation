@@ -52,7 +52,7 @@ mkdir -p target/aarch64-linux-android && touch $_/lib$LIB_NAME.so
 mkdir -p target/armv7-linux-androideabi && touch $_/lib$LIB_NAME.so
 mkdir -p target/x86_64-unknown-linux-gnu && touch $_/lib$LIB_NAME.so
 
-MANAGED_LIB_DIR_IOS=$PLATFORM_DIR/demos/unity_states/cs/bin/ios
+MANAGED_LIB_DIR_IOS=$PLATFORM_DIR/demos/unity_states/cs/src/bin/ios
 mkdir -p $MANAGED_LIB_DIR_IOS
 touch $MANAGED_LIB_DIR_IOS/client.dll
 touch $MANAGED_LIB_DIR_IOS/rsharp.dll
@@ -120,7 +120,7 @@ cd $CLIENT_DIR/cs/tests
 dotnet test
 
 # Package DLLs for use in Unity demo.
-cd $PLATFORM_DIR/demos/unity_states/cs
+cd $PLATFORM_DIR/demos/unity_states/cs/src
 CONSTELLATION_SKIP_CODEGEN=true dotnet build -o bin/main
 
 ## BINDINGS FOR STATICALLY-LINKED TARGETS ##
@@ -145,6 +145,6 @@ then
     fi
 
     # Package DLLs for use in Unity demo.
-    cd $PLATFORM_DIR/demos/unity_states/cs
+    cd $PLATFORM_DIR/demos/unity_states/cs/src
     CONSTELLATION_SKIP_CODEGEN=true dotnet build -o bin/ios -p:DefineConstants=UNITY_IOS
 fi

@@ -55,15 +55,15 @@ namespace Codegen
                     project_dir.FullName, "client", "cs", "src", "generated", "cpp_sharp"
                 ),
                 input_dir: Path.Join(project_dir.FullName, "client", "rust"),
-                cargo_artifact_dir: Path.Join(project_dir.FullName, "target"),
+                cargo_artifact_dir: Path.Join(project_dir.FullName, "target", "debug"),
                 "tp_client"
             ));
             libs.Add(new LibInfo(
                 output_dir: Path.Join(
-                    project_dir.FullName, "demos", "unity_states", "cs", "generated", "cpp_sharp"
+                    project_dir.FullName, "demos", "unity_states", "cs", "src", "generated", "cpp_sharp"
                 ),
                 input_dir: Path.Join(project_dir.FullName, "demos", "unity_states", "rust"),
-                cargo_artifact_dir: Path.Join(project_dir.FullName, "target"),
+                cargo_artifact_dir: Path.Join(project_dir.FullName, "target", "debug"),
                 "unity_states"
             ));
 

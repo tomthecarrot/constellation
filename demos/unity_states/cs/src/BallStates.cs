@@ -3,7 +3,8 @@ using States = Teleportal.Client.Contract.Properties.States;
 using ffi = unity_states.generated.__Internal;
 
 /// NOTE: this class is only ever a shared ref in rust
-public struct BallStates
+// TODO: Switch back to `struct` once https://github.com/dotnet/runtime/issues/6924 is fixed
+public class BallStates
 {
     readonly Ptr<BallStates> inner;
 
