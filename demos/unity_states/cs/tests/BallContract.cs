@@ -15,17 +15,23 @@ public class TestBallContract
     public void Test()
     {
         var baseline = new Baseline(true);
-        var contract = BallContract.Register(baseline);
-        var states = contract.States;
-        // var obj = contract.ObjectCreate(baseline, "some_addressable_id", "Evan");
+        var ballContract = BallContract.Register(baseline);
+        var ballStates = ballContract.States;
+        var ballObject = ballContract.ObjectCreate(
+            baseline,
+            420.69f, 0f, 0f,
+            0, 0, 0,
+            0f, 0f, 0f,
+            0
+        );
 
-        // var stateHandle = baseline.BindStateObjectHandle(s_slot.CharacterObject, obj_slot);
-        // var state = baseline.State(stateHandle);
+        var stateHandle = baseline.BindStateF32(ballStates.PosX, ballObject);
+        var state = baseline.State(stateHandle);
 
-        // Assert.Equal("Bevan", stateHandle.Value.Value);
+        Assert.Equal(420.69f, state.Value.Value);
 
-        // obj.Dispose();
+        ballObject.Dispose();
 
-        // Assert.Throws<InvalidOperationException>(() => { var _ = baseline.BindStateObjectHandle(states.CharacterObject, obj_slot); });
+        Assert.Throws<InvalidOperationException>(() => { var _ = baseline.BindStateF32(ballStates.PosX, ballObject); });
     }
 }
