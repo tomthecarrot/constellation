@@ -3,7 +3,7 @@ using States = Teleportal.Client.Contract.Properties.States;
 using ffi = unity_states.generated.__Internal;
 
 /// NOTE: this class is only ever a shared ref in rust
-public struct BallStates
+public class BallStates
 {
     readonly Ptr<BallStates> inner;
 

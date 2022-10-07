@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\crates\rsharp\cs\src\rsharp.csproj" />
-    <ProjectReference Include="..\..\..\client\cs\src\client.csproj" />
+    <ProjectReference Include="..\..\..\..\crates\rsharp\cs\src\rsharp.csproj" />
+    <ProjectReference Include="..\..\..\..\client\cs\src\client.csproj" />
   </ItemGroup>
 
   <ItemGroup>
