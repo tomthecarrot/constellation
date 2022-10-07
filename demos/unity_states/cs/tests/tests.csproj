@@ -1,0 +1,55 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+
+    <!-- This is our own property that determines the native library name. -->
+    <TpNativePrefix>$(MSBuildThisFileDirectory)..\..\..\..\target\debug\libunity_states</TpNativePrefix>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
+    <PackageReference Include="xunit" Version="2.4.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="coverlet.collector" Version="3.1.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+</ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\src\unity_states.csproj" />
+  </ItemGroup>
+
+  <!--
+    What the fuck is this shit, I hate MSBuild.
+    Taken from: https://github.com/dotnet/sdk/issues/10575
+
+    Note: When using wildcards in the path, the build won't fail if the file is
+    missing.
+  -->
+  <ItemGroup>
+    <!-- Here, we use the previously defined property -->
+    <NativeLibs Include="$(TpNativePrefix).so*" />
+    <NativeLibs Include="$(TpNativePrefix).dylib*" />
+    <NativeLibs Include="$(TpNativePrefix).dll*" />
+    <NativeLibs Include="$(TpNativePrefix).a*" />
+
+    <None Include="@(NativeLibs)">
+      <!-- <Pack>true</Pack> -->
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <!-- <None Include="_._">
+      <Pack>true</Pack>
+      <PackagePath>lib/netstandard2.0</PackagePath>
+    </None> -->
+  </ItemGroup>
+</Project>
