@@ -10,7 +10,7 @@
     <NoWarn>CS8629</NoWarn>
 
     <!-- This is our own property that determines the native library name. -->
-    <TpNativePrefix>$(MSBuildThisFileDirectory)..\..\..\..\target\debug\libunity_states</TpNativePrefix>
+    <TpNativePrefix>$(MSBuildThisFileDirectory)..\..\..\..\target\libunity_states</TpNativePrefix>
   </PropertyGroup>
 
   <!-- This automatically handles code generation needed by this library -->

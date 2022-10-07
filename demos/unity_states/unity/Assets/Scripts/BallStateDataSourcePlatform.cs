@@ -51,7 +51,7 @@ public class BallStateDataSourcePlatform : MonoBehaviour, IBallStateDataSource
 
     void Update()
     {
-        LogCurrentData();
+        // LogCurrentData();
     }
 
     public void LogCurrentData()

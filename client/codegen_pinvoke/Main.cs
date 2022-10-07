@@ -9,6 +9,8 @@ using System.Collections.Generic;
 using RtInfo = System.Runtime.InteropServices.RuntimeInformation;
 using OS = System.Runtime.InteropServices.OSPlatform;
 using Exception = System.Exception;
+using CppSharp.AST;
+using CppSharp.Passes;
 
 
 namespace Codegen
@@ -53,7 +55,7 @@ namespace Codegen
                     project_dir.FullName, "client", "cs", "src", "generated", "cpp_sharp"
                 ),
                 input_dir: Path.Join(project_dir.FullName, "client", "rust"),
-                cargo_artifact_dir: Path.Join(project_dir.FullName, "target", "debug"),
+                cargo_artifact_dir: Path.Join(project_dir.FullName, "target"),
                 "tp_client"
             ));
             libs.Add(new LibInfo(
@@ -61,7 +63,7 @@ namespace Codegen
                     project_dir.FullName, "demos", "unity_states", "cs", "generated", "cpp_sharp"
                 ),
                 input_dir: Path.Join(project_dir.FullName, "demos", "unity_states", "rust"),
-                cargo_artifact_dir: Path.Join(project_dir.FullName, "target", "debug"),
+                cargo_artifact_dir: Path.Join(project_dir.FullName, "target"),
                 "unity_states"
             ));
 
@@ -110,6 +112,12 @@ namespace Codegen
             options.GenerateClassTemplates = false;
             options.GenerateFinalizers = false;
 
+#if UNITY_IOS
+            // This option is only used for the iOS DLL. It replaces the argument
+            // in all `DllImport`s with `__Internal` for static linking.
+            options.GenerateInternalImports = true;
+#endif
+
             var module = options.AddModule(this.single_lib_name);
             module.Libraries.Add($"lib{this.single_lib_name}");
             module.OutputNamespace = this.lib_info.crate_name;
@@ -123,7 +131,10 @@ namespace Codegen
         public void SetupPasses(Driver driver) { }
 
         /// Do transformations that should happen before passes are processed.
-        public void Preprocess(Driver driver, ASTContext ctx) { }
+        public void Preprocess(Driver driver, ASTContext ctx)
+        {
+            new VisitMethodPass_IgnoreCopyConstructor().VisitASTContext(ctx);
+        }
 
         /// Do transformations that should happen after passes are processed.
         public void Postprocess(Driver driver, ASTContext ctx) { }
@@ -160,5 +171,25 @@ namespace Codegen
         }
     }
 
+
+    /// This pass instructs CppSharp to skip copy constructors, which are not
+    /// supported since we are compiling C dylibs and static libs (not C++ ones).
+    public class VisitMethodPass_IgnoreCopyConstructor : TranslationUnitPass
+    {
+        public override bool VisitMethodDecl(Method method)
+        {
+            if (!base.VisitMethodDecl(method))
+            {
+                return false;
+            }
+
+            if (method.IsCopyConstructor)
+            {
+                method.ExplicitlyIgnore();
+            }
+
+            return true;
+        }
+    }
 
 }

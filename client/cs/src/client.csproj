@@ -19,11 +19,11 @@
     <NoWarn>CS8629</NoWarn>
 
     <!-- This is our own property that determines the native library name. -->
-    <TpNativePrefix>$(MSBuildThisFileDirectory)..\..\..\target\debug\libunity_states</TpNativePrefix>
+    <TpNativePrefix>$(MSBuildThisFileDirectory)..\..\..\target\libunity_states</TpNativePrefix>
   </PropertyGroup>
 
   <!-- This automatically handles code generation needed by this library -->
-  <Target Name="codegen" BeforeTargets="BeforeCompile" >
+  <Target Name="codegen" BeforeTargets="BeforeCompile" Condition="'$(CONSTELLATION_SKIP_CODEGEN)'!='true'">
     <Message Text="Running code generators (wrapped)" Importance="high" />
     <Exec Command="cargo run -p cs_codegen -- -f" />
     <Message Text="Generating C headers" Importance="high" />
