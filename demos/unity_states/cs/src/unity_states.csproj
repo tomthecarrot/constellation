@@ -27,7 +27,7 @@
     <NoWarn>CS8629</NoWarn>
 
     <!-- This is our own property that determines the native library name. -->
-    <TpNativePrefix>$(MSBuildThisFileDirectory)..\..\rust\target\debug\libunity_states</TpNativePrefix>
+    <TpNativePrefix>$(MSBuildThisFileDirectory)..\..\..\..\target\debug\libunity_states</TpNativePrefix>
   </PropertyGroup>
 
   <!--
