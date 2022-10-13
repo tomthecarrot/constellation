@@ -8,23 +8,23 @@ publish = false
 
 [dependencies]
 arena = { path = "../../crates/datastructures/arena" }
+better_borrow = { path = "../../crates/better_borrow" }
 crossbeam-channel = "0.5"
 derive_more = "0.99"
 enum_dispatch = "0.3"
 eyre = "0.6"
-paste = "1"
-rand = "0.8"
-tracing = "0.1"
-typemap = "0.3"
-tp_contract_macro = { path = "../contract_macro" }
-log = "0.4"
 itertools = "0.10"
 keyframe = "1"
-better_borrow = { path = "../../crates/better_borrow" }
+lazy_static = "1"
+log = "0.4"
+paste = "1"
+rand = "0.8"
+ref-cast = "1"
 rsharp = { path = "../../crates/rsharp/rust", optional = true }
 safer-ffi = { version = "0.0.10", features = ["proc_macros"], optional = true }
-ref-cast = "1"
-lazy_static = "1"
+tp_contract_macro = { path = "../contract_macro" }
+tracing = "0.1"
+typemap = "0.3"
 
 [features]
 default = ["c_api"]

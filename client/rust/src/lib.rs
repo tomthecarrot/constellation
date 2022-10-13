@@ -15,7 +15,6 @@
     while_true
 )]
 #![allow(clippy::diverging_sub_expression)]
-#![feature(generic_associated_types)]
 
 // Necessary to allow proc macros to have the correct crate name when invoked from
 // this crate

@@ -34,7 +34,7 @@ impl<'b> Serializer<'b> {
 
     /// Serialize all objects related to contract `C`. Usually, this gets called once
     /// per relevant contract.
-    pub fn serialize<C: c::Contract>(&mut self, contract: C) -> Result<()> {
+    pub fn serialize<C: c::Contract>(&mut self, contract: &C) -> Result<()> {
         let fbb = &mut self.fbb;
         let contract_data: &c::ContractData = self.baseline.contract_data(contract.handle())?;
 
