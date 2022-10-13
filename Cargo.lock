@@ -3653,6 +3653,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "tp_contract_example"
+version = "0.0.0"
+dependencies = [
+ "rsharp",
+ "safer-ffi",
+ "tp_client",
+]
+
+[[package]]
 name = "tp_contract_macro"
 version = "0.0.0"
 dependencies = [
@@ -3673,6 +3682,7 @@ dependencies = [
  "flatc-rust",
  "paste",
  "tp_client",
+ "tp_contract_example",
 ]
 
 [[package]]
