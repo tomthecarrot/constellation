@@ -173,7 +173,9 @@ pub mod c_api {
     }
 
     mod _ExampleStates {
-        use crate::contract::properties::states::id::c_api::{StateId_F32, StateId_I8, StateId_U8};
+        use crate::contract::properties::states::id::c_api::{
+            StateId_F32, StateId_I8, StateId_String, StateId_U8,
+        };
         use crate::contract::states;
 
         use rsharp::remangle;
@@ -191,6 +193,7 @@ pub mod c_api {
             i8_1: i8,
             f32_0: f32,
             f32_1: f32,
+            str_0: String,
         }
 
         #[remangle(substitute!())]
@@ -227,6 +230,12 @@ pub mod c_api {
         #[ffi_export]
         pub fn ExampleStates__f32_1(s: &ExampleStates) -> repr_c::Box<StateId_F32> {
             Box::new(StateId_F32::from(s.f32_1)).into()
+        }
+
+        #[remangle(substitute!())]
+        #[ffi_export]
+        pub fn ExampleStates__str_0(s: &ExampleStates) -> repr_c::Box<StateId_String> {
+            Box::new(StateId_String::from(s.str_0)).into()
         }
     }
     pub use _ExampleStates::ExampleStates;
