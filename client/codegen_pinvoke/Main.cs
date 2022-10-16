@@ -7,6 +7,7 @@ using DirectoryInfo = System.IO.DirectoryInfo;
 using Path = System.IO.Path;
 using System.Collections.Generic;
 using RtInfo = System.Runtime.InteropServices.RuntimeInformation;
+using IO = System.IO;
 using OS = System.Runtime.InteropServices.OSPlatform;
 using Exception = System.Exception;
 using CppSharp.AST;
@@ -36,7 +37,7 @@ namespace Codegen
     {
         private static DirectoryInfo project_dir = GetProjectDir();
         private readonly LibInfo lib_info;
-        private string single_lib_name;
+        private string override_lib_name;
 
         static int Main(string[] args)
         {
@@ -89,22 +90,36 @@ namespace Codegen
                 }
 
                 // Actually generate the code
-                var single_lib_name = args[0];
-                CppSharp.ConsoleDriver.Run(new Codegen(lib, single_lib_name));
+                var override_lib_name = System.Environment.GetEnvironmentVariable("CONSTELLATION_DLLIMPORT_NAME")!;
+                CppSharp.ConsoleDriver.Run(new Codegen(lib, override_lib_name));
             }
 
             return 0;
         }
 
-        public Codegen(LibInfo lib_info, string single_lib_name)
+        public Codegen(LibInfo lib_info, string override_lib_name)
         {
             this.lib_info = lib_info;
-            this.single_lib_name = single_lib_name;
+            this.override_lib_name = override_lib_name;
         }
 
         /// Setup the driver options here.
         public void Setup(CppSharp.Driver driver)
         {
+            // Copy all DLLs to override location
+            var directoryInfo = new DirectoryInfo(this.lib_info.cargo_artifact_dir.FullName);
+            var filesList = directoryInfo.GetFiles($"lib{this.lib_info.crate_name}.*");
+            foreach (var fileInfo in filesList)
+            {
+                var lib_ext = fileInfo.Name.Split('.')[1];
+
+                IO.File.Copy(
+                    $"{this.lib_info.cargo_artifact_dir.FullName}/lib{this.lib_info.crate_name}.{lib_ext}",
+                    $"{this.lib_info.cargo_artifact_dir.FullName}/lib{this.override_lib_name}.{lib_ext}",
+                    true // overwrite if file exists
+                );
+            }
+
             var options = driver.Options;
             options.GeneratorKind = Gen.GeneratorKind.CSharp;
             options.OutputDir = this.lib_info.output_dir.FullName;
@@ -117,8 +132,8 @@ namespace Codegen
             options.GenerateInternalImports = true;
 #endif
 
-            var module = options.AddModule(this.single_lib_name);
-            module.Libraries.Add($"lib{this.single_lib_name}");
+            var module = options.AddModule(this.override_lib_name);
+            module.Libraries.Add($"lib{this.override_lib_name}");
             module.OutputNamespace = this.lib_info.crate_name;
 
             module.IncludeDirs.Add(this.lib_info.input_dir.FullName);
