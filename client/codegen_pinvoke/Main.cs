@@ -88,9 +88,8 @@ namespace Codegen
                     lib.output_dir.Delete(true);
                 }
 
-                const string single_lib_name = "unity_states";
-
                 // Actually generate the code
+                var single_lib_name = args[0];
                 CppSharp.ConsoleDriver.Run(new Codegen(lib, single_lib_name));
             }
 

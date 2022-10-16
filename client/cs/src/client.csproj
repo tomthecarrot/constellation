@@ -8,7 +8,6 @@
     <PackageReference Include="CppSharp.Runtime" Version="1.0.3" />
   </ItemGroup>
 
-
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <LangVersion>9.0</LangVersion>
@@ -19,7 +18,11 @@
     <NoWarn>CS8629</NoWarn>
 
     <!-- This is our own property that determines the native library name. -->
-    <TpNativePrefix>$(MSBuildThisFileDirectory)..\..\..\target\debug\libunity_states</TpNativePrefix>
+    <TpDllImportName Condition="'$(CONSTELLATION_DLLIMPORT_NAME)'==''">unity_states</TpDllImportName>
+
+    <!-- Override if necessary -->
+    <TpDllImportName Condition="'$(CONSTELLATION_DLLIMPORT_NAME)'!=''">'$(CONSTELLATION_DLLIMPORT_NAME)'</TpDllImportName>
+    <TpNativePrefix>$(MSBuildThisFileDirectory)..\..\..\target\debug\lib$(TpDllImportName)</TpNativePrefix>
   </PropertyGroup>
 
   <!-- This automatically handles code generation needed by this library -->
@@ -31,7 +34,7 @@
     <Message Text="Building native library" Importance="high" />
     <Exec Command="cargo build -p unity_states" />
     <Message Text="Running code generators (cpp_sharp)" Importance="high" />
-    <Exec Command="dotnet run -a x64" WorkingDirectory="$(MSBuildThisFileDirectory)..\..\codegen_pinvoke" />
+    <Exec Command="dotnet run -a x64 -- $(TpDllImportName)" WorkingDirectory="$(MSBuildThisFileDirectory)..\..\codegen_pinvoke" />
 
     <ItemGroup>
       <Compile Include="generated\wrapped\*.cs" KeepDuplicates="false"/>
