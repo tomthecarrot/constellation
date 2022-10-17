@@ -1,7 +1,6 @@
 /src/bin/
 /src/obj
-
-/generated/
+/src/generated/
 
 
 /tests/bin/
