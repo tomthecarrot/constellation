@@ -8,5 +8,5 @@ publish = false
 
 [dependencies]
 safer-ffi = { version = "0.0.10", features = ["proc_macros"] }
-tp_client = { path = "../rust" }
-rsharp = { path = "../../crates/rsharp/rust" }
+tp_client = { path = "../../rust" }
+rsharp = { path = "../../../crates/rsharp/rust" }

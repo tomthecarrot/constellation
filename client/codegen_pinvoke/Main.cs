@@ -69,7 +69,14 @@ namespace Codegen
                 cargo_artifact_dir: Path.Join(project_dir.FullName, "target", "debug"),
                 "unity_states"
             ));
-
+            libs.Add(new LibInfo(
+                output_dir: Path.Join(
+                    project_dir.FullName, "client", "contract_example", "cs", "generated", "cpp_sharp"
+                ),
+                input_dir: Path.Join(project_dir.FullName, "client", "contract_example", "rust"),
+                cargo_artifact_dir: Path.Join(project_dir.FullName, "target", "debug"),
+                "contract_example"
+            ));
             Console.WriteLine($"Project Directory: {project_dir}");
 
             foreach (var lib in libs)
