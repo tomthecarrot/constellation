@@ -14,6 +14,7 @@ struct Fields {
     i8_1: i8,
     f32_0: f32,
     f32_1: f32,
+    str_0: String,
 }
 
 #[test]
@@ -28,6 +29,7 @@ fn test_round_trip() {
             i8_1: -(i as i8 + 2),
             f32_0: i as f32 + 0.1,
             f32_1: i as f32 + 0.2,
+            str_0: i.to_string(),
         };
         fields.push(f);
     }
@@ -69,6 +71,7 @@ fn create_baseline(fields: &[Fields]) -> (ExampleContract, Baseline) {
             DynTpProperty::Primitive((f.i8_1).into()),
             DynTpProperty::Primitive((f.f32_0).into()),
             DynTpProperty::Primitive((f.f32_1).into()),
+            DynTpProperty::Primitive((f.str_0.to_owned()).into()),
         ];
         let obj = b
             .object_create(&c, states.into_iter(), [].into_iter())
@@ -107,6 +110,9 @@ fn check_matches_fields(fields: &[Fields], c: &ExampleContract, b: &Baseline) {
         let f32_1_h = b
             .bind_state(c.states().f32_1(), obj_h)
             .expect("Failed to bind f32_1");
+        let str_0_h = b
+            .bind_state(c.states().str_0(), obj_h)
+            .expect("Failed to bind str_0");
 
         let baseline_fields = Fields {
             u8_0: b.state(u8_0_h).expect("Failed to get u8_0").value,
@@ -115,6 +121,7 @@ fn check_matches_fields(fields: &[Fields], c: &ExampleContract, b: &Baseline) {
             i8_1: b.state(i8_1_h).expect("Failed to get i8_1").value,
             f32_0: b.state(f32_0_h).expect("Failed to get f32_0").value,
             f32_1: b.state(f32_1_h).expect("Failed to get f32_1").value,
+            str_0: b.state(str_0_h).expect("Failed to get str_0").value.clone(),
         };
 
         fields.remove(
