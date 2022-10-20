@@ -7,6 +7,7 @@ using DirectoryInfo = System.IO.DirectoryInfo;
 using Path = System.IO.Path;
 using System.Collections.Generic;
 using RtInfo = System.Runtime.InteropServices.RuntimeInformation;
+using IO = System.IO;
 using OS = System.Runtime.InteropServices.OSPlatform;
 using Exception = System.Exception;
 using CppSharp.AST;
@@ -34,9 +35,11 @@ namespace Codegen
 
     public sealed class Codegen : CppSharp.ILibrary
     {
+        private const string ENV_VAR_NAME_DLLIMPORT_OVERRIDE = "CONSTELLATION_DLLIMPORT_NAME";
+
         private static DirectoryInfo project_dir = GetProjectDir();
         private readonly LibInfo lib_info;
-        private string single_lib_name;
+        private string override_lib_name;
 
         static int Main(string[] args)
         {
@@ -88,24 +91,59 @@ namespace Codegen
                     lib.output_dir.Delete(true);
                 }
 
-                const string single_lib_name = "unity_states";
-
                 // Actually generate the code
-                CppSharp.ConsoleDriver.Run(new Codegen(lib, single_lib_name));
+                var override_lib_name = System.Environment.GetEnvironmentVariable(ENV_VAR_NAME_DLLIMPORT_OVERRIDE)!;
+                CppSharp.ConsoleDriver.Run(new Codegen(lib, override_lib_name));
             }
 
             return 0;
         }
 
-        public Codegen(LibInfo lib_info, string single_lib_name)
+        public Codegen(LibInfo lib_info, string override_lib_name)
         {
             this.lib_info = lib_info;
-            this.single_lib_name = single_lib_name;
+            this.override_lib_name = override_lib_name;
         }
 
         /// Setup the driver options here.
         public void Setup(CppSharp.Driver driver)
         {
+            // Copy all DLLs to override location.
+            //
+            // Leaf `csproj`s that contain their own native libraries and depend on this base `csproj` need to
+            // be able to override all `DllImport` arguments at compile time to one single library name.
+            // This is because the base `csproj` exposes client functionality such as `Baseline` and `RBox` to C#,
+            // while a leaf `csproj` may expose its own C# FFI such as custom contracts.
+            //
+            // The Constellation build process in Rust (`cargo build` step) currently outputs a monolithic native library,
+            // so all symbols from both the leaf crate AND the base crate (tp_client + rsharp) are present.
+            // If C# code `DllImport`s from multiple libraries, then references to base and leaf functionality from C#
+            // (e.g. `Baseline` and `MyCustomContract`, respectively) will render unusable because the objects
+            // do not coexist in the same allocation of memory made for each library on `dlopen`.
+            //
+            // CppSharp uses the native library's file name as the argument for `DllImport()`.
+            // (Reference: https://github.com/mono/CppSharp/blob/main/src/Generator/Generators/CSharp/CSharpSources.cs#L3497).
+            // Since there is no parameter we've found in CppSharp to do this override, we copy the base library to
+            // a destination file with the name provided by the environment variable defined in `Codegen.ENV_VAR_NAME_DLLIMPORT_OVERRIDE`.
+            // This "tricks" CppSharp into generating the same symbols in C# while using the overriding name.
+            //
+            // CppSharp codegen is the only process in which this destination file is used.
+            // After this invocation of CppSharp codegen, the copy operation does not affect subsequent compile steps.
+
+            var directoryInfo = new DirectoryInfo(this.lib_info.cargo_artifact_dir.FullName);
+            var filesList = directoryInfo.GetFiles($"lib{this.lib_info.crate_name}.*");
+            foreach (var fileInfo in filesList)
+            {
+                var lib_ext = fileInfo.Name.Split('.')[1];
+
+                // Example: Copy `libtp_client.so` -> `libyolo.so`
+                IO.File.Copy(
+                    $"{this.lib_info.cargo_artifact_dir.FullName}/lib{this.lib_info.crate_name}.{lib_ext}",
+                    $"{this.lib_info.cargo_artifact_dir.FullName}/lib{this.override_lib_name}.{lib_ext}",
+                    true // overwrite destination file if it already exists
+                );
+            }
+
             var options = driver.Options;
             options.GeneratorKind = Gen.GeneratorKind.CSharp;
             options.OutputDir = this.lib_info.output_dir.FullName;
@@ -118,8 +156,8 @@ namespace Codegen
             options.GenerateInternalImports = true;
 #endif
 
-            var module = options.AddModule(this.single_lib_name);
-            module.Libraries.Add($"lib{this.single_lib_name}");
+            var module = options.AddModule(this.override_lib_name);
+            module.Libraries.Add($"lib{this.override_lib_name}");
             module.OutputNamespace = this.lib_info.crate_name;
 
             module.IncludeDirs.Add(this.lib_info.input_dir.FullName);
