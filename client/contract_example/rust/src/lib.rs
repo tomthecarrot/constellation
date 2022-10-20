@@ -4,7 +4,7 @@ mod states;
 pub use crate::states::ExampleStates;
 
 use rsharp::remangle;
-use safer_ffi::{headers::Definer, prelude::*};
+use safer_ffi::prelude::*;
 use tp_client::contract::{Contract, ContractDataHandle, ContractId};
 
 #[remangle("tp_contract_example")]

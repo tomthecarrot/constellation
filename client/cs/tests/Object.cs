@@ -3,7 +3,7 @@ using Baseline = Teleportal.Client.Baseline;
 using InvalidOperationException = System.InvalidOperationException;
 using Xunit;
 using RSharp;
-using ExampleContract = Teleportal.Client.Contract.ExampleContract;
+using ExampleContract = Teleportal.Example.Contract.ExampleContract;
 
 public class TestObject
 {

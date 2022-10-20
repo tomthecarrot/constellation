@@ -2,7 +2,6 @@ using generated = tp_client.generated;
 using RSharp;
 using System.Collections.Generic;
 using ObjectHandle = Teleportal.Client.Object.ObjectHandle;
-using ExampleContract = Teleportal.Client.Contract.ExampleContract;
 using ContractDataHandle = Teleportal.Client.Contract.ContractDataHandle;
 using ContractData = Teleportal.Client.Contract.ContractData;
 

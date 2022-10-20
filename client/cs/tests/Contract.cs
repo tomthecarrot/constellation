@@ -1,7 +1,7 @@
 using Baseline = Teleportal.Client.Baseline;
 using Xunit;
 using InvalidOperationException = System.InvalidOperationException;
-using ExampleContract = Teleportal.Client.Contract.ExampleContract;
+using ExampleContract = Teleportal.Example.Contract.ExampleContract;
 using Encoding = System.Text.Encoding;
 
 public class TestContract

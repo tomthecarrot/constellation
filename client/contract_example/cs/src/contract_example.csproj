@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="../cs/src/client.csproj" />
+    <ProjectReference Include="../../../cs/src/client.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -19,7 +19,7 @@
     <NoWarn>CS8629</NoWarn>
 
     <!-- This is our own property that determines the native library name. -->
-    <TpNativePrefix>$(MSBuildThisFileDirectory)..\..\..\target\debug\libunity_states</TpNativePrefix>
+    <TpNativePrefix>$(MSBuildThisFileDirectory)..\..\..\..\target\debug\libunity_states</TpNativePrefix>
   </PropertyGroup>
 
   <!-- This automatically handles code generation needed by this library -->
@@ -29,7 +29,7 @@
     <Message Text="Building native library" Importance="high" />
     <Exec Command="cargo build -p tp_contract_example -p unity_states" />
     <Message Text="Running code generators (cpp_sharp)" Importance="high" />
-    <Exec Command="dotnet run -a x64" WorkingDirectory="$(MSBuildThisFileDirectory)..\..\codegen_pinvoke" />
+    <Exec Command="dotnet run -a x64" WorkingDirectory="$(MSBuildThisFileDirectory)..\..\..\codegen_pinvoke" />
 
     <ItemGroup>
       <Compile Include="generated\wrapped\*.cs" KeepDuplicates="false"/>
