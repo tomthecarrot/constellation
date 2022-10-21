@@ -223,3 +223,7 @@ mod c_api {
         }
     }
 }
+
+// Will ensure that this dependency actually gets linked
+#[allow(unused_imports)]
+use tp_contract_example;

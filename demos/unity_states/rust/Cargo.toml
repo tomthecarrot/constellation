@@ -7,8 +7,10 @@ publish = false
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [lib]
-crate-type = ["rlib", "cdylib", "staticlib"]
+# crate-type = ["rlib", "cdylib", "staticlib"]
+crate-type = ["cdylib"]
 
 [dependencies]
 tp_client = { path = "../../../client/rust" }
 safer-ffi = { version = "0.0.10", features = ["headers"] }
+tp_contract_example = { path = "../../../client/contract_example/rust" }
