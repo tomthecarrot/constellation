@@ -99,8 +99,8 @@ namespace Codegen
                 }
 
                 // Actually generate the code
-                var override_lib_name = System.Environment.GetEnvironmentVariable(ENV_VAR_NAME_DLLIMPORT_OVERRIDE)!;
-                CppSharp.ConsoleDriver.Run(new Codegen(lib, override_lib_name));
+                var override_lib_name = System.Environment.GetEnvironmentVariable(ENV_VAR_NAME_DLLIMPORT_OVERRIDE);
+                CppSharp.ConsoleDriver.Run(new Codegen(lib, override_lib_name ?? "unity_states"));
             }
 
             return 0;
@@ -137,18 +137,22 @@ namespace Codegen
             // CppSharp codegen is the only process in which this destination file is used.
             // After this invocation of CppSharp codegen, the copy operation does not affect subsequent compile steps.
 
-            var directoryInfo = new DirectoryInfo(this.lib_info.cargo_artifact_dir.FullName);
-            var filesList = directoryInfo.GetFiles($"lib{this.lib_info.crate_name}.*");
-            foreach (var fileInfo in filesList)
+            // No need to copy if the output name is the same as the input
+            if (this.lib_info.crate_name != this.override_lib_name)
             {
-                var lib_ext = fileInfo.Name.Split('.')[1];
+                var directoryInfo = new DirectoryInfo(this.lib_info.cargo_artifact_dir.FullName);
+                var filesList = directoryInfo.GetFiles($"lib{this.lib_info.crate_name}.*");
+                foreach (var fileInfo in filesList)
+                {
+                    var lib_ext = fileInfo.Name.Split('.')[1];
 
-                // Example: Copy `libtp_client.so` -> `libyolo.so`
-                IO.File.Copy(
-                    $"{this.lib_info.cargo_artifact_dir.FullName}/lib{this.lib_info.crate_name}.{lib_ext}",
-                    $"{this.lib_info.cargo_artifact_dir.FullName}/lib{this.override_lib_name}.{lib_ext}",
-                    true // overwrite destination file if it already exists
-                );
+                    // Example: Copy `libtp_client.so` -> `libyolo.so`
+                    IO.File.Copy(
+                        $"{this.lib_info.cargo_artifact_dir.FullName}/lib{this.lib_info.crate_name}.{lib_ext}",
+                        $"{this.lib_info.cargo_artifact_dir.FullName}/lib{this.override_lib_name}.{lib_ext}",
+                        true // overwrite destination file if it already exists
+                    );
+                }
             }
 
             var options = driver.Options;
