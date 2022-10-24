@@ -61,13 +61,17 @@ namespace Teleportal.Example.Contract
             }
         }
 
-        public ObjectHandle ObjectCreate(Baseline baseline, byte u8_0, byte u8_1, sbyte i8_0, sbyte i8_1, float f32_0, float f32_1)
+        public ObjectHandle ObjectCreate(Baseline baseline, byte u8_0, byte u8_1, sbyte i8_0, sbyte i8_1, float f32_0, float f32_1, RString str_0)
         {
             if (baseline.OwnershipSemantics == OwnershipSemantics.SharedRef)
             {
                 throw new OwnershipException("`baseline` must be mutable");
             }
-            var p = new Ptr<ObjectHandle>(generated.TpContractExampleExampleContractObjectCreate(this.Inner.Value.p, baseline.Inner.Value.p, u8_0, u8_1, i8_0, i8_1, f32_0, f32_1));
+            if (str_0.OwnershipSemantics != OwnershipSemantics.Owned)
+            {
+                throw new OwnershipException("`str_0` must be owned");
+            }
+            var p = new Ptr<ObjectHandle>(generated.TpContractExampleExampleContractObjectCreate(this.Inner.Value.p, baseline.Inner.Value.p, u8_0, u8_1, i8_0, i8_1, f32_0, f32_1, str_0.StealInner().p));
             return new ObjectHandle(p);
         }
 
@@ -143,6 +147,15 @@ namespace Teleportal.Example.Contract
             {
                 var p = new Ptr<States.StateId_F32>(generated.TpContractExampleExampleStatesF32_1(this.Inner.Value.p));
                 return new States.StateId_F32(p, OwnershipSemantics.Owned);
+            }
+        }
+
+        public States.StateId_String Str_0
+        {
+            get
+            {
+                var p = new Ptr<States.StateId_String>(generated.TpContractExampleExampleStatesStr0(this.Inner.Value.p));
+                return new States.StateId_String(p, OwnershipSemantics.Owned);
             }
         }
     }

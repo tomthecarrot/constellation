@@ -84,6 +84,7 @@ mod c_api {
         i8_1: i8,
         f32_0: f32,
         f32_1: f32,
+        str_0: repr_c::Box<rsharp::string::String>,
     ) -> repr_c::Box<CObjectHandle> {
         let states = [
             DynTpProperty::Primitive(u8_0.into()),
@@ -92,6 +93,7 @@ mod c_api {
             DynTpProperty::Primitive(i8_1.into()),
             DynTpProperty::Primitive(f32_0.into()),
             DynTpProperty::Primitive(f32_1.into()),
+            DynTpProperty::Primitive(str_0.into().inner.into()),
         ];
         let obj = baseline
             .object_create(contract, states.into_iter(), [].into_iter())
