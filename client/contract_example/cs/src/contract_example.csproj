@@ -1,0 +1,64 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="../../../cs/src/client.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CppSharp.Runtime" Version="1.0.3" />
+  </ItemGroup>
+
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Nullable>enable</Nullable>
+
+    <NoWarn>CS8629</NoWarn>
+
+    <!-- This is our own property that determines the native library name. -->
+    <TpNativePrefix>$(MSBuildThisFileDirectory)..\..\..\..\target\debug\libunity_states</TpNativePrefix>
+  </PropertyGroup>
+
+  <!-- This automatically handles code generation needed by this library -->
+  <Target Name="codegen" BeforeTargets="BeforeCompile" Condition="'$(CONSTELLATION_SKIP_CODEGEN)'!='true'">
+    <Message Text="Generating C headers" Importance="high" />
+    <Exec Command="cargo test -p tp_contract_example" />
+    <Message Text="Building native library" Importance="high" />
+    <Exec Command="cargo build -p tp_contract_example -p unity_states" />
+    <Message Text="Running code generators (cpp_sharp)" Importance="high" />
+    <Exec Command="dotnet run -a x64" WorkingDirectory="$(MSBuildThisFileDirectory)..\..\..\codegen_pinvoke" />
+
+    <ItemGroup>
+      <Compile Include="generated\wrapped\*.cs" KeepDuplicates="false"/>
+      <Compile Include="generated\cpp_sharp\*.cs" KeepDuplicates="false"/>
+    </ItemGroup>
+  </Target>
+
+  <!--
+    What the fuck is this shit, I hate MSBuild.
+    Taken from: https://github.com/dotnet/sdk/issues/10575
+
+    Note: When using wildcards in the path, the build won't fail if the file is
+    missing.
+  -->
+  <ItemGroup>
+    <!-- Here, we use the previously defined property -->
+    <NativeLibs Include="$(TpNativePrefix).so*" />
+    <NativeLibs Include="$(TpNativePrefix).dylib*" />
+    <NativeLibs Include="$(TpNativePrefix).dll*" />
+    <NativeLibs Include="$(TpNativePrefix).a*" />
+
+    <None Include="@(NativeLibs)">
+      <!-- <Pack>true</Pack> -->
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <!-- <None Include="_._">
+      <Pack>true</Pack>
+      <PackagePath>lib/netstandard2.0</PackagePath>
+    </None> -->
+  </ItemGroup>
+</Project>

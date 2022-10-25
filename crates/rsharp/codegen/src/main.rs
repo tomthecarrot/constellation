@@ -14,6 +14,6 @@ struct Args {
 
 fn main() -> Result<()> {
     let args = Args::parse();
-    let codegen = Codegen::new("rbox.cs.tpl", args.force).wrap_err("Failed to create `Codegen`")?;
+    let codegen = Codegen::new(args.force).wrap_err("Failed to create `Codegen`")?;
     codegen.render_all()
 }

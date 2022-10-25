@@ -1,6 +1,5 @@
 #![deny(
     bad_style,
-    const_err,
     improper_ctypes,
     non_shorthand_field_patterns,
     no_mangle_generic_items,
@@ -224,3 +223,7 @@ mod c_api {
         }
     }
 }
+
+// Will ensure that this dependency actually gets linked
+#[allow(unused_imports)]
+use tp_contract_example;

@@ -33,6 +33,7 @@ pub fn remangle(path: syn::LitStr, mut item: syn::Item) -> Result<TokenStream> {
         _ => return Err(Error::new(item.span(), "This item type is not supported")),
     }?;
 
+    // TODO: Add #[allow(non_camel_case_types, non_snake_case)] when safer-ffi is no longer broken
     let output = quote_spanned! {item.span() =>
         #item
         #[allow(unused)]

@@ -2,9 +2,9 @@ use tp_serialize::{Deserializer, Serializer};
 
 use flatbuffers::FlatBufferBuilder;
 use tp_client::baseline::{Baseline, BaselineKind};
-use tp_client::contract::c_api::ExampleContract;
 use tp_client::contract::properties::dynamic::DynTpProperty;
 use tp_client::contract::Contract;
+use tp_contract_example::ExampleContract;
 
 #[derive(PartialEq, Debug, Clone)]
 struct Fields {

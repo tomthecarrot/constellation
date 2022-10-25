@@ -1,0 +1,12 @@
+[package]
+name = "tp_contract_example"
+version = "0.0.0"
+description = "An example contract"
+edition = "2021"
+# Prevent accidental `cargo publish`
+publish = false
+
+[dependencies]
+safer-ffi = { version = "0.0.10", features = ["proc_macros"] }
+tp_client = { path = "../../rust" }
+rsharp = { path = "../../../crates/rsharp/rust" }

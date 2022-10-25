@@ -15,9 +15,9 @@ pub struct Codegen {
 }
 
 impl Codegen {
-    pub fn new(partial_tpl_filename: &str, overwrite: bool) -> Result<Self> {
-        let tpl_path = Path::new(env!("CARGO_MANIFEST_DIR")).join(partial_tpl_filename);
-        let partial_path = Path::new(env!("CARGO_MANIFEST_DIR")).join(partial_tpl_filename);
+    pub fn new(overwrite: bool) -> Result<Self> {
+        let tpl_path = Path::new(env!("CARGO_MANIFEST_DIR")).join("rbox.cs.tpl");
+        println!("{}", tpl_path.display());
         let output_dir = Path::new(env!("CARGO_MANIFEST_DIR"))
             .parent()
             .unwrap()
@@ -32,8 +32,6 @@ impl Codegen {
             .wrap_err_with(|| format!("Failed to create `output_dir`={output_dir:?}"))?;
 
         let mut reg = handlebars::Handlebars::new();
-        // Once handlebars-rs properly handles multi-line partials, we will remove this line
-        reg.set_prevent_indent(true);
 
         // Error when missing a value
         reg.set_strict_mode(true);
@@ -43,7 +41,7 @@ impl Codegen {
 
         reg.register_template_file(TPL_NAME, &tpl_path)?;
 
-        std::fs::read_to_string(&partial_path).wrap_err("Failed to read partial template file")?;
+        std::fs::read_to_string(&tpl_path).wrap_err("Failed to read template file")?;
 
         Ok(Self { reg, output_dir })
     }

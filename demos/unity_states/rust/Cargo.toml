@@ -12,3 +12,4 @@ crate-type = ["rlib", "cdylib", "staticlib"]
 [dependencies]
 tp_client = { path = "../../../client/rust" }
 safer-ffi = { version = "0.0.10", features = ["headers"] }
+tp_contract_example = { path = "../../../client/contract_example/rust" }
