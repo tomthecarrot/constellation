@@ -13,7 +13,7 @@ public class ConstellationBuildPreprocessor : IPostGenerateGradleAndroidProject
     public int callbackOrder { get { return 0; } }
     public void OnPostGenerateGradleAndroidProject(string unityProjectPath)
     {
-        var buildSettings = GetSettings();
+        var buildSettings = ConstellationBuildSettings.GetDefaults();
         string libDir = $"{unityProjectPath}/src/main/jniLibs";
         foreach (string libName in buildSettings.androidLibNames)
         {
@@ -23,27 +23,4 @@ public class ConstellationBuildPreprocessor : IPostGenerateGradleAndroidProject
             FileUtil.CopyFileOrDirectoryFollowSymlinks(src, dst);
         }
     }
-
-    private ConstellationBuildSettings GetSettings()
-    {
-        var settingsObjects = AssetDatabase.FindAssets("t:ConstellationBuildSettings").ToList()
-            .Select(AssetDatabase.GUIDToAssetPath)
-            .Select(AssetDatabase.LoadAssetAtPath<ConstellationBuildSettings>)
-            .ToList();
-
-        if (settingsObjects.Count == 0)
-        {
-            Debug.LogError($"[Constellation] {ERR_MSG_MISSING_SETTINGS}");
-            return null;
-        }
-        else if (settingsObjects.Count > 1)
-        {
-            Debug.LogError($"[Constellation] {ERR_MSG_TOO_MANY_SETTINGS}");
-            return null;
-        }
-        return settingsObjects[0];
-    }
-
-    private const string ERR_MSG_MISSING_SETTINGS = "Missing build settings! Create one via Assets menu > Create > ScriptableObjects > ConstellationBuildSettings and configure it.";
-    private const string ERR_MSG_TOO_MANY_SETTINGS = "There are more than one ConstellationBuildSettings objects in the project! Remove all except one and check the configuration.";
 }
