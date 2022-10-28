@@ -189,7 +189,7 @@ namespace Codegen
         public void Postprocess(Driver driver, ASTContext ctx) { }
 
         /// Get the toplevel folder in the project
-        public static DirectoryInfo GetProjectDir()
+        private static DirectoryInfo GetProjectDir()
         {
             // If we are compiling for a target different from the native platform,
             // this will be nested one folder deeper (to disambiguate the platform).
@@ -211,7 +211,7 @@ namespace Codegen
             // The "client" directory comes from this repo (Constellation).
             // The "codegen_movieoke" directory is added temporarily to support codegen
             // in the Movieoke repo, which references this codegen csproj.
-            if (project_dir.Name != "client" && project_dir.Name != "codegen_movieoke")
+            if (project_dir.Name != "client")
             {
                 project_dir = project_dir.Parent ?? project_dir.Root;
             }
