@@ -1,3 +1,5 @@
+mod handle_map;
+
 use eyre::{eyre, Result, WrapErr};
 use flatbuffers::{FlatBufferBuilder, WIPOffset};
 use paste::paste;
@@ -6,9 +8,10 @@ use tp_client::contract::properties::dynamic::{DynTpPrimitiveRef, DynTpPropertyR
 use tp_client::contract::properties::states::dyn_state::DynStateRef;
 use tp_client::contract::properties::states::IStates;
 
+use self::handle_map::{ContractsIdx, HandleMap, ObjectsIdx};
 use crate::baseline::BaselineArgs;
 use crate::contract::{ContractArgs, ContractDataHandleArgs, ContractIdArgs, ContractStatesArgs};
-use crate::object::ObjectArgs;
+use crate::object::{ObjectArgs, ObjectHandleArgs};
 use crate::primitive::StringArgs;
 use crate::state::{StateArgs, StateHandleArgs};
 use crate::{c, t};
@@ -19,6 +22,7 @@ pub struct Serializer<'b> {
     contracts: Vec<WIPOffset<t::Contract<'static>>>,
     states: Vec<WIPOffset<t::State<'static>>>,
     objects: Vec<WIPOffset<t::Object<'static>>>,
+    handle_map: HandleMap,
 }
 impl<'b> Serializer<'b> {
     pub fn new(mut fbb: FlatBufferBuilder<'static>, baseline: &'b c::Baseline) -> Serializer<'b> {
@@ -29,6 +33,7 @@ impl<'b> Serializer<'b> {
             contracts: Vec::new(),
             states: Vec::new(),
             objects: Vec::new(),
+            handle_map: Default::default(),
         }
     }
 
@@ -39,6 +44,9 @@ impl<'b> Serializer<'b> {
         let contract_data: &c::ContractData = self.baseline.contract_data(contract.handle())?;
 
         self.contracts.push(Self::serialize_contract::<C>(fbb)?);
+        self.handle_map
+            .insert_contract(contract.handle(), ContractsIdx(self.contracts.len() - 1));
+
         let contract_data_handle_t = {
             let idx = self.contracts.len() as u16 - 1;
             t::ContractDataHandle::create(fbb, &ContractDataHandleArgs { idx })
@@ -93,11 +101,30 @@ impl<'b> Serializer<'b> {
                                 },
                             )
                         }
+                        // Handles will be serialized to a dummy value, and populated later
                         DynTpPrimitiveRef::ObjectHandle(_) => {
-                            todo!("SER-464: Figure out how to map handles to fb indices")
+                            let p = t::ObjectHandle::create(fbb, &ObjectHandleArgs { idx: 0 });
+                            t::State::create(
+                                fbb,
+                                &StateArgs {
+                                    p_type: t::TpPrimitive::tp_serialize_object_ObjectHandle,
+                                    p: Some(p.as_union_value()),
+                                },
+                            )
                         }
                         DynTpPrimitiveRef::ContractDataHandle(_) => {
-                            todo!("SER-464: Figure out how to map handles to fb indices")
+                            let p = t::ContractDataHandle::create(
+                                fbb,
+                                &ContractDataHandleArgs { idx: 0 },
+                            );
+                            t::State::create(
+                                fbb,
+                                &StateArgs {
+                                    p_type:
+                                        t::TpPrimitive::tp_serialize_contract_ContractDataHandle,
+                                    p: Some(p.as_union_value()),
+                                },
+                            )
                         }
                     },
                     DynTpPropertyRef::Vec(_v) => todo!(),
@@ -177,6 +204,7 @@ impl<'b> Serializer<'b> {
 
     pub fn finish(mut self) -> FlatBufferBuilder<'static> {
         let fbb = &mut self.fbb;
+        // Second pass to write the handle data
 
         let baseline_t = {
             let contracts_t = fbb.create_vector_from_iter(self.contracts.into_iter());
