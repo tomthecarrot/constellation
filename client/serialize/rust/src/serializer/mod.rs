@@ -6,9 +6,9 @@ use paste::paste;
 use tp_client::apply_to_state_id;
 use tp_client::contract::properties::dynamic::{DynTpPrimitiveRef, DynTpPropertyRef};
 use tp_client::contract::properties::states::dyn_state::DynStateRef;
-use tp_client::contract::properties::states::IStates;
+use tp_client::contract::properties::states::{DynStateHandle, DynStateId, IStates};
 
-use self::handle_map::{ContractsIdx, HandleMap, ObjectsIdx};
+use self::handle_map::{ContractsIdx, HandleMap, ObjectsIdx, StatesIdx};
 use crate::baseline::BaselineArgs;
 use crate::contract::{ContractArgs, ContractDataHandleArgs, ContractIdArgs, ContractStatesArgs};
 use crate::object::{ObjectArgs, ObjectHandleArgs};
@@ -55,13 +55,16 @@ impl<'b> Serializer<'b> {
         for &obj_handle in contract_data.objects().iter() {
             let mut state_handles = Vec::new();
             for state_id in contract.state_iter() {
-                let state: DynStateRef = apply_to_state_id!(state_id, |state_id| {
-                    self.baseline
-                        .bind_state(state_id, obj_handle)
-                        .wrap_err("Failed to bind StateId to Object")
-                        .and_then(|h| self.baseline.state(h))
-                        .map(DynStateRef::from)
-                })?;
+                let (state, state_handle): (DynStateRef, DynStateHandle) =
+                    apply_to_state_id!(state_id, |state_id| {
+                        let state_handle = self
+                            .baseline
+                            .bind_state(state_id, obj_handle)
+                            .wrap_err("Failed to bind StateId to Object")?;
+                        let state = DynStateRef::from(self.baseline.state(state_handle)?);
+                        let state_handle = DynStateHandle::from(state_handle);
+                        Ok((state, state_handle))
+                    })?;
 
                 macro_rules! helper {
                     ($t:ident, $v:expr) => {{
@@ -103,6 +106,7 @@ impl<'b> Serializer<'b> {
                         }
                         // Handles will be serialized to a dummy value, and populated later
                         DynTpPrimitiveRef::ObjectHandle(_) => {
+                            // Dummy value of 0
                             let p = t::ObjectHandle::create(fbb, &ObjectHandleArgs { idx: 0 });
                             t::State::create(
                                 fbb,
@@ -113,6 +117,7 @@ impl<'b> Serializer<'b> {
                             )
                         }
                         DynTpPrimitiveRef::ContractDataHandle(_) => {
+                            // Dummy value of 0
                             let p = t::ContractDataHandle::create(
                                 fbb,
                                 &ContractDataHandleArgs { idx: 0 },
@@ -131,6 +136,10 @@ impl<'b> Serializer<'b> {
                 };
                 self.states.push(state_t);
                 let idx = self.states.len() as u32 - 1;
+                match state_id {
+                    _ => (),
+                }
+
                 let state_handle_t = t::StateHandle::create(fbb, &StateHandleArgs { idx });
                 state_handles.push(state_handle_t);
             }
@@ -144,6 +153,8 @@ impl<'b> Serializer<'b> {
                 },
             );
             self.objects.push(obj_t);
+            self.handle_map
+                .insert_object(obj_handle, ObjectsIdx(self.objects.len() - 1));
         }
         Ok(())
     }
@@ -204,7 +215,8 @@ impl<'b> Serializer<'b> {
 
     pub fn finish(mut self) -> FlatBufferBuilder<'static> {
         let fbb = &mut self.fbb;
-        // Second pass to write the handle data
+        // Second pass to write the handle data. We will go back through the handles and
+        // properly update their indices by using the `HandleMap`
 
         let baseline_t = {
             let contracts_t = fbb.create_vector_from_iter(self.contracts.into_iter());

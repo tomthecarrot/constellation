@@ -11,18 +11,40 @@ pub struct ObjectsIdx(pub usize);
 #[derive(Hash, Eq, PartialEq, Debug, Clone, Copy)]
 pub struct ContractsIdx(pub usize);
 
+/// Index into `states` vec
+#[derive(Hash, Eq, PartialEq, Debug, Clone, Copy)]
+pub struct StatesIdx(pub usize);
+
 #[derive(Default, Debug)]
 pub struct HandleMap {
+    /// Handles to objects
     objects: BiHashMap<c::ObjectHandle, ObjectsIdx>,
-    // usize is index into `contracts` vec
+    /// Handles to contracts
     contracts: BiHashMap<c::ContractDataHandle, ContractsIdx>,
+    /// Handles to State<ContractDataHandle>
+    contract_states: BiHashMap<c::StateHandle<c::ContractDataHandle>, StatesIdx>,
+    /// Handles to State<ObjectHandle>
+    object_states: BiHashMap<c::StateHandle<c::ObjectHandle>, StatesIdx>,
 }
 impl HandleMap {
     pub fn insert_object(&mut self, handle: c::ObjectHandle, idx: ObjectsIdx) {
         self.objects.insert(handle, idx);
     }
+
     pub fn insert_contract(&mut self, handle: c::ContractDataHandle, idx: ContractsIdx) {
         self.contracts.insert(handle, idx);
+    }
+
+    pub fn insert_contract_state(
+        &mut self,
+        handle: c::StateHandle<c::ContractDataHandle>,
+        idx: StatesIdx,
+    ) {
+        self.contract_states.insert(handle, idx);
+    }
+
+    pub fn insert_object_state(&mut self, handle: c::StateHandle<c::ObjectHandle>, idx: StatesIdx) {
+        self.object_states.insert(handle, idx);
     }
 }
 
