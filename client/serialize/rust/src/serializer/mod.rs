@@ -5,6 +5,7 @@ use flatbuffers::{FlatBufferBuilder, WIPOffset};
 use paste::paste;
 use tp_client::apply_to_state_id;
 use tp_client::contract::properties::dynamic::{DynTpPrimitiveRef, DynTpPropertyRef};
+use tp_client::contract::properties::states::dyn_handle::DynStateHandlePrimitive;
 use tp_client::contract::properties::states::dyn_state::DynStateRef;
 use tp_client::contract::properties::states::{DynStateHandle, DynStateId, IStates};
 
@@ -55,15 +56,15 @@ impl<'b> Serializer<'b> {
         for &obj_handle in contract_data.objects().iter() {
             let mut state_handles = Vec::new();
             for state_id in contract.state_iter() {
-                let (state, state_handle): (DynStateRef, DynStateHandle) =
-                    apply_to_state_id!(state_id, |state_id| {
+                let (state_handle, state) =
+                    apply_to_state_id!(state_id, |state_id| -> eyre::Result<_> {
                         let state_handle = self
                             .baseline
                             .bind_state(state_id, obj_handle)
                             .wrap_err("Failed to bind StateId to Object")?;
                         let state = DynStateRef::from(self.baseline.state(state_handle)?);
                         let state_handle = DynStateHandle::from(state_handle);
-                        Ok((state, state_handle))
+                        Ok((state_handle, state))
                     })?;
 
                 macro_rules! helper {
@@ -135,12 +136,20 @@ impl<'b> Serializer<'b> {
                     DynTpPropertyRef::Vec(_v) => todo!(),
                 };
                 self.states.push(state_t);
-                let idx = self.states.len() as u32 - 1;
-                match state_id {
-                    _ => (),
+                let idx = self.states.len() - 1;
+                // Insert state handles
+                match state_handle {
+                    DynStateHandle::Primitive(DynStateHandlePrimitive::ObjectHandle(h)) => {
+                        self.handle_map.insert_object_state(h, StatesIdx(idx));
+                    }
+                    DynStateHandle::Primitive(DynStateHandlePrimitive::ContractDataHandle(h)) => {
+                        self.handle_map.insert_contract_state(h, StatesIdx(idx));
+                    }
+                    _ => (), // Do nothing for non-handles
                 }
 
-                let state_handle_t = t::StateHandle::create(fbb, &StateHandleArgs { idx });
+                let state_handle_t =
+                    t::StateHandle::create(fbb, &StateHandleArgs { idx: idx as u32 });
                 state_handles.push(state_handle_t);
             }
 
