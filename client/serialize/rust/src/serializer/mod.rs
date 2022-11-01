@@ -226,6 +226,16 @@ impl<'b> Serializer<'b> {
         let fbb = &mut self.fbb;
         // Second pass to write the handle data. We will go back through the handles and
         // properly update their indices by using the `HandleMap`
+        for (object_state_handle, object_state_idx) in self.handle_map.object_states.iter() {
+            let object_handle = self
+                .baseline
+                .state(*object_state_handle)
+                .expect("Unexpectly had a missing handle")
+                .value;
+            // This is the index value we want to overwrite the dummy index with
+            let object_idx = self.handle_map[object_handle];
+            let wip_offset = self.states[object_state_idx.0];
+        }
 
         let baseline_t = {
             let contracts_t = fbb.create_vector_from_iter(self.contracts.into_iter());

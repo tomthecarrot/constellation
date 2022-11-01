@@ -18,13 +18,13 @@ pub struct StatesIdx(pub usize);
 #[derive(Default, Debug)]
 pub struct HandleMap {
     /// Handles to objects
-    objects: BiHashMap<c::ObjectHandle, ObjectsIdx>,
+    pub objects: BiHashMap<c::ObjectHandle, ObjectsIdx>,
     /// Handles to contracts
-    contracts: BiHashMap<c::ContractDataHandle, ContractsIdx>,
+    pub contracts: BiHashMap<c::ContractDataHandle, ContractsIdx>,
     /// Handles to State<ContractDataHandle>
-    contract_states: BiHashMap<c::StateHandle<c::ContractDataHandle>, StatesIdx>,
+    pub contract_states: BiHashMap<c::StateHandle<c::ContractDataHandle>, StatesIdx>,
     /// Handles to State<ObjectHandle>
-    object_states: BiHashMap<c::StateHandle<c::ObjectHandle>, StatesIdx>,
+    pub object_states: BiHashMap<c::StateHandle<c::ObjectHandle>, StatesIdx>,
 }
 impl HandleMap {
     pub fn insert_object(&mut self, handle: c::ObjectHandle, idx: ObjectsIdx) {
