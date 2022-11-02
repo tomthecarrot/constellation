@@ -1,17 +1,24 @@
+mod handle_map;
+
 use eyre::{eyre, Result, WrapErr};
 use flatbuffers::{FlatBufferBuilder, WIPOffset};
 use paste::paste;
 use tp_client::apply_to_state_id;
 use tp_client::contract::properties::dynamic::{DynTpPrimitiveRef, DynTpPropertyRef};
+use tp_client::contract::properties::states::dyn_handle::DynStateHandlePrimitive;
 use tp_client::contract::properties::states::dyn_state::DynStateRef;
-use tp_client::contract::properties::states::IStates;
+use tp_client::contract::properties::states::{DynStateHandle, IStates};
 
+use self::handle_map::{ContractsIdx, HandleMap, ObjectsIdx, StatesIdx};
 use crate::baseline::BaselineArgs;
 use crate::contract::{ContractArgs, ContractDataHandleArgs, ContractIdArgs, ContractStatesArgs};
-use crate::object::ObjectArgs;
+use crate::object::{ObjectArgs, ObjectHandleArgs};
 use crate::primitive::StringArgs;
 use crate::state::{StateArgs, StateHandleArgs};
 use crate::{c, t};
+
+/// The dummy value that will be used for temporary `WIPOffset` values.
+const WIP_DUMMY: flatbuffers::UOffsetT = 1337;
 
 pub struct Serializer<'b> {
     fbb: FlatBufferBuilder<'static>,
@@ -19,6 +26,7 @@ pub struct Serializer<'b> {
     contracts: Vec<WIPOffset<t::Contract<'static>>>,
     states: Vec<WIPOffset<t::State<'static>>>,
     objects: Vec<WIPOffset<t::Object<'static>>>,
+    handle_map: HandleMap,
 }
 impl<'b> Serializer<'b> {
     pub fn new(mut fbb: FlatBufferBuilder<'static>, baseline: &'b c::Baseline) -> Serializer<'b> {
@@ -29,6 +37,7 @@ impl<'b> Serializer<'b> {
             contracts: Vec::new(),
             states: Vec::new(),
             objects: Vec::new(),
+            handle_map: Default::default(),
         }
     }
 
@@ -39,6 +48,9 @@ impl<'b> Serializer<'b> {
         let contract_data: &c::ContractData = self.baseline.contract_data(contract.handle())?;
 
         self.contracts.push(Self::serialize_contract::<C>(fbb)?);
+        self.handle_map
+            .insert_contract(contract.handle(), ContractsIdx(self.contracts.len() - 1));
+
         let contract_data_handle_t = {
             let idx = self.contracts.len() as u16 - 1;
             t::ContractDataHandle::create(fbb, &ContractDataHandleArgs { idx })
@@ -47,13 +59,16 @@ impl<'b> Serializer<'b> {
         for &obj_handle in contract_data.objects().iter() {
             let mut state_handles = Vec::new();
             for state_id in contract.state_iter() {
-                let state: DynStateRef = apply_to_state_id!(state_id, |state_id| {
-                    self.baseline
-                        .bind_state(state_id, obj_handle)
-                        .wrap_err("Failed to bind StateId to Object")
-                        .and_then(|h| self.baseline.state(h))
-                        .map(DynStateRef::from)
-                })?;
+                let (state_handle, state) =
+                    apply_to_state_id!(state_id, |state_id| -> eyre::Result<_> {
+                        let state_handle = self
+                            .baseline
+                            .bind_state(state_id, obj_handle)
+                            .wrap_err("Failed to bind StateId to Object")?;
+                        let state = DynStateRef::from(self.baseline.state(state_handle)?);
+                        let state_handle = DynStateHandle::from(state_handle);
+                        Ok((state_handle, state))
+                    })?;
 
                 macro_rules! helper {
                     ($t:ident, $v:expr) => {{
@@ -93,18 +108,29 @@ impl<'b> Serializer<'b> {
                                 },
                             )
                         }
-                        DynTpPrimitiveRef::ObjectHandle(_) => {
-                            todo!("SER-464: Figure out how to map handles to fb indices")
-                        }
-                        DynTpPrimitiveRef::ContractDataHandle(_) => {
-                            todo!("SER-464: Figure out how to map handles to fb indices")
+                        // Handles will be serialized to a dummy value, and populated later
+                        DynTpPrimitiveRef::ObjectHandle(_)
+                        | DynTpPrimitiveRef::ContractDataHandle(_) => {
+                            WIPOffset::<t::State>::new(WIP_DUMMY)
                         }
                     },
-                    DynTpPropertyRef::Vec(_v) => todo!(),
+                    DynTpPropertyRef::Vec(_v) => todo!("Vectors not supported yet"),
                 };
                 self.states.push(state_t);
-                let idx = self.states.len() as u32 - 1;
-                let state_handle_t = t::StateHandle::create(fbb, &StateHandleArgs { idx });
+                let idx = self.states.len() - 1;
+                // Insert state handles
+                match state_handle {
+                    DynStateHandle::Primitive(DynStateHandlePrimitive::ObjectHandle(h)) => {
+                        self.handle_map.insert_object_state(h, StatesIdx(idx));
+                    }
+                    DynStateHandle::Primitive(DynStateHandlePrimitive::ContractDataHandle(h)) => {
+                        self.handle_map.insert_contract_state(h, StatesIdx(idx));
+                    }
+                    _ => (), // Do nothing for non-handles
+                }
+
+                let state_handle_t =
+                    t::StateHandle::create(fbb, &StateHandleArgs { idx: idx as u32 });
                 state_handles.push(state_handle_t);
             }
 
@@ -117,6 +143,8 @@ impl<'b> Serializer<'b> {
                 },
             );
             self.objects.push(obj_t);
+            self.handle_map
+                .insert_object(obj_handle, ObjectsIdx(self.objects.len() - 1));
         }
         Ok(())
     }
@@ -176,8 +204,54 @@ impl<'b> Serializer<'b> {
     }
 
     pub fn finish(mut self) -> FlatBufferBuilder<'static> {
-        let fbb = &mut self.fbb;
+        // Second pass to write the handle data. We will go back through the handles and
+        // properly update their indices by using the `HandleMap`
+        macro_rules! rewrite_states {
+            ($handle_ident:ident, $map_field:expr, $handle_variant:expr $(,)?) => {
+                for (state_handle, state_idx) in $map_field.iter() {
+                    let referenced_idx = {
+                        let referenced_handle = self
+                            .baseline
+                            .state(*state_handle)
+                            .expect("Unexpectly had a missing handle")
+                            .value;
+                        self.handle_map[referenced_handle]
+                    };
 
+                    // Create the state flatbuffer
+                    let state_offset = paste::paste! {{
+                        let p = t::$handle_ident::create(
+                            &mut self.fbb,
+                            &[<$handle_ident Args>] {
+                                idx: referenced_idx.0 as _,
+                            },
+                        );
+                        t::State::create(
+                            &mut self.fbb,
+                            &StateArgs {
+                                p_type: $handle_variant,
+                                p: Some(p.as_union_value()),
+                            },
+                        )
+                    }};
+                    debug_assert_eq!(self.states[state_idx.0].value(), WIP_DUMMY);
+                    self.states[state_idx.0] = state_offset;
+                }
+            };
+        }
+        rewrite_states!(
+            ContractDataHandle,
+            self.handle_map.contract_states,
+            t::TpPrimitive::tp_serialize_contract_ContractDataHandle,
+        );
+        rewrite_states!(
+            ObjectHandle,
+            self.handle_map.object_states,
+            t::TpPrimitive::tp_serialize_object_ObjectHandle,
+        );
+
+        // Now we need to actually serialize all of these vectors into the final buffer
+        let fbb = &mut self.fbb;
         let baseline_t = {
             let contracts_t = fbb.create_vector_from_iter(self.contracts.into_iter());
             let states_t = fbb.create_vector_from_iter(self.states.into_iter());

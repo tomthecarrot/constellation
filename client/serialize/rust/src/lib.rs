@@ -33,6 +33,7 @@ mod types;
 mod c {
     pub use tp_client::baseline::Baseline;
     pub use tp_client::contract::properties::dynamic::{TpPrimitiveType, TpPropertyType};
+    pub use tp_client::contract::properties::states::StateHandle;
     pub use tp_client::contract::{Contract, ContractData, ContractDataHandle, ContractId};
     pub use tp_client::object::ObjectHandle;
 }
