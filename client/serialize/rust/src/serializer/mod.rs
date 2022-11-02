@@ -7,7 +7,7 @@ use tp_client::apply_to_state_id;
 use tp_client::contract::properties::dynamic::{DynTpPrimitiveRef, DynTpPropertyRef};
 use tp_client::contract::properties::states::dyn_handle::DynStateHandlePrimitive;
 use tp_client::contract::properties::states::dyn_state::DynStateRef;
-use tp_client::contract::properties::states::{DynStateHandle, DynStateId, IStates};
+use tp_client::contract::properties::states::{DynStateHandle, IStates};
 
 use self::handle_map::{ContractsIdx, HandleMap, ObjectsIdx, StatesIdx};
 use crate::baseline::BaselineArgs;
@@ -16,6 +16,9 @@ use crate::object::{ObjectArgs, ObjectHandleArgs};
 use crate::primitive::StringArgs;
 use crate::state::{StateArgs, StateHandleArgs};
 use crate::{c, t};
+
+/// The dummy value that will be used for temporary `WIPOffset` values.
+const WIP_DUMMY: flatbuffers::UOffsetT = 1337;
 
 pub struct Serializer<'b> {
     fbb: FlatBufferBuilder<'static>,
@@ -106,34 +109,12 @@ impl<'b> Serializer<'b> {
                             )
                         }
                         // Handles will be serialized to a dummy value, and populated later
-                        DynTpPrimitiveRef::ObjectHandle(_) => {
-                            // Dummy value of 0
-                            let p = t::ObjectHandle::create(fbb, &ObjectHandleArgs { idx: 0 });
-                            t::State::create(
-                                fbb,
-                                &StateArgs {
-                                    p_type: t::TpPrimitive::tp_serialize_object_ObjectHandle,
-                                    p: Some(p.as_union_value()),
-                                },
-                            )
-                        }
-                        DynTpPrimitiveRef::ContractDataHandle(_) => {
-                            // Dummy value of 0
-                            let p = t::ContractDataHandle::create(
-                                fbb,
-                                &ContractDataHandleArgs { idx: 0 },
-                            );
-                            t::State::create(
-                                fbb,
-                                &StateArgs {
-                                    p_type:
-                                        t::TpPrimitive::tp_serialize_contract_ContractDataHandle,
-                                    p: Some(p.as_union_value()),
-                                },
-                            )
+                        DynTpPrimitiveRef::ObjectHandle(_)
+                        | DynTpPrimitiveRef::ContractDataHandle(_) => {
+                            WIPOffset::<t::State>::new(WIP_DUMMY)
                         }
                     },
-                    DynTpPropertyRef::Vec(_v) => todo!(),
+                    DynTpPropertyRef::Vec(_v) => todo!("Vectors not supported yet"),
                 };
                 self.states.push(state_t);
                 let idx = self.states.len() - 1;
@@ -223,20 +204,54 @@ impl<'b> Serializer<'b> {
     }
 
     pub fn finish(mut self) -> FlatBufferBuilder<'static> {
-        let fbb = &mut self.fbb;
         // Second pass to write the handle data. We will go back through the handles and
         // properly update their indices by using the `HandleMap`
-        for (object_state_handle, object_state_idx) in self.handle_map.object_states.iter() {
-            let object_handle = self
-                .baseline
-                .state(*object_state_handle)
-                .expect("Unexpectly had a missing handle")
-                .value;
-            // This is the index value we want to overwrite the dummy index with
-            let object_idx = self.handle_map[object_handle];
-            let wip_offset = self.states[object_state_idx.0];
-        }
+        macro_rules! rewrite_states {
+            ($handle_ident:ident, $map_field:expr, $handle_variant:expr $(,)?) => {
+                for (state_handle, state_idx) in $map_field.iter() {
+                    let referenced_idx = {
+                        let referenced_handle = self
+                            .baseline
+                            .state(*state_handle)
+                            .expect("Unexpectly had a missing handle")
+                            .value;
+                        self.handle_map[referenced_handle]
+                    };
 
+                    // Create the state flatbuffer
+                    let state_offset = paste::paste! {{
+                        let p = t::$handle_ident::create(
+                            &mut self.fbb,
+                            &[<$handle_ident Args>] {
+                                idx: referenced_idx.0 as _,
+                            },
+                        );
+                        t::State::create(
+                            &mut self.fbb,
+                            &StateArgs {
+                                p_type: $handle_variant,
+                                p: Some(p.as_union_value()),
+                            },
+                        )
+                    }};
+                    debug_assert_eq!(self.states[state_idx.0].value(), WIP_DUMMY);
+                    self.states[state_idx.0] = state_offset;
+                }
+            };
+        }
+        rewrite_states!(
+            ContractDataHandle,
+            self.handle_map.contract_states,
+            t::TpPrimitive::tp_serialize_contract_ContractDataHandle,
+        );
+        rewrite_states!(
+            ObjectHandle,
+            self.handle_map.object_states,
+            t::TpPrimitive::tp_serialize_object_ObjectHandle,
+        );
+
+        // Now we need to actually serialize all of these vectors into the final buffer
+        let fbb = &mut self.fbb;
         let baseline_t = {
             let contracts_t = fbb.create_vector_from_iter(self.contracts.into_iter());
             let states_t = fbb.create_vector_from_iter(self.states.into_iter());
