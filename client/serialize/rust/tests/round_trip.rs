@@ -3,8 +3,38 @@ use tp_serialize::{Deserializer, Serializer};
 use flatbuffers::FlatBufferBuilder;
 use tp_client::baseline::{Baseline, BaselineKind};
 use tp_client::contract::properties::dynamic::DynTpProperty;
-use tp_client::contract::Contract;
+use tp_client::contract::{Contract, ContractDataHandle, ContractId};
 use tp_contract_example::ExampleContract;
+
+struct EmptyContract {
+    handle: ContractDataHandle,
+}
+impl Contract for EmptyContract {
+    type States = ();
+
+    type Channels = ();
+
+    const ID: ContractId = ContractId {
+        name: "empty",
+        version: (0, 0, 0),
+    };
+
+    fn new(handle: tp_client::contract::ContractDataHandle) -> Self {
+        Self { handle }
+    }
+
+    fn states(&self) -> &Self::States {
+        &()
+    }
+
+    fn channels(&self) -> &Self::Channels {
+        &()
+    }
+
+    fn handle(&self) -> tp_client::contract::ContractDataHandle {
+        self.handle
+    }
+}
 
 #[derive(PartialEq, Debug, Clone)]
 struct Fields {
@@ -60,6 +90,12 @@ fn test_round_trip() {
 
 fn create_baseline(fields: &[Fields]) -> (ExampleContract, Baseline) {
     let mut b = Baseline::new(BaselineKind::Main);
+
+    let empty_c: EmptyContract = b.register_contract().expect("Faild to register contract");
+    let empty_obj = b
+        .object_create(&empty_c, [].into_iter(), [].into_iter())
+        .expect("Failed to create object");
+
     let c: ExampleContract = b.register_contract().expect("Failed to register contract");
 
     let mut objs = Vec::with_capacity(fields.len());
@@ -72,6 +108,8 @@ fn create_baseline(fields: &[Fields]) -> (ExampleContract, Baseline) {
             DynTpProperty::Primitive((f.f32_0).into()),
             DynTpProperty::Primitive((f.f32_1).into()),
             DynTpProperty::Primitive((f.str_0.to_owned()).into()),
+            DynTpProperty::Primitive(empty_obj.into()),
+            DynTpProperty::Primitive(empty_c.handle().into()),
         ];
         let obj = b
             .object_create(&c, states.into_iter(), [].into_iter())
