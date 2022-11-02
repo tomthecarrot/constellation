@@ -19,11 +19,13 @@
     <NoWarn>CS8629</NoWarn>
 
     <!-- This is our own property that determines the native library name. -->
-    <TpNativePrefix>$(MSBuildThisFileDirectory)..\..\..\target\debug\libunity_states</TpNativePrefix>
+    <TpNativeDir>$(MSBuildThisFileDirectory)..\..\..\target\debug</TpNativeDir>
+    <TpNativePrefix>unity_states</TpNativePrefix>
   </PropertyGroup>
 
   <!-- This automatically handles code generation needed by this library -->
   <Target Name="codegen" BeforeTargets="BeforeCompile" Condition="'$(CONSTELLATION_SKIP_CODEGEN)'!='true'">
+    <Message Text="test: $(TpNativeDir)\$(TpNativePrefix).dll" Importance="high" />
     <Message Text="Running code generators (wrapped)" Importance="high" />
     <Exec Command="cargo run -p cs_codegen -- -f" />
     <Message Text="Generating C headers" Importance="high" />
@@ -48,10 +50,10 @@
   -->
   <ItemGroup>
     <!-- Here, we use the previously defined property -->
-    <NativeLibs Include="$(TpNativePrefix).so*" />
-    <NativeLibs Include="$(TpNativePrefix).dylib*" />
-    <NativeLibs Include="$(TpNativePrefix).dll*" />
-    <NativeLibs Include="$(TpNativePrefix).a*" />
+    <NativeLibs Include="$(TpNativeDir)\$(TpNativePrefix).dll*" />
+    <NativeLibs Include="$(TpNativeDir)\lib$(TpNativePrefix).dylib*" />
+    <NativeLibs Include="$(TpNativeDir)\lib$(TpNativePrefix).so*" />
+    <NativeLibs Include="$(TpNativeDir)\lib$(TpNativePrefix).a*" />
 
     <None Include="@(NativeLibs)">
       <!-- <Pack>true</Pack> -->
