@@ -6,9 +6,11 @@ mod _dummy {
     use rsharp::remangle;
     use safer_ffi::prelude::*;
     use tp_client::contract::properties::states::id::c_api::{
-        StateId_F32, StateId_I8, StateId_String, StateId_U8,
+        StateId_ContractDataHandle, StateId_F32, StateId_I8, StateId_ObjectHandle, StateId_String,
+        StateId_U8,
     };
-    use tp_client::contract::states;
+    use tp_client::contract::{states, ContractDataHandle};
+    use tp_client::object::ObjectHandle;
 
     #[remangle(substitute!())]
     #[states]
@@ -23,6 +25,8 @@ mod _dummy {
         f32_0: f32,
         f32_1: f32,
         str_0: String,
+        oh_0: ObjectHandle,
+        ch_0: ContractDataHandle,
     }
 
     #[remangle(substitute!())]
@@ -65,6 +69,18 @@ mod _dummy {
     #[ffi_export]
     pub fn ExampleStates__str_0(s: &ExampleStates) -> repr_c::Box<StateId_String> {
         Box::new(StateId_String::from(s.str_0)).into()
+    }
+
+    #[remangle(substitute!())]
+    #[ffi_export]
+    pub fn ExampleStates__oh_0(s: &ExampleStates) -> repr_c::Box<StateId_ObjectHandle> {
+        Box::new(StateId_ObjectHandle::from(s.oh_0)).into()
+    }
+
+    #[remangle(substitute!())]
+    #[ffi_export]
+    pub fn ExampleStates__ch_0(s: &ExampleStates) -> repr_c::Box<StateId_ContractDataHandle> {
+        Box::new(StateId_ContractDataHandle::from(s.ch_0)).into()
     }
 }
 pub use _dummy::*;
