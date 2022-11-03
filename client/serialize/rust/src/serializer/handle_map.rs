@@ -44,24 +44,32 @@ impl HandleMap {
 impl Index<rs::ObjectHandle> for HandleMap {
     type Output = ObjectsIdx;
     fn index(&self, index: rs::ObjectHandle) -> &Self::Output {
-        self.objects.get_by_left(&index).expect("No such handle")
+        self.objects
+            .get_by_left(&index)
+            .expect("No such handle was serialized")
     }
 }
 impl Index<rs::ContractDataHandle> for HandleMap {
     type Output = ContractsIdx;
     fn index(&self, index: rs::ContractDataHandle) -> &Self::Output {
-        self.contracts.get_by_left(&index).expect("No such handle")
+        self.contracts
+            .get_by_left(&index)
+            .expect("No such handle was serialized")
     }
 }
 impl Index<ObjectsIdx> for HandleMap {
     type Output = rs::ObjectHandle;
     fn index(&self, index: ObjectsIdx) -> &Self::Output {
-        self.objects.get_by_right(&index).expect("No such handle")
+        self.objects
+            .get_by_right(&index)
+            .expect("No such handle was serialized")
     }
 }
 impl Index<ContractsIdx> for HandleMap {
     type Output = rs::ContractDataHandle;
     fn index(&self, index: ContractsIdx) -> &Self::Output {
-        self.contracts.get_by_right(&index).expect("No such handle")
+        self.contracts
+            .get_by_right(&index)
+            .expect("No such handle was serialized")
     }
 }

@@ -64,14 +64,17 @@ fn test_round_trip() {
         fields.push(f);
     }
 
-    let (contract, baseline) = create_baseline(&fields);
-    check_matches_fields(&fields, &contract, &baseline);
+    let (empty_contract, example_contract, baseline) = create_baseline(&fields);
+    check_matches_fields(&fields, &example_contract, &baseline);
 
     let bytes = {
         let mut serializer = Serializer::new(FlatBufferBuilder::new(), &baseline);
         serializer
-            .serialize(&contract)
-            .expect("Failed to serialize contract");
+            .serialize(&example_contract)
+            .expect("Failed to serialize ExampleContract");
+        serializer
+            .serialize(&empty_contract)
+            .expect("Failed to serialize EmptyContract");
         serializer.finish().finished_data().to_vec()
     };
     let (deserialized_contract, deserialized_baseline) = {
@@ -84,11 +87,11 @@ fn test_round_trip() {
     };
 
     check_matches_fields(&fields, &deserialized_contract, &deserialized_baseline);
-    check_matches_fields(&fields, &contract, &deserialized_baseline);
+    check_matches_fields(&fields, &example_contract, &deserialized_baseline);
     check_matches_fields(&fields, &deserialized_contract, &baseline);
 }
 
-fn create_baseline(fields: &[Fields]) -> (ExampleContract, Baseline) {
+fn create_baseline(fields: &[Fields]) -> (EmptyContract, ExampleContract, Baseline) {
     let mut b = Baseline::new(BaselineKind::Main);
 
     let empty_c: EmptyContract = b.register_contract().expect("Faild to register contract");
@@ -117,7 +120,7 @@ fn create_baseline(fields: &[Fields]) -> (ExampleContract, Baseline) {
         objs.push(obj);
     }
 
-    (c, b)
+    (empty_c, c, b)
 }
 
 fn check_matches_fields(fields: &[Fields], c: &ExampleContract, b: &Baseline) {
