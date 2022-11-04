@@ -6,10 +6,9 @@ using Gen = CppSharp.Generators;
 using DirectoryInfo = System.IO.DirectoryInfo;
 using Path = System.IO.Path;
 using System.Collections.Generic;
-using RtInfo = System.Runtime.InteropServices.RuntimeInformation;
 using IO = System.IO;
-using OS = System.Runtime.InteropServices.OSPlatform;
 using Exception = System.Exception;
+using System.Runtime.InteropServices;
 using CppSharp.AST;
 using CppSharp.Passes;
 
@@ -167,8 +166,19 @@ namespace Codegen
             options.GenerateInternalImports = true;
 #endif
 
+            // Adjust native library reference based on the current platform.
+            // CppSharp on Windows works only when explicitly passing the file extension.
+            string dllRef;
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                dllRef = $"{this.override_lib_name}.dll";
+            } else
+            {
+                dllRef = $"lib{this.override_lib_name}";
+            }
+
             var module = options.AddModule(this.override_lib_name);
-            module.Libraries.Add($"lib{this.override_lib_name}");
+            module.Libraries.Add(dllRef);
             module.OutputNamespace = this.lib_info.crate_name;
 
             module.IncludeDirs.Add(this.lib_info.input_dir.FullName);

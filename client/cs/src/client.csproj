@@ -50,6 +50,7 @@
   -->
   <ItemGroup>
     <!-- Here, we use the previously defined property -->
+    <!-- On Windows, there is no `lib` prefix. -->
     <NativeLibs Include="$(TpNativeDir)\$(TpNativePrefix).dll*" />
     <NativeLibs Include="$(TpNativeDir)\lib$(TpNativePrefix).dylib*" />
     <NativeLibs Include="$(TpNativeDir)\lib$(TpNativePrefix).so*" />
