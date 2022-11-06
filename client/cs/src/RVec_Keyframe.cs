@@ -20,7 +20,8 @@ namespace Teleportal.Client.Contract.Properties.Channels
 
         override protected void NativeDrop(struct_RVec_Keyframe_U8 inner)
         {
-            generated.__Internal.TpClientContractPropertiesChannelsRVecKeyframeU8Drop(inner);
+            // FIXME: this line errors at build-time on Windows.
+            // generated.__Internal.TpClientContractPropertiesChannelsRVecKeyframeU8Drop(inner);
         }
 
         public unsafe override void push(Keyframe_U8 e)

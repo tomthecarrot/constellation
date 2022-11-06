@@ -6,10 +6,11 @@ using Gen = CppSharp.Generators;
 using DirectoryInfo = System.IO.DirectoryInfo;
 using Path = System.IO.Path;
 using System.Collections.Generic;
-using RtInfo = System.Runtime.InteropServices.RuntimeInformation;
 using IO = System.IO;
-using OS = System.Runtime.InteropServices.OSPlatform;
 using Exception = System.Exception;
+using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
+using System.Linq;
 using CppSharp.AST;
 using CppSharp.Passes;
 
@@ -140,16 +141,27 @@ namespace Codegen
             // No need to copy if the output name is the same as the input
             if (this.lib_info.crate_name != this.override_lib_name)
             {
-                var directoryInfo = new DirectoryInfo(this.lib_info.cargo_artifact_dir.FullName);
-                var filesList = directoryInfo.GetFiles($"lib{this.lib_info.crate_name}.*");
-                foreach (var fileInfo in filesList)
-                {
-                    var lib_ext = fileInfo.Name.Split('.')[1];
+                // Find all native library files for the given name
+                var rgx = new Regex($"({this.lib_info.crate_name})[.](so|a|dylib|dll)");
+                var filesList = IO.Directory.GetFiles(this.lib_info.cargo_artifact_dir.FullName)
+                    .Where(path => rgx.IsMatch(path))
+                    .ToList();
 
-                    // Example: Copy `libtp_client.so` -> `libyolo.so`
+                foreach (var fileName in filesList)
+                {
+                    var lib_ext = fileName.Split('.')[1];
+
+                    // Only prepend `lib` for Windows DLLs.
+                    string libPrefix = (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && (lib_ext != "dll")) ? "lib" : "";
+
+                    // Examples:
+                    // Copy `libtp_client.so` -> `libyolo.so` for Android or Linux
+                    // Copy `libtp_client.a` -> `libyolo.a` for iOS
+                    // Copy `libtp_client.dylib` -> `libyolo.dylib` for macOS
+                    // Copy `tp_client.dll` -> `yolo.dll` for Windows
                     IO.File.Copy(
-                        $"{this.lib_info.cargo_artifact_dir.FullName}/lib{this.lib_info.crate_name}.{lib_ext}",
-                        $"{this.lib_info.cargo_artifact_dir.FullName}/lib{this.override_lib_name}.{lib_ext}",
+                        $"{this.lib_info.cargo_artifact_dir.FullName}/{libPrefix}{this.lib_info.crate_name}.{lib_ext}",
+                        $"{this.lib_info.cargo_artifact_dir.FullName}/{libPrefix}{this.override_lib_name}.{lib_ext}",
                         true // overwrite destination file if it already exists
                     );
                 }
@@ -167,8 +179,19 @@ namespace Codegen
             options.GenerateInternalImports = true;
 #endif
 
+            // Adjust native library reference based on the current platform.
+            // CppSharp on Windows works only when explicitly passing the file extension.
+            string dllRef;
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                dllRef = $"{this.override_lib_name}.dll";
+            } else
+            {
+                dllRef = $"lib{this.override_lib_name}";
+            }
+
             var module = options.AddModule(this.override_lib_name);
-            module.Libraries.Add($"lib{this.override_lib_name}");
+            module.Libraries.Add(dllRef);
             module.OutputNamespace = this.lib_info.crate_name;
 
             module.IncludeDirs.Add(this.lib_info.input_dir.FullName);

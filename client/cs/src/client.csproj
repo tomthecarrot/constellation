@@ -19,7 +19,8 @@
     <NoWarn>CS8629</NoWarn>
 
     <!-- This is our own property that determines the native library name. -->
-    <TpNativePrefix>$(MSBuildThisFileDirectory)..\..\..\target\debug\libunity_states</TpNativePrefix>
+    <TpNativeDir>$(MSBuildThisFileDirectory)..\..\..\target\debug</TpNativeDir>
+    <TpDllImportName>unity_states</TpDllImportName>
   </PropertyGroup>
 
   <!-- This automatically handles code generation needed by this library -->
@@ -48,10 +49,11 @@
   -->
   <ItemGroup>
     <!-- Here, we use the previously defined property -->
-    <NativeLibs Include="$(TpNativePrefix).so*" />
-    <NativeLibs Include="$(TpNativePrefix).dylib*" />
-    <NativeLibs Include="$(TpNativePrefix).dll*" />
-    <NativeLibs Include="$(TpNativePrefix).a*" />
+    <!-- On Windows, there is no `lib` prefix. -->
+    <NativeLibs Include="$(TpNativeDir)\$(TpDllImportName).dll*" />
+    <NativeLibs Include="$(TpNativeDir)\lib$(TpDllImportName).dylib*" />
+    <NativeLibs Include="$(TpNativeDir)\lib$(TpDllImportName).so*" />
+    <NativeLibs Include="$(TpNativeDir)\lib$(TpDllImportName).a*" />
 
     <None Include="@(NativeLibs)">
       <!-- <Pack>true</Pack> -->
