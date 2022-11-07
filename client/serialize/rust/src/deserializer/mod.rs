@@ -47,6 +47,8 @@ impl<'a> Deserializer<'a> {
                 return Err(eyre!("Already deserialized contract. ID: {:?}", C::ID));
             }
 
+            // Find the contrat table that matches `C::ID`
+            //
             // Deserialization would be faster if we searched for *all* contracts we
             // wanted to deserialize here, and not just an O(n) search for a single one.
             // But I'm punting this optimization until we know we need it.
@@ -55,6 +57,7 @@ impl<'a> Deserializer<'a> {
                 .enumerate()
                 .find(|(_idx, c)| {
                     // Using option to give us try operator.
+                    // Check that ID matches
                     || -> Option<()> {
                         let id = c.id()?;
                         (id.name()? == C::ID.name
