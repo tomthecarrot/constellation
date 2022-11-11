@@ -1,4 +1,4 @@
-mod handle_map;
+pub(crate) mod handle_map;
 
 use eyre::{eyre, Result, WrapErr};
 use flatbuffers::{FlatBufferBuilder, WIPOffset};
@@ -13,7 +13,7 @@ use self::handle_map::{ContractsIdx, HandleMap, ObjectsIdx, StatesIdx};
 use crate::baseline::BaselineArgs;
 use crate::contract::{ContractArgs, ContractDataHandleArgs, ContractIdArgs, ContractStatesArgs};
 use crate::object::{ObjectArgs, ObjectHandleArgs};
-use crate::primitive::StringArgs;
+use crate::primitive::FbStringArgs;
 use crate::state::{StateArgs, StateHandleArgs};
 use crate::{c, t};
 
@@ -99,11 +99,12 @@ impl<'b> Serializer<'b> {
                         DynTpPrimitiveRef::F64(&p) => helper!(F64, p),
                         DynTpPrimitiveRef::String(s) => {
                             let s = fbb.create_string(s.as_str());
-                            let p = t::primitive::String::create(fbb, &StringArgs { v: Some(s) });
+                            let p =
+                                t::primitive::FbString::create(fbb, &FbStringArgs { v: Some(s) });
                             t::State::create(
                                 fbb,
                                 &StateArgs {
-                                    p_type: t::TpPrimitive::String,
+                                    p_type: t::TpPrimitive::FbString,
                                     p: Some(p.as_union_value()),
                                 },
                             )

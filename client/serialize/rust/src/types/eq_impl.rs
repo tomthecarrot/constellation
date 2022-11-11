@@ -46,7 +46,7 @@ impl PartialEq<c::TpPropertyType> for crate::primitive::TpPrimitive {
             | (Self::Bool, Primitive(C::Bool))
             | (Self::F32, Primitive(C::F32))
             | (Self::F64, Primitive(C::F64))
-            | (Self::String, Primitive(C::String))
+            | (Self::FbString, Primitive(C::String))
             | (Self::tp_serialize_object_ObjectHandle, Primitive(C::ObjectHandle))
             | (Self::tp_serialize_contract_ContractDataHandle, Primitive(C::ContractDataHandle)) => {
                 true
@@ -75,7 +75,7 @@ impl PartialEq<crate::primitive::TpPrimitiveKind> for crate::primitive::TpPrimit
             | (Self::Bool, O::Bool)
             | (Self::F32, O::F32)
             | (Self::F64, O::F64)
-            | (Self::String, O::String)
+            | (Self::FbString, O::String)
             | (Self::tp_serialize_object_ObjectHandle, O::ObjectHandle)
             | (Self::tp_serialize_contract_ContractDataHandle, O::ContractDataHandle) => true,
             _ => false,
