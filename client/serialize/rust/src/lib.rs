@@ -47,7 +47,9 @@ mod t {
     pub use crate::primitive::TpPrimitiveKind;
     pub use crate::state::{State, StateHandle};
     pub mod primitive {
-        pub use crate::primitive::{Bool, String, F32, F64, I16, I32, I64, I8, U16, U32, U64, U8};
+        pub use crate::primitive::{
+            Bool, FbString, F32, F64, I16, I32, I64, I8, U16, U32, U64, U8,
+        };
     }
 }
 

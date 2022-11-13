@@ -1,3 +1,4 @@
+
 use bimap::BiHashMap;
 use eyre::{eyre, Result, WrapErr};
 use tp_client::baseline::BaselineKind;
@@ -189,7 +190,7 @@ impl<'a> Deserializer<'a> {
                         P::Bool => helper!(obj_state_t.p_as_bool().unwrap().v()),
                         P::F32 => helper!(obj_state_t.p_as_f32().unwrap().v()),
                         P::F64 => helper!(obj_state_t.p_as_f64().unwrap().v()),
-                        P::String => helper!(obj_state_t.p_as_string().unwrap().v().unwrap()),
+                        P::FbString => helper!(obj_state_t.p_as_fb_string().unwrap().v().unwrap()),
                         P::tp_serialize_object_ObjectHandle => {
                             obj_state_t
                                 .p_as_tp_serialize_object_object_handle()
