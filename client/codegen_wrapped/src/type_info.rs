@@ -156,7 +156,7 @@ type_info!(
     "Teleportal.Client.Object.ObjectHandle",
     false,
     "Teleportal.Client.Object.ObjectHandle",
-    O::Owned,
+    O::Ref,
 );
 type_info!(
     ContractDataHandle,
@@ -165,5 +165,5 @@ type_info!(
     "Teleportal.Client.Contract.ContractDataHandle",
     false,
     "Teleportal.Client.Contract.ContractDataHandle",
-    O::Owned,
+    O::Ref,
 );

@@ -37,7 +37,7 @@ public class BallContract : OpaqueWrapper<BallContract>
         get
         {
             var p = new Ptr<ContractDataHandle>(ffi.BallContract_handle(this.Inner.Value.p));
-            return new ContractDataHandle(p);
+            return new ContractDataHandle(p, OwnershipSemantics.SharedRef);
         }
     }
 
@@ -76,7 +76,7 @@ public class BallContract : OpaqueWrapper<BallContract>
             scale_x, scale_y, scale_z,
             color
         ));
-        return new ObjectHandle(p);
+        return new ObjectHandle(p, OwnershipSemantics.SharedRef);
     }
 
     public static void ObjectRemove(Baseline baseline, ContractDataHandle contract)
