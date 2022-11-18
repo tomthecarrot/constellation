@@ -8,7 +8,7 @@ namespace Teleportal.Client.Object
 {
     public sealed class ObjectHandle : OpaqueWrapper<ObjectHandle>
     {
-        public ObjectHandle(Ptr<ObjectHandle> inner) : base(inner, OwnershipSemantics.Owned) { }
+        public ObjectHandle(Ptr<ObjectHandle> inner) : base(inner, OwnershipSemantics.SharedRef) { }
 
         override protected void NativeDrop(Ptr<ObjectHandle> inner)
         {
