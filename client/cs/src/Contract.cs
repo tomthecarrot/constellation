@@ -8,7 +8,7 @@ namespace Teleportal.Client.Contract
 {
     public sealed class ContractDataHandle : OpaqueWrapper<ContractDataHandle>
     {
-        public ContractDataHandle(Ptr<ContractDataHandle> inner) : base(inner, OwnershipSemantics.Owned) { }
+        public ContractDataHandle(Ptr<ContractDataHandle> inner, OwnershipSemantics semantics) : base(inner, semantics) { }
 
         override protected void NativeDrop(Ptr<ContractDataHandle> inner)
         {

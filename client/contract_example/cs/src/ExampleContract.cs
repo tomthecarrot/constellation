@@ -44,7 +44,7 @@ namespace Teleportal.Example.Contract
                         this.Inner.Value.p
                     )
                 );
-                return new ContractDataHandle(p);
+                return new ContractDataHandle(p, OwnershipSemantics.Owned);
             }
         }
 
@@ -72,7 +72,7 @@ namespace Teleportal.Example.Contract
                 throw new OwnershipException("`str_0` must be owned");
             }
             var p = new Ptr<ObjectHandle>(generated.TpContractExampleExampleContractObjectCreate(this.Inner.Value.p, baseline.Inner.Value.p, u8_0, u8_1, i8_0, i8_1, f32_0, f32_1, str_0.StealInner().p));
-            return new ObjectHandle(p);
+            return new ObjectHandle(p, OwnershipSemantics.Owned);
         }
 
         public void ObjectRemove(Baseline baseline, ObjectHandle obj)
