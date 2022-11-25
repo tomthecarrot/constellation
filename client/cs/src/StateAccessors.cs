@@ -129,7 +129,7 @@ namespace Teleportal.Client
             var p = new Ptr<States.State_ObjectHandle>(
                 ffi.TpClientBaselineBaselineStateObjectHandle(this.Inner.Value.p, state_handle.Inner.Value.p)
             );
-            return new States.State_ObjectHandle(p, OwnershipSemantics.Owned);
+            return new States.State_ObjectHandle(p, OwnershipSemantics.SharedRef);
         }
 
         public States.State_String StateMut(States.StateHandle_String state_handle)
