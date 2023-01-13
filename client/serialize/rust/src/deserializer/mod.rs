@@ -1,26 +1,24 @@
 mod a;
 
-use bimap::BiHashMap;
 use eyre::{eyre, Result, WrapErr};
 use tp_client::baseline::BaselineKind;
 use tp_client::contract::properties::dynamic::{DynTpPrimitive, DynTpProperty};
 use tp_client::contract::properties::states::IStates;
 
+use crate::serializer::handle_map::HandleMap;
 use crate::{c, t};
 
 pub struct Deserializer<'a> {
     data: &'a [u8],
     baseline: c::Baseline,
-    contract_idxs: BiHashMap<c::ContractId, usize>,
-    contract_data_handles: BiHashMap<c::ContractId, c::ContractDataHandle>,
+    handle_map: HandleMap,
 }
 impl<'a> Deserializer<'a> {
     pub fn new(data: &'a [u8], baseline_kind: BaselineKind) -> Self {
         Self {
             data,
             baseline: c::Baseline::new(baseline_kind),
-            contract_idxs: Default::default(),
-            contract_data_handles: Default::default(),
+            handle_map: HandleMap::default(),
         }
     }
 
@@ -47,44 +45,15 @@ impl<'a> Deserializer<'a> {
                 return Err(eyre!("Already deserialized contract. ID: {:?}", C::ID));
             }
 
-            // Find the contrat table that matches `C::ID`
+            // Find the contract table that matches `C::ID`
             //
             // Deserialization would be faster if we searched for *all* contracts we
             // wanted to deserialize here, and not just an O(n) search for a single one.
             // But I'm punting this optimization until we know we need it.
-            let (contract_idx, _contract_t) = contracts_t
+            let (contract_idx, contract_t) = contracts_t
                 .into_iter()
                 .enumerate()
-                .find(|(_idx, c)| {
-                    // Using option to give us try operator.
-                    // Check that ID matches
-                    || -> Option<()> {
-                        let id = c.id()?;
-                        (id.name()? == C::ID.name
-                            && (id.v_major(), id.v_minor(), id.v_patch()) == C::ID.version)
-                            .then_some(())
-                    }()
-                    // Check that properties match
-                    .and_then(|_| {
-                        let states_t = c.states()?;
-                        let nfields = C::States::field_names().len();
-                        let names = states_t.names()?;
-                        let types = states_t.types()?;
-                        // Lengths match?
-                        (names.len() == nfields && types.len() == nfields).then_some(())?;
-                        // Names match?
-                        std::iter::zip(C::States::field_names().into_iter(), names.iter())
-                            .all(|(a, b)| *a == b)
-                            .then_some(())?;
-                        // Types match?
-                        std::iter::zip(C::States::enumerate_types().into_iter(), types.iter())
-                            .all(|(a, b)| *a == b)
-                            .then_some(())?;
-
-                        Some(())
-                    })
-                    .is_some()
-                })
+                .find(|(_idx, c)| contracts_match::<C>(*c))
                 .ok_or(eyre!("Coult not find a matching contract!"))?;
 
             let contract: C = self.baseline.register_contract()?;
@@ -236,4 +205,34 @@ impl<'a> Deserializer<'a> {
     pub fn finish(self) -> c::Baseline {
         self.baseline
     }
+}
+
+/// Check that contract ID and types match
+fn contracts_match<C: c::Contract>(contract_t: t::Contract) -> bool {
+    let c = contract_t;
+    // Option gives us try operator
+    // Check that IDs match
+    || -> Option<()> {
+        let id = c.id()?;
+        (id.name()? == C::ID.name && (id.v_major(), id.v_minor(), id.v_patch()) == C::ID.version)
+            .then_some(())
+    }()
+    // Check that properties match
+    .and_then(|_| {
+        let states_t = c.states()?;
+        let nfields = C::States::field_names().len();
+        let names = states_t.names()?;
+        let types = states_t.types()?;
+        // Lengths match?
+        (names.len() == nfields && types.len() == nfields).then_some(())?;
+        // Names match?
+        std::iter::zip(C::States::field_names().into_iter(), names.iter())
+            .all(|(a, b)| *a == b)
+            .then_some(())?;
+        // Types match?
+        std::iter::zip(C::States::enumerate_types().into_iter(), types.iter())
+            .all(|(a, b)| *a == b)
+            .then_some(())
+    })
+    .is_some()
 }
