@@ -29,17 +29,17 @@ pub use self::serializer::Serializer;
 
 mod types;
 
-/// The types related to the tp_client
-mod c {
+/// The types related to the tp_client rust library
+mod rs {
     pub use tp_client::baseline::Baseline;
     pub use tp_client::contract::properties::dynamic::{TpPrimitiveType, TpPropertyType};
-    pub use tp_client::contract::properties::states::StateHandle;
+    pub use tp_client::contract::properties::states::{DynStateHandle, StateHandle};
     pub use tp_client::contract::{Contract, ContractData, ContractDataHandle, ContractId};
     pub use tp_client::object::ObjectHandle;
 }
 
 /// The types related to the flatbuffer
-mod t {
+mod fb {
     pub use crate::baseline::Baseline;
     pub use crate::contract::{Contract, ContractDataHandle, ContractId, ContractStates};
     pub use crate::object::{Object, ObjectHandle};

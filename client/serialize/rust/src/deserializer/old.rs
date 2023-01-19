@@ -4,19 +4,19 @@ use tp_client::baseline::BaselineKind;
 use tp_client::contract::properties::dynamic::{DynTpPrimitive, DynTpProperty};
 use tp_client::contract::properties::states::IStates;
 
-use crate::{c, t};
+use crate::{fb, rs};
 
 pub struct Deserializer<'a> {
     data: &'a [u8],
-    baseline: c::Baseline,
-    contract_idxs: BiHashMap<c::ContractId, usize>,
-    contract_data_handles: BiHashMap<c::ContractId, c::ContractDataHandle>,
+    baseline: rs::Baseline,
+    contract_idxs: BiHashMap<rs::ContractId, usize>,
+    contract_data_handles: BiHashMap<rs::ContractId, rs::ContractDataHandle>,
 }
 impl<'a> Deserializer<'a> {
     pub fn new(data: &'a [u8], baseline_kind: BaselineKind) -> Self {
         Self {
             data,
-            baseline: c::Baseline::new(baseline_kind),
+            baseline: rs::Baseline::new(baseline_kind),
             contract_idxs: Default::default(),
             contract_data_handles: Default::default(),
         }
@@ -24,8 +24,8 @@ impl<'a> Deserializer<'a> {
 
     /// Deserialize all objects related to contract `C`. Usually, this gets called
     /// once per relevant contract.
-    pub fn deserialize<C: c::Contract>(&mut self) -> Result<C> {
-        let baseline_t = flatbuffers::root::<t::Baseline>(self.data)
+    pub fn deserialize<C: rs::Contract>(&mut self) -> Result<C> {
+        let baseline_t = flatbuffers::root::<fb::Baseline>(self.data)
             .wrap_err("Error while verifying flatbuffer")?;
 
         // Validate and register the contract
@@ -103,7 +103,7 @@ impl<'a> Deserializer<'a> {
 
             // Filter to just the objects that match our contract
             // usize is the index into the flatbuffer's `Baseline.states` vec.
-            let matching_objects: Vec<(usize, t::Object)> = objects_t
+            let matching_objects: Vec<(usize, fb::Object)> = objects_t
                 .into_iter()
                 .enumerate()
                 .filter(|(_idx, obj)| {
@@ -175,7 +175,7 @@ impl<'a> Deserializer<'a> {
                     }
 
                     // Handle dynamic typing of union to access the property
-                    use t::TpPrimitive as P;
+                    use fb::TpPrimitive as P;
                     #[allow(unreachable_code)]
                     match obj_state_t.p_type() {
                         P::U8 => helper!(obj_state_t.p_as_u8().unwrap().v()),
@@ -228,7 +228,7 @@ impl<'a> Deserializer<'a> {
 
     /// Finish deserialization, and return the [`c::Baseline`] with the deserialized
     /// results.
-    pub fn finish(self) -> c::Baseline {
+    pub fn finish(self) -> rs::Baseline {
         self.baseline
     }
 }

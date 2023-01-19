@@ -45,3 +45,81 @@
 //!    deserialized `ObjectHandle`.
 //! 7. Delete the null contract and its null object.
 //! 8. Everything should be deserialized in the baseline now. Return the baseline to the caller.
+
+use bimap::BiHashMap;
+use std::collections::HashMap;
+
+use crate::rs;
+use crate::types::{ContractsIdx, ObjectsIdx, StatesIdx};
+
+/// Tracks the relationships between indicies in the flatbuffer and instantiated
+/// contracts in the baseline.
+struct InstantiatedContracts(BiHashMap<ContractsIdx, rs::ContractDataHandle>);
+impl InstantiatedContracts {
+    /// None if the contract wasn't instantiated yet.
+    fn get_handle(&self, idx: ContractsIdx) -> Option<rs::ContractDataHandle> {
+        self.0.get_by_left(&idx).copied()
+    }
+
+    fn get_idx(&self, handle: rs::ContractDataHandle) -> ContractsIdx {
+        self.0
+            .get_by_right(&handle)
+            .copied()
+            .expect("Only instantiated contract handles should have been used. Howmst")
+    }
+}
+
+/// Tracks the relationships between indicies in the flatbuffer and instantiated states
+/// in the baseline. This assumes that all `State<ObjectHandle>`s in the baseline are
+/// supposed to point to the null object at this stage in deserialization.
+struct InstantiatedStates {
+    /// All instantiated states, including ones that reference null objects.
+    instantiations: BiHashMap<StatesIdx, rs::DynStateHandle>,
+    /// A mapping of null states to the objects in the flatbuffer they are supposed
+    /// to reference.
+    null_map: HashMap<rs::StateHandle<rs::ObjectHandle>, ObjectsIdx>,
+}
+impl InstantiatedStates {
+    /// `None` if the contract wasn't instantiated yet.
+    fn get_handle(&self, idx: StatesIdx) -> Option<rs::DynStateHandle> {
+        self.instantiations.get_by_left(&idx).copied()
+    }
+
+    fn get_idx(&self, handle: rs::DynStateHandle) -> StatesIdx {
+        self.instantiations
+            .get_by_right(&handle)
+            .copied()
+            .expect("Only instantiated state handles should have been used. Howmst?")
+    }
+
+    fn is_null_idx(&self, idx: StatesIdx) -> bool {
+        let h = self
+            .get_handle(idx)
+            .expect("idx has no corresponding handle.");
+        self.is_null_handle(h)
+    }
+
+    fn is_null_handle(&self, handle: rs::DynStateHandle) -> bool {
+        use tp_client::contract::properties::states::dyn_handle::DynStateHandlePrimitive as P;
+        use tp_client::contract::properties::states::DynStateHandle;
+        let h = match handle {
+            DynStateHandle::Primitive(p) => match p {
+                P::ObjectHandle(h) => h,
+                _ => return false,
+            },
+            DynStateHandle::Vec(_) => panic!("unsupported"),
+        };
+        assert!(
+            self.null_map.contains_key(&h),
+            "this is a bug: All object handles should be null"
+        );
+        return true;
+    }
+
+    fn get_original_idx(&self, handle: rs::StateHandle<rs::ObjectHandle>) -> ObjectsIdx {
+        self.null_map
+            .get(&handle)
+            .copied()
+            .expect("`handle` should have been present in the list of null states, but wasnt")
+    }
+}
