@@ -2,7 +2,7 @@ use bimap::BiHashMap;
 use std::collections::HashMap;
 
 use crate::rs;
-use crate::types::{ContractsIdx, ObjectsIdx, StatesIdx};
+use crate::types::{ObjectsIdx, StatesIdx};
 
 /// Tracks the relationships between indicies in the flatbuffer and instantiated states
 /// in the baseline. This assumes that all `State<ObjectHandle>`s in the baseline are

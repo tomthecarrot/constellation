@@ -47,39 +47,140 @@
 //! 8. Everything should be deserialized in the baseline now. Return the baseline to the caller.
 
 mod contracts;
+mod null_contract;
+mod objects;
 mod states;
 
 use self::contracts::InstantiatedContracts;
+use self::null_contract::NullContract;
+use self::objects::InstantiatedObjects;
 use self::states::InstantiatedStates;
-use crate::rs;
 use crate::types::ContractsIdx;
+use crate::{fb, rs};
 
-pub struct Deserializer {
-    //
-}
+use eyre::{eyre, Result, WrapErr};
+use tp_client::contract::properties::states::IStates;
 
-pub struct DeserializerBuilder<'a> {
+pub struct Deserializer<'a> {
     b: rs::Baseline,
     contracts: InstantiatedContracts,
-    bytes: &'a [u8],
+    data: &'a [u8],
+    baseline_t: fb::Baseline<'a>,
+    null_contract: NullContract,
+    null_obj: rs::ObjectHandle,
 }
-impl<'a> DeserializerBuilder<'a> {
-    pub fn new(bytes: &'a [u8], kind: rs::BaselineKind) -> Self {
-        Self {
-            b: rs::Baseline::new(kind),
+impl<'a> Deserializer<'a> {
+    pub fn new(data: &'a [u8], kind: rs::BaselineKind) -> Result<Self> {
+        let baseline_t =
+            flatbuffers::root::<fb::Baseline>(data).wrap_err("Error while verifying flatbuffer")?;
+
+        let mut b = rs::Baseline::new(kind);
+        let null_contract: NullContract = b.register_contract().unwrap();
+        let null_obj = b
+            .object_create(&null_contract, [].into_iter(), [].into_iter())
+            .unwrap();
+
+        Ok(Deserializer {
+            b,
             contracts: InstantiatedContracts::new(),
-            bytes,
-        }
+            data,
+            baseline_t,
+            null_contract,
+            null_obj,
+        })
     }
-    pub fn register_contract<C: rs::Contract>(&mut self) -> C {
-        // Check that the contract exists in the flatbuffer somewhere, and get its index
-        let idx: ContractsIdx = { todo!() };
-        let c = self
+
+    /// Call this once for each contract.
+    pub fn register_contract<C: rs::Contract>(&mut self) -> Result<C> {
+        // Yes this is not super efficient. But who cares, this is the simplest to understand.
+        let idx = find_matching_contract::<C>(self.baseline_t)
+            .wrap_err("Failed to find matching contract")?;
+        let contract = self
             .b
             .register_contract::<C>()
-            .expect("Contract already existed");
-        let handle = c.handle();
+            .wrap_err("Contract already existed")?;
+        let handle = contract.handle();
         self.contracts.register_contract(idx, handle);
-        c
+        Ok(contract)
     }
+
+    /// Finishes serialization.
+    pub fn finish(mut self) -> Result<rs::Baseline> {
+        let instantiated_states = self
+            .deserialize_states()
+            .wrap_err("Error while deserializing states")?;
+        let instantiated_objects = self
+            .deserialize_objects(&instantiated_states)
+            .wrap_err("Error while deserializing objects")?;
+        self.fix_null_states(&instantiated_states, &instantiated_objects);
+
+        use rs::Contract;
+        self.b
+            .unregister_contract::<NullContract>(self.null_contract.handle())
+            .wrap_err("Could not remove NullContract")?;
+        Ok(self.b)
+    }
+
+    /// Deserializes all states into the baseline. `State<ObjectHandle>`s will point to the null
+    /// object. Metadata about the states is stored in `InstantiatedStates`
+    fn deserialize_states(&mut self) -> Result<InstantiatedStates> {
+        todo!()
+    }
+
+    /// Deserializes all objects into the baseline.
+    fn deserialize_objects(&mut self, states: &InstantiatedStates) -> Result<InstantiatedObjects> {
+        todo!()
+    }
+
+    /// Takes all deserialized states that hold the null object's handle, and sets them to their
+    /// correct target object based on what was originally in the flatbuffer.
+    fn fix_null_states(&mut self, states: &InstantiatedStates, objects: &InstantiatedObjects) {
+        todo!()
+    }
+}
+
+fn find_matching_contract<C: rs::Contract>(baseline_t: fb::Baseline) -> Result<ContractsIdx> {
+    // Check that the contract exists in the flatbuffer somewhere, and get its index
+    let Some(contracts_t) = baseline_t.contracts() else {
+        return Err(eyre!("There are no contracts to deserialize"));
+    };
+
+    // Deserialization would be faster if we searched for *all* contracts we
+    // wanted to deserialize here, and not just an O(n) search for a single one.
+    // But I'm punting this optimization until we know we need it.
+    let (contract_idx, _contract_t) = contracts_t
+        .into_iter()
+        .enumerate()
+        .find(|(_idx, c)| {
+            // Using option to give us try operator.
+            || -> Option<()> {
+                let id = c.id()?;
+                (id.name()? == C::ID.name
+                    && (id.v_major(), id.v_minor(), id.v_patch()) == C::ID.version)
+                    .then_some(())
+            }()
+            // Check that properties match
+            .and_then(|_| {
+                let states_t = c.states()?;
+                let nfields = C::States::field_names().len();
+                let names = states_t.names()?;
+                let types = states_t.types()?;
+                // Lengths match?
+                (names.len() == nfields && types.len() == nfields).then_some(())?;
+                // Names match?
+                std::iter::zip(C::States::field_names().into_iter(), names.iter())
+                    .all(|(a, b)| *a == b)
+                    .then_some(())?;
+                // Types match?
+                std::iter::zip(C::States::enumerate_types().into_iter(), types.iter())
+                    .all(|(a, b)| *a == b)
+                    .then_some(())?;
+
+                Some(())
+            })
+            .is_some()
+        })
+        .ok_or(eyre!("Coult not find a matching contract!"))?;
+
+    Ok(ContractsIdx(contract_idx))
 }

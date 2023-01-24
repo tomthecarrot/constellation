@@ -6,10 +6,18 @@ use crate::types::ContractsIdx;
 /// Tracks the relationships between indicies in the flatbuffer and instantiated
 /// contracts in the baseline.
 #[derive(Debug, Default)]
-pub struct InstantiatedContracts(BiHashMap<ContractsIdx, rs::ContractDataHandle>);
+pub struct InstantiatedContracts(pub BiHashMap<ContractsIdx, rs::ContractDataHandle>);
 impl InstantiatedContracts {
     pub fn new() -> Self {
         Self::default()
+    }
+
+    pub fn is_registered_handle(&self, handle: rs::ContractDataHandle) -> bool {
+        self.0.contains_right(&handle)
+    }
+
+    pub fn is_registered_idx(&self, idx: ContractsIdx) -> bool {
+        self.0.contains_left(&idx)
     }
 
     /// None if the contract wasn't instantiated yet.
