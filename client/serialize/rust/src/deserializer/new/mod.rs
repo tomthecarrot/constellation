@@ -351,6 +351,11 @@ impl<'a> Deserializer<'a> {
         }
 
         let mut dyn_props: Vec<DynTpProperty> = Vec::new();
+        // Used to track which states are null states temporarily. We don't have the
+        // `rs::StateHandle` for the state until after we construct the object, so this
+        // will be used after object construction to re-associate these `StatesIdx`
+        // with the `rs::StateHandle`.
+        let mut null_states: Vec<(rs::StateId<rs::ObjectHandle>, StatesIdx)> = Vec::new();
         for obj_state_idx in obj_states.into_iter() {
             let obj_state_t = self.b.base_t.states().unwrap().get(obj_state_idx.0);
             // Handle dynamic typing of union to access the property
@@ -370,7 +375,20 @@ impl<'a> Deserializer<'a> {
                 P::F64 => helper!(obj_state_t.p_as_f64().unwrap().v()),
                 P::FbString => helper!(obj_state_t.p_as_fb_string().unwrap().v().unwrap()),
                 P::tp_serialize_object_ObjectHandle => {
-                    todo!("Need to save the original referenced state in inst_states");
+                    // Figure out what object was referenced in the state, and track it.
+                    let referenced_obj_handle_t: fb::ObjectHandle = obj_state_t
+                        .p_as_tp_serialize_object_object_handle()
+                        .unwrap();
+                    let referenced_obj_idx =
+                        ObjectsIdx(usize::try_from(referenced_obj_handle_t.idx()).unwrap());
+                    self.inst_states
+                        .track_obj_reference(obj_state_idx, referenced_obj_idx)?;
+
+                    // Mark our state as a null state.
+                    let state_id: rs::StateId<rs::ObjectHandle> =
+                        todo!("get stateid from index into object's states list");
+                    null_states.push((state_id, obj_state_idx));
+
                     // Set to the null object
                     DynTpProperty::Primitive(DynTpPrimitive::ObjectHandle(self.b.null_obj))
                 }
@@ -398,6 +416,18 @@ impl<'a> Deserializer<'a> {
             .base
             .object_create(contract, dyn_props.into_iter(), [].into_iter())
             .wrap_err("failed to create object")?;
+
+        // Go back through all marked null states and actually associate their idx with
+        // their handle.
+        for (null_state_id, null_state_idx) in null_states {
+            let null_state_handle: rs::StateHandle<rs::ObjectHandle> = self
+                .b
+                .base
+                .bind_state(null_state_id, new_obj_handle)
+                .expect("impossible: we already serialized the state");
+            self.inst_states
+                .track_instantiated_state(null_state_idx, null_state_handle)?;
+        }
 
         self.inst_objects.add_object(new_obj_handle, obj.idx);
 
