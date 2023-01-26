@@ -32,7 +32,7 @@ impl InstantiatedContracts {
             .expect("Only instantiated contract handles should have been used. Howmst")
     }
 
-    pub fn register_contract(&mut self, idx: ContractsIdx, handle: rs::ContractDataHandle) {
+    pub fn add_contract(&mut self, idx: ContractsIdx, handle: rs::ContractDataHandle) {
         assert!(matches!(
             self.0.insert(idx, handle),
             bimap::Overwritten::Neither

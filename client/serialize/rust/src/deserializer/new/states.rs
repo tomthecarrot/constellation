@@ -7,6 +7,7 @@ use crate::types::{ObjectsIdx, StatesIdx};
 /// Tracks the relationships between indicies in the flatbuffer and instantiated states
 /// in the baseline. This assumes that all `State<ObjectHandle>`s in the baseline are
 /// supposed to point to the null object at this stage in deserialization.
+#[derive(Default)]
 pub struct InstantiatedStates {
     /// All instantiated states, including ones that reference null objects.
     pub instantiations: BiHashMap<StatesIdx, rs::DynStateHandle>,
@@ -15,6 +16,10 @@ pub struct InstantiatedStates {
     pub null_map: HashMap<rs::StateHandle<rs::ObjectHandle>, ObjectsIdx>,
 }
 impl InstantiatedStates {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     /// `None` if the contract wasn't instantiated yet.
     pub fn get_handle(&self, idx: StatesIdx) -> Option<rs::DynStateHandle> {
         self.instantiations.get_by_left(&idx).copied()
