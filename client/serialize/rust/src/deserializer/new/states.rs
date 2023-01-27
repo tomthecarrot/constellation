@@ -75,4 +75,12 @@ impl InstantiatedStates {
             .copied()
             .expect("State was never tracked!")
     }
+
+    pub fn iter(
+        &self,
+    ) -> impl Iterator<Item = (StatesIdx, rs::StateHandle<rs::ObjectHandle>, ObjectsIdx)> + '_ {
+        self.states
+            .iter()
+            .map(|(s_idx, h)| (*s_idx, *h, self.get_obj_ref_idx(*s_idx)))
+    }
 }

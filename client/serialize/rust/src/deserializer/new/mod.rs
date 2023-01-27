@@ -161,7 +161,13 @@ impl<'a> Deserializer<'a> {
 
     pub fn finish(mut self) -> Result<rs::Baseline> {
         use rs::Contract;
-        self.fix_null_states();
+        /// Takes all deserialized states that hold the null object's handle, and sets them to their
+        /// correct target object based on what was originally in the flatbuffer.
+        for (s_idx, s_handle, o_idx) in self.inst_states.iter() {
+            let o_handle: rs::ObjectHandle = self.inst_objects.get_handle(o_idx);
+            let state_ref: &mut rs::State<_> = self.b.base.state_mut(s_handle).unwrap();
+            state_ref.value = o_handle;
+        }
 
         // This should also remove the null object
         self.b
@@ -170,12 +176,6 @@ impl<'a> Deserializer<'a> {
             .wrap_err("Could not remove NullContract")?;
 
         Ok(self.b.base)
-    }
-
-    /// Takes all deserialized states that hold the null object's handle, and sets them to their
-    /// correct target object based on what was originally in the flatbuffer.
-    fn fix_null_states(&mut self) {
-        todo!()
     }
 }
 
