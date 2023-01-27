@@ -1,8 +1,8 @@
 pub use tp_contract_macro::{channels, states};
 pub mod properties;
 
-use crate::contract::properties::channels::{ChannelsIter, IChannels};
-use crate::contract::properties::states::{IStates, StatesIter};
+use crate::contract::properties::channels::{ChannelsIter, DynChannelId, IChannels};
+use crate::contract::properties::states::{DynStateId, IStates, StatesIter};
 use crate::object::ObjectHandle;
 
 #[cfg(feature = "c_api")]
@@ -52,6 +52,22 @@ pub trait Contract {
     }
     fn chan_iter(&self) -> ChannelsIter<Self::Channels> {
         ChannelsIter::new(self.handle())
+    }
+
+    /// Returns `None` if there is no state at that index.
+    fn state_id(&self, idx: usize) -> Option<DynStateId> {
+        Self::States::enumerate_types()
+            .get(idx)
+            .copied()
+            .map(|prop_type| DynStateId::new(self.handle(), idx, prop_type))
+    }
+
+    /// Returns `None` if there is no channel at that index.
+    fn chan_id(&self, idx: usize) -> Option<DynChannelId> {
+        Self::Channels::enumerate_types()
+            .get(idx)
+            .copied()
+            .map(|prop_type| DynChannelId::new(self.handle(), idx, prop_type))
     }
 }
 
