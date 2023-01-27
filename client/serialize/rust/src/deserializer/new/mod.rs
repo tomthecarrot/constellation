@@ -60,7 +60,8 @@ use crate::{fb, rs};
 
 use eyre::{eyre, Result, WrapErr};
 use tp_client::contract::properties::dynamic::{DynTpPrimitive, DynTpProperty};
-use tp_client::contract::properties::states::IStates;
+use tp_client::contract::properties::states::id::DynStateIdPrimitive;
+use tp_client::contract::properties::states::{DynStateId, IStates};
 
 pub struct DeserializerBuilder<'a> {
     base: rs::Baseline,
@@ -336,6 +337,11 @@ impl<'a> Deserializer<'a> {
     ) -> Result<()> {
         // TODO: This could be an array if we had a const for `C`'s number of states.
         let mut obj_states: Vec<StatesIdx> = Vec::new();
+        assert_eq!(
+            obj_states.len(),
+            C::States::enumerate_types().len(),
+            "sanity check"
+        );
         if let Some(obj_states_t) = obj.t.states() {
             obj_states.extend(
                 obj_states_t
@@ -356,7 +362,7 @@ impl<'a> Deserializer<'a> {
         // will be used after object construction to re-associate these `StatesIdx`
         // with the `rs::StateHandle`.
         let mut null_states: Vec<(rs::StateId<rs::ObjectHandle>, StatesIdx)> = Vec::new();
-        for obj_state_idx in obj_states.into_iter() {
+        for (state_id, obj_state_idx) in contract.state_iter().zip(obj_states.into_iter()) {
             let obj_state_t = self.b.base_t.states().unwrap().get(obj_state_idx.0);
             // Handle dynamic typing of union to access the property
             use fb::TpPrimitive as P;
@@ -384,9 +390,10 @@ impl<'a> Deserializer<'a> {
                     self.inst_states
                         .track_obj_reference(obj_state_idx, referenced_obj_idx)?;
 
+                    let DynStateId::Primitive(DynStateIdPrimitive::ObjectHandle(state_id)) = state_id else {
+                        unreachable!("We already validated that the state type should match the contract");
+                    };
                     // Mark our state as a null state.
-                    let state_id: rs::StateId<rs::ObjectHandle> =
-                        todo!("get stateid from index into object's states list");
                     null_states.push((state_id, obj_state_idx));
 
                     // Set to the null object
