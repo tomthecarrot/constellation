@@ -337,12 +337,13 @@ impl<'a> Deserializer<'a> {
     ) -> Result<()> {
         // TODO: This could be an array if we had a const for `C`'s number of states.
         let mut obj_states: Vec<StatesIdx> = Vec::new();
-        assert_eq!(
-            obj_states.len(),
-            C::States::enumerate_types().len(),
-            "sanity check"
-        );
         if let Some(obj_states_t) = obj.t.states() {
+            assert_eq!(
+                obj_states_t.len(),
+                C::States::enumerate_types().len(),
+                "sanity check"
+            );
+
             obj_states.extend(
                 obj_states_t
                     .into_iter()
