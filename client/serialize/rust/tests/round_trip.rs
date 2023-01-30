@@ -67,7 +67,7 @@ fn test_round_trip() -> eyre::Result<()> {
 
     let (empty_contract, example_contract, baseline) = create_baseline(&fields);
     check_matches_fields(&fields, &example_contract, &baseline)
-        .wrap_err("`create_baseline` doesn't seem to be correct.");
+        .wrap_err("`create_baseline` doesn't seem to be correct.")?;
 
     let bytes = {
         let mut serializer = Serializer::new(FlatBufferBuilder::new(), &baseline);
@@ -89,7 +89,7 @@ fn test_round_trip() -> eyre::Result<()> {
 
         deserializer
             .deserialize_objects(&deserialized_contract)
-            .wrap_err("Failed to deserialize objects in ExampleContract");
+            .wrap_err("Failed to deserialize objects in ExampleContract")?;
 
         let deserialized_baseline = deserializer
             .finish()
