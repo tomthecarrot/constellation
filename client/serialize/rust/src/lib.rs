@@ -22,7 +22,7 @@ dynpath::wrap! {
 pub use self::generated::tp_serialize::*;
 
 mod deserializer;
-pub use self::deserializer::Deserializer;
+pub use self::deserializer::{Deserializer, DeserializerBuilder};
 
 mod serializer;
 pub use self::serializer::Serializer;

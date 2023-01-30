@@ -161,8 +161,8 @@ impl<'a> Deserializer<'a> {
 
     pub fn finish(mut self) -> Result<rs::Baseline> {
         use rs::Contract;
-        /// Takes all deserialized states that hold the null object's handle, and sets them to their
-        /// correct target object based on what was originally in the flatbuffer.
+        // Takes all deserialized states that hold the null object's handle, and sets them to their
+        // correct target object based on what was originally in the flatbuffer.
         for (s_idx, s_handle, o_idx) in self.inst_states.iter() {
             let o_handle: rs::ObjectHandle = self.inst_objects.get_handle(o_idx);
             let state_ref: &mut rs::State<_> = self.b.base.state_mut(s_handle).unwrap();
