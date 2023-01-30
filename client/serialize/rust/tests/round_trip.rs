@@ -1,5 +1,6 @@
-use tp_serialize::{Deserializer, Serializer};
+use tp_serialize::{Deserializer, DeserializerBuilder, Serializer};
 
+use eyre::WrapErr;
 use flatbuffers::FlatBufferBuilder;
 use tp_client::baseline::{Baseline, BaselineKind};
 use tp_client::contract::properties::dynamic::DynTpProperty;
@@ -48,7 +49,7 @@ struct Fields {
 }
 
 #[test]
-fn test_round_trip() {
+fn test_round_trip() -> eyre::Result<()> {
     let mut fields = Vec::new();
     for i in 0..10 {
         let f = Fields {
@@ -65,30 +66,42 @@ fn test_round_trip() {
     }
 
     let (empty_contract, example_contract, baseline) = create_baseline(&fields);
-    check_matches_fields(&fields, &example_contract, &baseline);
+    check_matches_fields(&fields, &example_contract, &baseline)
+        .wrap_err("`create_baseline` doesn't seem to be correct.");
 
     let bytes = {
         let mut serializer = Serializer::new(FlatBufferBuilder::new(), &baseline);
         serializer
             .serialize(&example_contract)
-            .expect("Failed to serialize ExampleContract");
+            .wrap_err("Failed to serialize ExampleContract")?;
         serializer
             .serialize(&empty_contract)
-            .expect("Failed to serialize EmptyContract");
+            .wrap_err("Failed to serialize EmptyContract")?;
         serializer.finish().finished_data().to_vec()
     };
     let (deserialized_contract, deserialized_baseline) = {
-        let mut deserializer = Deserializer::new(&bytes, BaselineKind::Main);
-        let deserialized_contract = deserializer
-            .deserialize::<ExampleContract>()
-            .expect("Failed to deserialize contract");
-        let deserialized_baseline = deserializer.finish();
+        let mut builder = DeserializerBuilder::new(&bytes, BaselineKind::Main)
+            .wrap_err("Failed to create DeserializerBuilder")?;
+        let deserialized_contract: ExampleContract = builder
+            .register_contract()
+            .wrap_err("Failed to register ExampleContract")?;
+        let mut deserializer = builder.finish();
+
+        deserializer
+            .deserialize_objects(&deserialized_contract)
+            .wrap_err("Failed to deserialize objects in ExampleContract");
+
+        let deserialized_baseline = deserializer
+            .finish()
+            .wrap_err("Failed to finish deserialization")?;
         (deserialized_contract, deserialized_baseline)
     };
 
-    check_matches_fields(&fields, &deserialized_contract, &deserialized_baseline);
-    check_matches_fields(&fields, &example_contract, &deserialized_baseline);
-    check_matches_fields(&fields, &deserialized_contract, &baseline);
+    check_matches_fields(&fields, &deserialized_contract, &deserialized_baseline)?;
+    check_matches_fields(&fields, &example_contract, &deserialized_baseline)?;
+    check_matches_fields(&fields, &deserialized_contract, &baseline)?;
+
+    Ok(())
 }
 
 fn create_baseline(fields: &[Fields]) -> (EmptyContract, ExampleContract, Baseline) {
@@ -123,7 +136,7 @@ fn create_baseline(fields: &[Fields]) -> (EmptyContract, ExampleContract, Baseli
     (empty_c, c, b)
 }
 
-fn check_matches_fields(fields: &[Fields], c: &ExampleContract, b: &Baseline) {
+fn check_matches_fields(fields: &[Fields], c: &ExampleContract, b: &Baseline) -> eyre::Result<()> {
     let mut fields = fields.to_vec();
     let cd = b
         .contract_data(c.handle())
@@ -175,4 +188,6 @@ fn check_matches_fields(fields: &[Fields], c: &ExampleContract, b: &Baseline) {
 
     // No fields should be left, because all fields were matched with baseline data
     assert_eq!(fields.len(), 0);
+
+    Ok(())
 }
