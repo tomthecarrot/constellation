@@ -44,15 +44,11 @@ impl InstantiatedStates {
         state_idx: StatesIdx,
         referenced_obj_idx: ObjectsIdx,
     ) -> Result<()> {
-        if self
-            .obj_refs
-            .insert(state_idx, referenced_obj_idx)
-            .is_none()
-        {
-            Err(eyre!("object reference was already tracked!"))
-        } else {
-            Ok(())
+        if self.obj_refs.contains_key(&state_idx) {
+            return Err(eyre!("object reference was already tracked!"));
         }
+        self.obj_refs.insert(state_idx, referenced_obj_idx);
+        Ok(())
     }
 
     pub fn get_state_handle(&self, idx: StatesIdx) -> rs::StateHandle<rs::ObjectHandle> {
