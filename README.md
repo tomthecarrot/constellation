@@ -3,7 +3,7 @@
 # Constellation by Teleportal
 
 Constellation is a time-sampled and realtime data model and spatial computing
-library. For more info, reach out to us as [hello@teleportal.app][hello email].
+library. For more info, reach out to us at [hello@teleportal.app][hello email].
 
 
 ## License
