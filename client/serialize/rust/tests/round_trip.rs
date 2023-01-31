@@ -79,27 +79,50 @@ fn test_round_trip() -> eyre::Result<()> {
             .wrap_err("Failed to serialize EmptyContract")?;
         serializer.finish().finished_data().to_vec()
     };
-    let (deserialized_contract, deserialized_baseline) = {
+    let (de_empty_contract, de_example_contract, de_baseline) = {
         let mut builder = DeserializerBuilder::new(&bytes, BaselineKind::Main)
             .wrap_err("Failed to create DeserializerBuilder")?;
-        let deserialized_contract: ExampleContract = builder
+        let de_example_contract: ExampleContract = builder
             .register_contract()
             .wrap_err("Failed to register ExampleContract")?;
+        let de_empty_contract: EmptyContract = builder
+            .register_contract()
+            .wrap_err("Failed to register EmptyContract")?;
         let mut deserializer = builder.finish();
 
         deserializer
-            .deserialize_objects(&deserialized_contract)
+            .deserialize_objects(&de_example_contract)
             .wrap_err("Failed to deserialize objects in ExampleContract")?;
+        deserializer
+            .deserialize_objects(&de_empty_contract)
+            .wrap_err("Failed to deserialize objects in EmptyContract")?;
 
-        let deserialized_baseline = deserializer
+        let de_baseline = deserializer
             .finish()
             .wrap_err("Failed to finish deserialization")?;
-        (deserialized_contract, deserialized_baseline)
+        (de_empty_contract, de_example_contract, de_baseline)
     };
 
-    check_matches_fields(&fields, &deserialized_contract, &deserialized_baseline)?;
-    check_matches_fields(&fields, &example_contract, &deserialized_baseline)?;
-    check_matches_fields(&fields, &deserialized_contract, &baseline)?;
+    // Validate that EmptyContract and its objects were deserialized propery
+    {
+        let cd = de_baseline.contract_data(de_empty_contract.handle())?;
+        assert_eq!(
+            cd.id(),
+            EmptyContract::ID,
+            "ID of deserialized EmptyContract did not match"
+        );
+        assert_eq!(
+            cd.objects().len(),
+            1,
+            "Expected deserialized EmptyContract to have exactly 1 object"
+        );
+    }
+
+    // Validate that all ExampleContract objects in the two baselines match
+    // TODO: Currently this does not check if handle types are correct!
+    check_matches_fields(&fields, &de_example_contract, &de_baseline)?;
+    check_matches_fields(&fields, &example_contract, &de_baseline)?;
+    check_matches_fields(&fields, &de_example_contract, &baseline)?;
 
     Ok(())
 }
