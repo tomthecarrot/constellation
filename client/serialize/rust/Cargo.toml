@@ -18,6 +18,7 @@ dynpath = { git = "https://github.com/TheButlah/dynpath", rev = "0058f9d5fd28cc9
 
 [dev-dependencies]
 tp_contract_example = { path = "../../contract_example/rust" }
+color-eyre = "0.6"
 
 [build-dependencies]
 flatc-rust = "0.2"

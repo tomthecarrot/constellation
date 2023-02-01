@@ -3707,6 +3707,7 @@ name = "tp_serialize"
 version = "0.0.0"
 dependencies = [
  "bimap",
+ "color-eyre",
  "dynpath",
  "eyre",
  "flatbuffers",
