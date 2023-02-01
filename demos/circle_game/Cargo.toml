@@ -15,7 +15,7 @@ publish = false
 crate-type = ["cdylib", "rlib"]
 
 [features]
-# default = ["bevy/dynamic"]
+default = ["bevy/dynamic"]
 
 # Dependencies shared by both native and WASM
 [dependencies]
