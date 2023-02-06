@@ -1,9 +1,9 @@
-use crate::{c, t};
+use crate::{fb, rs};
 
-impl From<c::TpPrimitiveType> for t::TpPrimitiveKind {
-    fn from(other: c::TpPrimitiveType) -> Self {
-        use c::TpPrimitiveType as C;
-        use t::TpPrimitiveKind as T;
+impl From<rs::TpPrimitiveType> for fb::TpPrimitiveKind {
+    fn from(other: rs::TpPrimitiveType) -> Self {
+        use fb::TpPrimitiveKind as T;
+        use rs::TpPrimitiveType as C;
         match other {
             C::U8 => T::U8,
             C::U16 => T::U16,

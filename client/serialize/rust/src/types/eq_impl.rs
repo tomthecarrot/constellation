@@ -1,10 +1,10 @@
-use crate::c;
+use crate::rs;
 
-impl PartialEq<c::TpPropertyType> for crate::primitive::TpPrimitiveKind {
-    fn eq(&self, other: &c::TpPropertyType) -> bool {
+impl PartialEq<rs::TpPropertyType> for crate::primitive::TpPrimitiveKind {
+    fn eq(&self, other: &rs::TpPropertyType) -> bool {
         use crate::primitive::TpPrimitiveKind as T;
-        use c::TpPrimitiveType as C;
-        use c::TpPropertyType::Primitive;
+        use rs::TpPrimitiveType as C;
+        use rs::TpPropertyType::Primitive;
         match (*self, other) {
             (T::U8, Primitive(C::U8))
             | (T::U16, Primitive(C::U16))
@@ -24,16 +24,16 @@ impl PartialEq<c::TpPropertyType> for crate::primitive::TpPrimitiveKind {
         }
     }
 }
-impl PartialEq<crate::primitive::TpPrimitiveKind> for c::TpPropertyType {
+impl PartialEq<crate::primitive::TpPrimitiveKind> for rs::TpPropertyType {
     fn eq(&self, other: &crate::primitive::TpPrimitiveKind) -> bool {
         other == self
     }
 }
 
-impl PartialEq<c::TpPropertyType> for crate::primitive::TpPrimitive {
-    fn eq(&self, other: &c::TpPropertyType) -> bool {
-        use c::TpPrimitiveType as C;
-        use c::TpPropertyType::Primitive;
+impl PartialEq<rs::TpPropertyType> for crate::primitive::TpPrimitive {
+    fn eq(&self, other: &rs::TpPropertyType) -> bool {
+        use rs::TpPrimitiveType as C;
+        use rs::TpPropertyType::Primitive;
         match (*self, *other) {
             (Self::U8, Primitive(C::U8))
             | (Self::U16, Primitive(C::U16))
@@ -55,7 +55,7 @@ impl PartialEq<c::TpPropertyType> for crate::primitive::TpPrimitive {
         }
     }
 }
-impl PartialEq<crate::primitive::TpPrimitive> for c::TpPropertyType {
+impl PartialEq<crate::primitive::TpPrimitive> for rs::TpPropertyType {
     fn eq(&self, other: &crate::primitive::TpPrimitive) -> bool {
         other == self
     }

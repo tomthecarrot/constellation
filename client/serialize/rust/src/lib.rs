@@ -22,24 +22,26 @@ dynpath::wrap! {
 pub use self::generated::tp_serialize::*;
 
 mod deserializer;
-pub use self::deserializer::Deserializer;
+pub use self::deserializer::{Deserializer, DeserializerBuilder};
 
 mod serializer;
 pub use self::serializer::Serializer;
 
 mod types;
 
-/// The types related to the tp_client
-mod c {
-    pub use tp_client::baseline::Baseline;
+/// The types related to the tp_client rust library
+mod rs {
+    pub use tp_client::baseline::{Baseline, BaselineKind};
     pub use tp_client::contract::properties::dynamic::{TpPrimitiveType, TpPropertyType};
-    pub use tp_client::contract::properties::states::StateHandle;
+    pub use tp_client::contract::properties::states::{
+        DynStateHandle, State, StateHandle, StateId,
+    };
     pub use tp_client::contract::{Contract, ContractData, ContractDataHandle, ContractId};
     pub use tp_client::object::ObjectHandle;
 }
 
 /// The types related to the flatbuffer
-mod t {
+mod fb {
     pub use crate::baseline::Baseline;
     pub use crate::contract::{Contract, ContractDataHandle, ContractId, ContractStates};
     pub use crate::object::{Object, ObjectHandle};
