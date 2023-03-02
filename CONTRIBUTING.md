@@ -3,7 +3,6 @@
 Thank you for helping design the future of spatial computing! This document describes
 what you need to know to contribute to this project.
 
-
 ## Contributor License Agreement
 
 We ask each contributor to sign a Contributor License Agreement (CLA). The CLA doesn't
@@ -15,14 +14,11 @@ on how to sign the CLA.
 
 The CLA can be found [here][CLA].
 
-
 ## Documentation
 
 Documentation from the rust source code can be generated and viewed with
 `cargo doc --all --no-deps --document-private-items --open`.
 
-For internal design docs and the platform spec, see the [Confluence pages][confluence].
-These are not yet available for public use.
+Internal design docs are not yet publicly accessible.
 
-[confluence]: https://teleportal.atlassian.net/wiki/spaces/ENG/pages/33528/Platform+v3
 [CLA]: CLA.md
